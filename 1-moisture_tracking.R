@@ -24,18 +24,18 @@ library(dplyr)
   # 3. mass tracking file
 read_massdata <- function(fqfn) {
   ca <- readxl::read_excel("data/Core_key.xlsx") %>% 
-    select(1:7)
+    dplyr::select(1:7)
   
   dry <- read_excel(fqfn, sheet = "initial") %>% 
-    select(Core, EmptyWt_g, DryWt_g)
+    dplyr::select(Core, EmptyWt_g, DryWt_g)
   
-  mass = readxl::read_excel(fqfn, sheet = "Mass_tracking") %>% 
+  readxl::read_excel(fqfn, sheet = "Mass_tracking") %>% 
     filter(!is.na(Site), Site != "AMB", Core != "0") %>% # remove unnecessary crap
     left_join(ca, by = "Core") %>% 
     left_join(dry, by = "Core") %>% 
     filter(is.na(skip)) %>% # exclude the rows as needed
-    select(Core, Start_datetime, Seq.Program, Core_assignment, EmptyWt_g, DryWt_g, Mass_g, Moisture) %>% 
-    mutate(Start_datetime = as.POSIXct(strptime(Start_datetime,format = "%m/%d/%Y %H:%M")), #f-ing datetime
+    dplyr::select(Core, Start_datetime, Seq.Program, Core_assignment, EmptyWt_g, DryWt_g, Mass_g, Moisture) %>% 
+    dplyr::mutate(Start_datetime = as.POSIXct(strptime(Start_datetime,format = "%m/%d/%Y %H:%M")), #f-ing datetime
 # calculate moisture content for each core
            DryWt_g = round(DryWt_g,2),
            MoistWt_g = Mass_g - EmptyWt_g,
@@ -53,4 +53,14 @@ plan <- drake_plan(
     output_file = file_out("1b-moisture_markdown.md"),
     quiet = TRUE)
 )
+
+
+
+
+
+
+
+
+
+
 

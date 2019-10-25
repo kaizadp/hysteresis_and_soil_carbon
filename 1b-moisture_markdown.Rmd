@@ -26,12 +26,13 @@ Run: `r Sys.Date()`
 
 ```{r, echo=FALSE, message=FALSE}
 source("1-moisture_tracking.R")
+
 readd("massdata") %>% 
   group_by(Core) %>% 
   dplyr::mutate(Hours = as.integer(difftime(Start_datetime, min(Start_datetime), units = "hours"))) ->
   massdata
 
-ggplot(massdata, aes(Hours, Moisture_perc, group = `Core`)) +
+ggplot(massdata, aes(Hours, Moisture_perc)) +
   geom_point() + geom_line()+
   facet_wrap(~Core_assignment)+
   ylim(0,175)
