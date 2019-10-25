@@ -1,10 +1,10 @@
 # hysteresis
 drying and wetting soils to various suctions
 
-	soils (3 levels): soil; soil+sand; soil+clay
+	soils (2 levels): soil; soil+sand
 
-	suction (5 levels): 0 kPa, -1 kPa, -10 kPa, -33 kPa, -70 kPa
-
+	moisture (5 levels): saturated, 100% w/w, 75%, 50%, dry
+		+ field moist
 	treatment (2 levels): wetting, drying
 
 
