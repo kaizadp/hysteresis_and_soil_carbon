@@ -1,0 +1,39 @@
+---
+output:
+  github_document:
+    html_preview: true
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r knitrsetup, echo=FALSE, message=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "README-"
+)
+options(tibble.print_min = 5, tibble.print_max = 5)
+library(drake)
+library(ggplot2)
+theme_set(theme_bw())
+library(dplyr)
+```
+
+# HYSTERESIS
+Tracking moisture in soil cores
+
+Run: `r Sys.Date()`
+
+```{r, echo=FALSE, message=FALSE}
+source("1-moisture_tracking.R")
+readd("massdata") %>% 
+  group_by(Core) %>% 
+  dplyr::mutate(Hours = as.integer(difftime(Start_datetime, min(Start_datetime), units = "hours"))) ->
+  massdata
+
+ggplot(massdata, aes(Hours, Moisture_perc, group = `Core`)) +
+  geom_point() + geom_line()+
+  facet_wrap(~Core_assignment)+
+  ylim(0,175)
+```
+
