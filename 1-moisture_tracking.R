@@ -4,6 +4,8 @@
 
 # tracking moisture content in soil cores
 ### taken from BBL's script TESDrydown/drake_plan.R
+# hit run/knit on the RMarkdown file, no need to run this script separately. 
+
 
 # drake plan
 
@@ -16,12 +18,10 @@ library(readxl)
 library(tidyr)
 library(dplyr)
 
-      # download_massdata <- function(fqfn) {
-      #   readxl::read_xlsx("Core_key.xlsx") %>% 
-      #     filter(is.na(skip)) %>% 
-      #     select(1:6)
-      # }
-
+# create a function that combines all the data needed for the weight/moisture calculation
+  # 1. core key
+  # 2. initial core weights, including dry weight 
+  # 3. mass tracking file
 read_massdata <- function(fqfn) {
   ca <- readxl::read_excel("data/Core_key.xlsx") %>% 
     select(1:7)
@@ -30,12 +30,13 @@ read_massdata <- function(fqfn) {
     select(Core, EmptyWt_g, DryWt_g)
   
   mass = readxl::read_excel(fqfn, sheet = "Mass_tracking") %>% 
-    filter(!is.na(Site), Site != "AMB", Core != "0") %>% 
+    filter(!is.na(Site), Site != "AMB", Core != "0") %>% # remove unnecessary crap
     left_join(ca, by = "Core") %>% 
     left_join(dry, by = "Core") %>% 
-    filter(is.na(skip)) %>% 
+    filter(is.na(skip)) %>% # exclude the rows as needed
     select(Core, Start_datetime, Seq.Program, Core_assignment, EmptyWt_g, DryWt_g, Mass_g, Moisture) %>% 
-    mutate(Start_datetime = as.POSIXct(strptime(Start_datetime,format = "%m/%d/%Y %H:%M")),
+    mutate(Start_datetime = as.POSIXct(strptime(Start_datetime,format = "%m/%d/%Y %H:%M")), #f-ing datetime
+# calculate moisture content for each core
            DryWt_g = round(DryWt_g,2),
            MoistWt_g = Mass_g - EmptyWt_g,
            Water_g = MoistWt_g - DryWt_g,
