@@ -26,10 +26,10 @@ read_massdata <- function(fqfn) {
   ca <- readxl::read_excel("data/Core_key.xlsx") %>% 
     dplyr::select(1:7)
   
-  dry <- read_excel(fqfn, sheet = "initial") %>% 
+  dry <- read_excel("data/Core_weights.xlsx", sheet = "initial") %>% 
     dplyr::select(Core, EmptyWt_g, DryWt_g)
   
-  readxl::read_excel(fqfn, sheet = "Mass_tracking") %>% 
+  readxl::read_excel("data/Core_weights.xlsx", sheet = "Mass_tracking") %>% 
     filter(!is.na(Site), Site != "AMB", Core != "0") %>% # remove unnecessary crap
     left_join(ca, by = "Core") %>% 
     left_join(dry, by = "Core") %>% 
