@@ -32,7 +32,7 @@ readd("massdata") %>%
   dplyr::mutate(Hours = as.integer(difftime(Start_datetime, min(Start_datetime), units = "hours"))) ->
   massdata
 
-ggplot(massdata, aes(Hours, Moisture_perc)) +
+ggplot(massdata, aes(Start_datetime, Moisture_perc)) +
   geom_point() + geom_line()+
   facet_wrap(~Core_assignment)+
   ylim(0,175)
