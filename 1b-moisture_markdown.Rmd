@@ -25,6 +25,7 @@ Tracking moisture in soil cores
 Run: `r Sys.Date()`
 
 ```{r, echo=FALSE, message=FALSE}
+gc()
 source("1-moisture_tracking.R")
 
 readd("massdata") %>% 
