@@ -55,9 +55,6 @@ plan <- drake_plan(
 )
 
 
-a=readd(massdata)
-
-
 
 
 
