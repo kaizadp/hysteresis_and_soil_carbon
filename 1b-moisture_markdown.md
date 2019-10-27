@@ -5,6 +5,8 @@
 
 Tracking moisture in soil cores
 
-Run: 2019-10-26
+Run: 2019-10-27
+
+    #> Warning: Removed 10 rows containing missing values (geom_point).
 
 ![](README-unnamed-chunk-1-1.png)<!-- -->

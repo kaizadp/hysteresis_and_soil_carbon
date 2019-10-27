@@ -29,13 +29,13 @@ read_massdata <- function(fqfn) {
   dry <- read_excel("data/Core_weights.xlsx", sheet = "initial") %>% 
     dplyr::select(Core, EmptyWt_g, DryWt_g)
   
-  readxl::read_excel("data/Core_weights.xlsx", sheet = "Mass_tracking") %>% 
+ readxl::read_excel("data/Core_weights.xlsx", sheet = "Mass_tracking") %>% 
     filter(!is.na(Site), Site != "AMB", Core != "0") %>% # remove unnecessary crap
     left_join(ca, by = "Core") %>% 
     left_join(dry, by = "Core") %>% 
     filter(is.na(skip)) %>% # exclude the rows as needed
-    dplyr::select(Core, Start_datetime, Seq.Program, Core_assignment, EmptyWt_g, DryWt_g, Mass_g, Moisture) %>% 
-    dplyr::mutate(Start_datetime = as.POSIXct(strptime(Start_datetime,format = "%m/%d/%Y %H:%M")), #f-ing datetime
+   # dplyr::select(Core, Stop_datetime, Seq.Program, Core_assignment, EmptyWt_g, DryWt_g, Mass_g, Moisture) %>% 
+    dplyr::mutate(Stop_datetime = as.POSIXct(strptime(Stop_datetime,format = "%m/%d/%Y %H:%M")), #f-ing datetime
 # calculate moisture content for each core
            DryWt_g = round(DryWt_g,2),
            MoistWt_g = Mass_g - EmptyWt_g,
@@ -55,7 +55,7 @@ plan <- drake_plan(
 )
 
 
-
+a=readd(massdata)
 
 
 
