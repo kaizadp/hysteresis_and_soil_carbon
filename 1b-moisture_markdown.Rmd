@@ -45,7 +45,8 @@ massdata %>%
   dplyr::filter(!is.na(moisture)) %>% 
   ungroup %>% 
   group_by(Core_assignment) %>% 
-  dplyr::summarize(moisture = round(mean(moisture),2))->current_moisture
+  dplyr::summarize(moisture = round(mean(moisture),2),
+                   time = max(Stop_datetime))->current_moisture
 
 print("Current moisture conditions")
 knitr::kable(current_moisture)
