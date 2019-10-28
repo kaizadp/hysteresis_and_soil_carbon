@@ -28,8 +28,9 @@ Run: `r Sys.Date()`
 gc()
 source("1-moisture_tracking.R")
 
-readd("massdata") %>% 
-  group_by(Core) %>% 
+# readd("massdata") %>% 
+
+mass %>% group_by(Core) %>% 
   dplyr::mutate(Hours = as.integer(difftime(Stop_datetime, min(Stop_datetime), units = "hours"))) ->
   massdata
 
@@ -37,5 +38,17 @@ ggplot(massdata, aes(Stop_datetime, Moisture_perc)) +
   geom_point() + geom_line()+
   facet_wrap(~Core_assignment)+
   ylim(0,175)
+
+massdata %>% 
+  group_by(Core) %>% 
+  mutate(moisture = if_else(Stop_datetime == max(Stop_datetime),Moisture_perc,as.numeric(NA))) %>% 
+  dplyr::filter(!is.na(moisture)) %>% 
+  ungroup %>% 
+  group_by(Core_assignment) %>% 
+  dplyr::summarize(moisture = round(mean(moisture),2))->current_moisture
+
+print("Current moisture conditions")
+knitr::kable(current_moisture)
+
  ```
 
