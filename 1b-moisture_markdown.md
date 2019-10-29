@@ -8,8 +8,8 @@ Tracking moisture in soil cores
 Run: 2019-10-28
 
     #>           used (Mb) gc trigger (Mb) limit (Mb) max used (Mb)
-    #> Ncells  653242 34.9    1246507 66.6         NA  1246507 66.6
-    #> Vcells 1118643  8.6    8388608 64.0      16384  1769699 13.6
+    #> Ncells  653242 34.9    1246521 66.6         NA  1246521 66.6
+    #> Vcells 1118643  8.6    8388608 64.0      16384  1769635 13.6
 
 ![](README-unnamed-chunk-1-1.png)<!-- -->
 
