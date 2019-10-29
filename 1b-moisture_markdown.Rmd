@@ -25,7 +25,6 @@ Tracking moisture in soil cores
 Run: `r Sys.Date()`
 
 ```{r, echo=FALSE, message=FALSE}
-gc()
 source("1-moisture_tracking.R")
 
 # readd("massdata") %>% 
@@ -34,7 +33,7 @@ mass %>% group_by(Core) %>%
   dplyr::mutate(Hours = as.integer(difftime(Stop_datetime, min(Stop_datetime), units = "hours"))) ->
   massdata
 
-ggplot(massdata, aes(Stop_datetime, Moisture_perc)) +
+ggplot(mass, aes(Stop_datetime, Moisture_perc)) +
   geom_point() + geom_line()+
   facet_wrap(~Core_assignment)+
   ylim(0,175)
