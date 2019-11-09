@@ -95,6 +95,7 @@ library(drake)
 
 plan <- drake_plan(
   picarro_raw = process_directory("data/picarro_data/"),
-  picarro_clean = clean_picarro_data(picarro_raw)
+  picarro_clean = clean_picarro_data(picarro_raw),
+  picarro_fluxes = compute_fluxes(picarro_clean)
 )
 message("Now type make(plan)")

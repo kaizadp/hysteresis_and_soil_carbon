@@ -5,9 +5,11 @@ clean_picarro_data <- function(prd) {
   
   prd %>% 
     clean_data(tz = "UTC") %>% 
-    assign_sample_numbers() ->
-    pd
+    assign_sample_numbers()
+}
+
+
+compute_fluxes <- function(pd) {
+  message("Welcome to compute_fluxes")
   
-  
-  pd
 }
