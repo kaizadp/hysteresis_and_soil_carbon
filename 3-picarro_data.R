@@ -3,5 +3,11 @@
 clean_picarro_data <- function(prd) {
   message("Welcome to clean_picarro_data")
   
-  message("All done.")
+  prd %>% 
+    clean_data(tz = "UTC") %>% 
+    assign_sample_numbers() ->
+    pd
+  
+  
+  pd
 }
