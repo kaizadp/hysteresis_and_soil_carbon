@@ -88,3 +88,13 @@ gg_vankrev <- function(data,mapping){
 # replace the initial `ggplot` function with `gg_vankrev` and use as normal
 
 ## CREATE OUTPUT FILES
+
+source("3-picarro_data.R")
+
+library(drake)
+
+plan <- drake_plan(
+  picarro_raw = process_directory("data/picarro_data/"),
+  picarro_clean = clean_picarro_data(picarro_raw)
+)
+message("Now type make(plan)")
