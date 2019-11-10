@@ -23,8 +23,8 @@ match_picarro_data <- function(pd, valve_key) {
   for(i in seq_len(nrow(valve_key))) {
     # find matches based on timestamp
     matches <- with(pd, DATETIME >= valve_key$Start_datetime[i] & 
-                    DATETIME <= valve_key$Stop_datetime[i] &
-                    MPVPosition == valve_key$Valve[i])
+                      DATETIME <= valve_key$Stop_datetime[i] &
+                      MPVPosition == valve_key$Valve[i])
     
     # update match count for each record in each dataset
     pd_match_count[matches] <- pd_match_count[matches] + 1
@@ -39,6 +39,23 @@ match_picarro_data <- function(pd, valve_key) {
   # Return the Picarro data with new 'Core' column, and counts of how many times each
   # data row was matched (should be 1) and how many rows each valve_key entry matched
   list(pd = bind_rows(results), pmc = pd_match_count, vkmc = valve_key_match_count)
+}
+
+# Check for problems in the match process
+qc_match <- function(p_clean, p_clean_matched, valve_key, p_match_count, valve_key_match_count) {
+  vkmc <- sum(valve_key_match_count > 0)
+  message(vkmc, " of ", length(valve_key_match_count), " valve key entries were matched")
+  if(any(valve_key_match_count == 0)) {
+    warning("Some valve key entries were not matched")
+  }
+  message(sum(p_match_count > 0), " of ", length(p_match_count), " Picarro data entries were matched")
+  pmc1 <- sum(p_match_count > 1)
+  if(pmc1) {
+    warning(pmc1, " Picarro data entries were matched more than once")
+  }
+  
+  p <- ggplot(p_clean, aes(DATETIME, MPVPosition, color = p_match_count)) + geom_point()
+  ggsave("outputs/qc_match.pdf", plot = p)
 }
 
 compute_fluxes <- function(pd) {

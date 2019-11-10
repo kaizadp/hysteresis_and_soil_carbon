@@ -112,8 +112,10 @@ plan <- drake_plan(
   # Match Picarro data with the valve key data
   pcm = match_picarro_data(picarro_clean, valve_key),
   picarro_clean_matched = pcm$pd,
-  picarro_match_count = pcm$pd_match_count,
+  picarro_match_count = pcm$pmc,
   valve_key_match_count = pcm$vkmc,
+  
+  qc = qc_match(picarro_clean, picarro_clean_matched, valve_key, picarro_match_count, valve_key_match_count),
   
   picarro_fluxes = compute_fluxes(picarro_clean_matched)
 )
