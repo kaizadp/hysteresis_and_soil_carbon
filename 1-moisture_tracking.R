@@ -17,6 +17,7 @@ library(googlesheets)
 library(readxl)
 library(tidyr)
 library(dplyr)
+library(lubridate)
 
 # create a function that combines all the data needed for the weight/moisture calculation
 # 1. core key
@@ -46,22 +47,30 @@ library(dplyr)
 
 ### DOING THIS WITHOUT F-ING DRAKE
 
-ca <- readxl::read_excel("data/Core_key.xlsx") %>%
-  dplyr::select(1:7)
+read_core_key <- function(filename) {
+  readxl::read_excel("data/Core_key.xlsx") %>%
+    dplyr::select(Core, soil_type, treatment, trt, Core_assignment, Moisture, skip)
+}
+ca <- read_core_key("data/Core_key.xlsx")
 
-dry <- read_excel("data/Core_weights.xlsx", sheet = "initial") %>% 
-  dplyr::select(Core, EmptyWt_g, DryWt_g)
+read_core_dryweights <- function(filename, sheet) {
+  read_excel(filename, sheet = sheet) %>% 
+    dplyr::select(Core, EmptyWt_g, DryWt_g)
+}
+dry <- read_core_dryweights("data/Core_weights.xlsx", sheet = "initial")
 
-mass <- readxl::read_excel("data/Core_weights.xlsx", sheet = "Mass_tracking") %>% 
-  filter(!is.na(Site), Site != "AMB", Core != "0") %>% # remove unnecessary crap
-  left_join(ca, by = "Core") %>% 
-  left_join(dry, by = "Core") %>% 
-  filter(is.na(skip)) %>% # exclude the rows as needed
-  dplyr::select(Core, Stop_datetime, Seq.Program, Core_assignment, EmptyWt_g, DryWt_g, Mass_g, Moisture) %>% 
-  dplyr::mutate(Stop_datetime = as.POSIXct(strptime(Stop_datetime, format = "%m/%d/%Y %H:%M")), # f-ing datetime
-                #  # calculate moisture content for each core
-                DryWt_g = round(DryWt_g,2),
-                MoistWt_g = Mass_g - EmptyWt_g,
-                Water_g = MoistWt_g - DryWt_g,
-                Moisture_perc = round(((Water_g / DryWt_g) * 100), 2))
-
+read_core_masses <- function(filename, sheet) {
+  readxl::read_excel(filename, sheet = sheet) %>% 
+    filter(!is.na(Site), Site != "AMB", Core != "0") %>% # remove unnecessary crap
+    left_join(ca, by = "Core") %>% 
+    left_join(dry, by = "Core") %>% 
+    filter(is.na(skip)) %>% # exclude the rows as needed
+    dplyr::select(Core, Stop_datetime, Seq.Program, Core_assignment, EmptyWt_g, DryWt_g, Mass_g, Moisture) %>% 
+    dplyr::mutate(Stop_datetime = as.POSIXct(strptime(Stop_datetime, format = "%m/%d/%Y %H:%M")), # f-ing datetime
+                  #  # calculate moisture content for each core
+                  DryWt_g = round(DryWt_g,2),
+                  MoistWt_g = Mass_g - EmptyWt_g,
+                  Water_g = MoistWt_g - DryWt_g,
+                  Moisture_perc = round(((Water_g / DryWt_g) * 100), 2))
+}
+mass <- read_core_masses("data/Core_weights.xlsx", sheet = "Mass_tracking")
