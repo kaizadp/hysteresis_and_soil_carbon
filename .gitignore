@@ -5,6 +5,7 @@
 
 # OS files
 .DS_Store
+Icon*
 
 # Script products
 outputs/*.png
