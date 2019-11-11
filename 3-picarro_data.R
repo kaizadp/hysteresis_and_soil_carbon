@@ -58,6 +58,21 @@ qc_match <- function(p_clean, p_clean_matched, valve_key, p_match_count, valve_k
   ggsave("outputs/qc_match.pdf", plot = p)
 }
 
+# Plot concentrations
+qc_concentrations <- function(p_clean_matched, valve_key) {
+  p_co2 <- ggplot(p_clean_matched, aes(Elapsed_seconds, CO2_dry, group = Sample_number)) + 
+    geom_line(alpha = 0.5) + 
+    facet_wrap(~Core, scales = "free_y") +
+    theme(axis.text.y = element_blank(), strip.text = element_text(size = 6))
+  ggsave("outputs/qc_co2.pdf", plot = p_co2, height = 8, width = 8)
+  
+  p_ch4 <- ggplot(p_clean_matched, aes(Elapsed_seconds, CH4_dry, group = Sample_number)) + 
+    geom_line(alpha = 0.5) + 
+    facet_wrap(~Core, scales = "free_y") +
+    theme(axis.text.y = element_blank(), strip.text = element_text(size = 6))
+  ggsave("outputs/qc_ch4.pdf", plot = p_ch4)
+}
+
 compute_fluxes <- function(pd) {
   message("Welcome to compute_fluxes")
   
