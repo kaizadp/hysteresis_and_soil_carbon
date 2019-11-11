@@ -110,16 +110,19 @@ compute_ghg_fluxes <- function(p_clean_matched, valve_key) {
 qc_fluxes <- function(ghg_fluxes, valve_key) {
   ghg_fluxes %>% 
     left_join(valve_key, by = "Core") %>% 
-    mutate(Sand = if_else(grepl("sand", Core_assignment), "Soil_sand", "Soil")) ->
+    mutate(Sand = if_else(grepl("sand", Core_assignment), "Soil_sand", "Soil"),
+           Status = case_when(grepl("_D$", Core_assignment) ~ "Dry",
+                              grepl("_W$", Core_assignment) ~ "Wet",
+                              grepl("_fm$", Core_assignment) ~ "FM")) ->
     gf
   
   p_co2 <- ggplot(gf, aes(DATETIME, flux_co2_umol_g_s, group = Core, color = Core_assignment)) + 
     geom_point() + geom_line() +
-    facet_grid(Sand ~ .)
+    facet_grid(Sand ~ Status, scale = "free")
   ggsave("outputs/fluxes_co2.pdf", plot = p_co2, width = 8, height = 6)
   p_ch4 <- ggplot(gf, aes(DATETIME, flux_ch4_nmol_g_s, group = Core, color = Core_assignment)) + 
     geom_point() + geom_line() +
-    facet_grid(Sand ~ .)
+    facet_grid(Sand ~ Status)
   ggsave("outputs/fluxes_ch4.pdf", plot = p_ch4, width = 8, height = 6)
   
 }
