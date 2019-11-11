@@ -1,0 +1,11 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+# OS files
+.DS_Store
+Icon*
+
+# Script products
+outputs/
