@@ -73,7 +73,7 @@ qc_concentrations <- function(p_clean_matched, valve_key) {
   ggsave("outputs/qc_ch4.pdf", plot = p_ch4)
 }
 
-compute_ghg_fluxes <- function(p_clean_matched) {
+compute_ghg_fluxes <- function(p_clean_matched, valve_key) {
   message("Welcome to compute_fluxes")
 
   # The instrument tubing is 455 cm long by ID 1/16"
@@ -96,19 +96,30 @@ compute_ghg_fluxes <- function(p_clean_matched) {
               flux_ch4_nmol_s = compute_flux(Elapsed_seconds, 
                                              CH4_dry / 1000,  # in ppb not ppm 
                                              volume_cm3 = V_tubing + V_picarro, 
-                                             tair_C = Tair) * 1000)
+                                             tair_C = Tair) * 1000) %>% 
+    # join with valve_key data to get dry weights
+    left_join(valve_key, by = "Core") %>% 
+    group_by(Core, Sample_number, DATETIME) %>% 
+    summarise(flux_co2_umol_s = flux_co2_umol_s,
+              flux_ch4_nmol_s = flux_ch4_nmol_s,
+              flux_co2_umol_g_s = flux_co2_umol_s / mean(DryWt_g),
+              flux_ch4_nmol_g_s = flux_ch4_nmol_s / mean(DryWt_g)) %>% 
+    ungroup()
 }
 
 qc_fluxes <- function(ghg_fluxes, valve_key) {
   ghg_fluxes %>% 
-    left_join(valve_key, by = "Core") ->
+    left_join(valve_key, by = "Core") %>% 
+    mutate(Sand = if_else(grepl("sand", Core_assignment), "Soil_sand", "Soil")) ->
     gf
   
-  p_co2 <- ggplot(gf, aes(DATETIME, flux_co2_umol_s, group = Core, color = Core_assignment)) + 
-    geom_point() + geom_line()
-  ggsave("outputs/fluxes_co2.pdf", plot = p_co2, width = 6, height = 4)
-  p_ch4 <- ggplot(gf, aes(DATETIME, flux_ch4_nmol_s, group = Core, color = Core_assignment)) + 
-    geom_point() + geom_line()
-  ggsave("outputs/fluxes_ch4.pdf", plot = p_ch4, width = 6, height = 4)
+  p_co2 <- ggplot(gf, aes(DATETIME, flux_co2_umol_g_s, group = Core, color = Core_assignment)) + 
+    geom_point() + geom_line() +
+    facet_grid(Sand ~ .)
+  ggsave("outputs/fluxes_co2.pdf", plot = p_co2, width = 8, height = 6)
+  p_ch4 <- ggplot(gf, aes(DATETIME, flux_ch4_nmol_g_s, group = Core, color = Core_assignment)) + 
+    geom_point() + geom_line() +
+    facet_grid(Sand ~ .)
+  ggsave("outputs/fluxes_ch4.pdf", plot = p_ch4, width = 8, height = 6)
   
 }
