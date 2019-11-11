@@ -73,8 +73,42 @@ qc_concentrations <- function(p_clean_matched, valve_key) {
   ggsave("outputs/qc_ch4.pdf", plot = p_ch4)
 }
 
-compute_fluxes <- function(pd) {
+compute_ghg_fluxes <- function(p_clean_matched) {
   message("Welcome to compute_fluxes")
+
+  # The instrument tubing is 455 cm long by ID 1/16"
+  V_tubing <- (1/16 * 2.54 / 2 ) ^ 2 * pi * 455
+  # Internal volume of Picarro? 
+  V_picarro <- 9 # Assume same as PP-Systems
   
+  Tair = 21  # per Kaizad
+  
+  p_clean_matched %>% 
+    group_by(Sample_number) %>% 
+    filter(n() > 1) %>% 
+    group_by(Core, Sample_number) %>% 
+    summarise(DATETIME = mean(DATETIME),
+              n = n(),
+              flux_co2_umol_s = compute_flux(Elapsed_seconds, 
+                                             CO2_dry, 
+                                             volume_cm3 = V_tubing + V_picarro, 
+                                             tair_C = Tair),
+              flux_ch4_nmol_s = compute_flux(Elapsed_seconds, 
+                                             CH4_dry / 1000,  # in ppb not ppm 
+                                             volume_cm3 = V_tubing + V_picarro, 
+                                             tair_C = Tair) * 1000)
 }
 
+qc_fluxes <- function(ghg_fluxes, valve_key) {
+  ghg_fluxes %>% 
+    left_join(valve_key, by = "Core") ->
+    gf
+  
+  p_co2 <- ggplot(gf, aes(DATETIME, flux_co2_umol_s, group = Core, color = Core_assignment)) + 
+    geom_point() + geom_line()
+  ggsave("outputs/fluxes_co2.pdf", plot = p_co2, width = 6, height = 4)
+  p_ch4 <- ggplot(gf, aes(DATETIME, flux_ch4_nmol_s, group = Core, color = Core_assignment)) + 
+    geom_point() + geom_line()
+  ggsave("outputs/fluxes_ch4.pdf", plot = p_ch4, width = 6, height = 4)
+  
+}
