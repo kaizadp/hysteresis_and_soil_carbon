@@ -50,5 +50,5 @@ massdata %>%
 print("Current moisture conditions")
 knitr::kable(current_moisture)
 
- ```
+```
 
