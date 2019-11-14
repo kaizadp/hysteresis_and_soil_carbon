@@ -103,7 +103,8 @@ compute_ghg_fluxes <- function(p_clean_matched, valve_key) {
     summarise(flux_co2_umol_s = flux_co2_umol_s,
               flux_ch4_nmol_s = flux_ch4_nmol_s,
               flux_co2_umol_g_s = flux_co2_umol_s / mean(DryWt_g),
-              flux_ch4_nmol_g_s = flux_ch4_nmol_s / mean(DryWt_g)) %>% 
+              flux_ch4_nmol_g_s = flux_ch4_nmol_s / mean(DryWt_g),
+              flux_co2_umol_gC_s = flux_co2_umol_s / mean(Carbon_g))%>% 
     ungroup()
 }
 
