@@ -52,7 +52,7 @@ theme_kp <- function() {  # this for all the elements common across plots
           panel.border = element_rect(color="black",size=1.5, fill = NA),
           
           plot.title = element_text(hjust = 0.05, size = 14),
-          axis.text = element_text(size = 14, face = "bold", color = "black"),
+          axis.text = element_text(size = 14, color = "black"),
           axis.title = element_text(size = 14, face = "bold", color = "black"),
           
           # formatting for facets
@@ -89,36 +89,4 @@ gg_vankrev <- function(data,mapping){
 
 ## CREATE OUTPUT FILES
 
-source("1-moisture_tracking.R")
-source("3-picarro_data.R")
 
-library(drake)
-
-plan <- drake_plan(
-  # Metadata
-  core_key = read_core_key(file_in("data/Core_key.xlsx")),
-  core_dry_weights = read_core_dryweights(file_in("data/Core_weights.xlsx"), sheet = "initial"),
-  core_masses = read_core_masses(file_in("data/Core_weights.xlsx"),
-                                  sheet = "Mass_tracking", core_key, core_dry_weights),
-  valve_key = filter(core_masses, Seq.Program == "CPCRW_SFDec2018.seq"),
-
-  # Picarro data
-  # Using the 'trigger' argument below means we only re-read the Picarro raw
-  # data when necessary, i.e. when the files change
-  picarro_raw = target(process_directory("data/picarro_data/"),
-                       trigger = trigger(change = list.files("data/picarro_data/", pattern = "dat$", recursive = TRUE))),
-  picarro_clean = clean_picarro_data(picarro_raw),
-  
-  # Match Picarro data with the valve key data
-  pcm = match_picarro_data(picarro_clean, valve_key),
-  picarro_clean_matched = pcm$pd,
-  picarro_match_count = pcm$pmc,
-  valve_key_match_count = pcm$vkmc,
-  
-  qc1 = qc_match(picarro_clean, picarro_clean_matched, valve_key, picarro_match_count, valve_key_match_count),
-  qc2 = qc_concentrations(picarro_clean_matched, valve_key),
-  
-  ghg_fluxes = compute_ghg_fluxes(picarro_clean_matched, valve_key),
-  qc3 = qc_fluxes(ghg_fluxes, valve_key)
-)
-message("Now type make(plan)")
