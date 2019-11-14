@@ -67,8 +67,6 @@ cum_flux %>%
     dplyr::summarize(cum = mean(cum),
                      max = mean(max))->mean,  
   
-  
-  
 # preliminary plots
 
 p_cum = ggplot(cum_flux, aes(x = moisture_lvl, y = cum*1000, color = trt))+
@@ -104,8 +102,6 @@ p_trt = ggplot(gf, aes(DATETIME, flux_co2_umol_g_s*1000, color = Core_assignment
   facet_wrap(~Core_assignment, scale = "free_x")+
   geom_hline(yintercept = 0)+
   theme(legend.position="none"),
-  
-  
   
 ggsave("outputs/fluxes_co2_cum.png", plot = p_cum, width = 8, height = 6),
 ggsave("outputs/fluxes_co2_max.png", plot = p_max, width = 8, height = 6),
