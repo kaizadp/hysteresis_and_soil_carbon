@@ -5,7 +5,7 @@
 
 Tracking moisture in soil cores
 
-Run: 2019-11-11
+Run: 2019-11-14
 
 ![](README-unnamed-chunk-1-1.png)<!-- -->
 
