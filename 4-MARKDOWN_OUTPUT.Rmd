@@ -1,9 +1,9 @@
 ---
 title: "Hysteresis and Soil C"
 author: "Kaizad Patel"
-date: "11/14/2019"
 output: word_document
 ---
+Run: `r Sys.Date()`
 
 ```{r setup, include=FALSE}
 
@@ -13,23 +13,21 @@ knitr::opts_chunk$set(echo=FALSE,message=FALSE,warning=FALSE,
                       )
 
 source("3c-picarro_output_NODRAKE.R")
+make(plan)
 
 cum_flux = readd(cum_flux)
 gf = readd(gf)
 meanflux = readd(meanflux)
 mean_percsat = readd(mean_percsat)
-
-
-
-
 ```
-Run: `r Sys.Date()`
 
 
 # 1. PICARRO DATA
 
+## negative fluxes removed
 ## initial plots, QA, QC
-number of readings
+
+1. number of readings
 
 
 ```{r num}
@@ -37,16 +35,9 @@ ggplot(cum_flux, aes(x = Core, y = n))+
     geom_point()+
     ggtitle("no. of readings")
 ```
+### NOTE: most readings removed for cores 95, 100, and some others
 
-each core
-```{r, fig.width=15, fig.height=15}
-ggplot(gf, aes(DATETIME, flux_co2_umol_g_s*1000, color = Sand)) + 
-    geom_point() + geom_line() +
-    ylab("flux_co2_nmol_g_s")+
-    facet_wrap(~Core, scale = "free_x")+
-    geom_hline(yintercept = 0)+
-    theme(legend.position="none")
-```
+2. plotting by Core_assignment
 
 ```{r, fig.width=8, fig.height=8}
 ggplot(gf, aes(DATETIME, flux_co2_umol_g_s*1000, color = Core_assignment)) + 
@@ -55,14 +46,92 @@ ggplot(gf, aes(DATETIME, flux_co2_umol_g_s*1000, color = Core_assignment)) +
     facet_wrap(~Core_assignment, scale = "free_x")+
     geom_hline(yintercept = 0)+
     theme(legend.position="none")
-  
 ```
 
+3. each core
+
+```{r cores1, fig.width=15, fig.height=15, include = FALSE}
+ggplot(gf, aes(DATETIME, flux_co2_umol_g_s*1000, color = Sand)) + 
+    geom_point() + geom_line() +
+    ylab("flux_co2_nmol_g_s")+
+    facet_wrap(~Core, scale = "free_x")+
+    geom_hline(yintercept = 0)+
+    theme(legend.position="none")
+```
+
+checking individual flux values for each core
+
+
+```{r cores2}
+ggplot(gf, aes(x = as.factor(Core), y = flux_co2_umol_g_s*1000, color = Status, shape = Sand)) + 
+  geom_point() +
+  scale_shape_manual(values = c(1,19))+
+  ylab("flux_co2_nmol_g_s")+
+  facet_wrap(~moisture_lvl, scale = "free_x")+
+  theme(axis.text.x = element_text(angle=90,hjust=1))
+```
+
+5. finding outliers
+
+outlier > 4 SD from the mean for each group
+
+```{r, fig.height=10, fig.width=12}
+gf %>% 
+  dplyr::select(Core, Core_assignment,Moisture_perc, Sand, Status, soil_type, moisture_lvl,trt,
+                DATETIME, flux_co2_umol_g_s, flux_co2_umol_gC_s) %>% 
+  group_by(Core_assignment) %>% 
+  dplyr::mutate(mean = mean(flux_co2_umol_g_s),
+                median = median(flux_co2_umol_g_s),
+                sd = sd(flux_co2_umol_g_s),
+                se = sd/sqrt(n())) %>% 
+  ungroup %>% 
+  dplyr::mutate(outlier = if_else((flux_co2_umol_g_s - mean) > 4*sd,"y",as.character(NA)))->gf_test
+
+
+
+ggplot(gf_test, aes(x = as.character(Core),y = flux_co2_umol_g_s*1000, color = outlier, shape = soil_type))+
+  geom_point()+
+  ylab("flux_co2_nmol_g_s")+
+  facet_wrap(~Core_assignment, scale = "free")
+```
+
+
+
+6. checking temporal CV (coefficient of variation) for each core
+
+
+```{r}
+ggplot(cum_flux, aes(x = as.factor(Core), y = cv, color = Status, shape = soil_type))+
+  geom_point()+
+  scale_shape_manual(values = c(1,19))+
+  facet_wrap(~moisture_lvl, scale = "free_x")+
+  theme(axis.text.x = element_text(angle=90,hjust=1))
+
+```
+
+---
+
+
+7. comparing mean and median
+
+
+```{r}
+ggplot(cum_flux, aes(x = as.factor(Core), y = (mean-median)*1000, color = Status, shape = soil_type))+
+  geom_point()+
+  scale_shape_manual(values = c(1,19))+
+  ylab("mean-median, co2_nmol_g_s")+
+  facet_wrap(~moisture_lvl, scale = "free_x")+
+  theme(axis.text.x = element_text(angle=90,hjust=1))
+
+```
+
+
 ## normalized to soil
+
 ```{r soil}
 ggplot(cum_flux, aes(x = moisture_lvl, y = cum*1000, color = trt))+
     geom_point(position = position_dodge(width = 0.5))+
-    geom_smooth(data = meanflux, aes(x = as.numeric(moisture_lvl), y = cum*1000))+
+    geom_smooth(data = meanflux, aes(x = as.numeric(moisture_lvl), y = cum*1000), linetype = "longdash", size = 0.5)+
     geom_vline(xintercept = 6.5)+
     ylab("cum flux_co2_nmol_g_s")+
     facet_grid(soil_type~.)+
@@ -70,18 +139,34 @@ ggplot(cum_flux, aes(x = moisture_lvl, y = cum*1000, color = trt))+
   
 ggplot(cum_flux, aes(x = moisture_lvl, y = max*1000, color = trt))+
     geom_point(position = position_dodge(width = 0.5))+
-    geom_smooth(data = meanflux, aes(x = as.numeric(moisture_lvl), y = max*1000))+
+    geom_smooth(data = meanflux, aes(x = as.numeric(moisture_lvl), y = max*1000), linetype = "longdash", size = 0.5)+
     geom_vline(xintercept = 6.5)+
     ylab("maximum flux_co2_nmol_g_s")+
     facet_grid(soil_type~.)+
     ggtitle("maximum CO2 flux")
+
+ggplot(cum_flux, aes(x = moisture_lvl, y = mean*1000, color = trt))+
+    geom_point(position = position_dodge(width = 0.5))+
+    geom_smooth(data = meanflux, aes(x = as.numeric(moisture_lvl), y = mean*1000), linetype = "longdash", size = 0.5)+
+    geom_vline(xintercept = 6.5)+
+    ylab("mean flux_co2_nmol_g_s")+
+    facet_grid(soil_type~.)+
+    ggtitle("mean CO2 flux")
+
+ggplot(cum_flux, aes(x = moisture_lvl, y = median*1000, color = trt))+
+    geom_point(position = position_dodge(width = 0.5))+
+    geom_smooth(data = meanflux, aes(x = as.numeric(moisture_lvl), y = median*1000), linetype = "longdash", size = 0.5)+
+    geom_vline(xintercept = 6.5)+
+    ylab("mean flux_co2_nmol_g_s")+
+    facet_grid(soil_type~.)+
+    ggtitle("mean CO2 flux")
 ```
 
 ## normalized to TC content
 ```{r carbon}
 ggplot(cum_flux, aes(x = moisture_lvl, y = cumC*1000, color = trt))+
     geom_point(position = position_dodge(width = 0.5))+
-    geom_smooth(data = meanflux, aes(x = as.numeric(moisture_lvl), y = cumC*1000))+
+    geom_smooth(data = meanflux, aes(x = as.numeric(moisture_lvl), y = cumC*1000), linetype = "longdash", size = 0.5)+
     geom_vline(xintercept = 6.5)+
     ylab("cum flux_co2_nmol_gC_s")+
     facet_grid(soil_type~.)+
@@ -89,7 +174,7 @@ ggplot(cum_flux, aes(x = moisture_lvl, y = cumC*1000, color = trt))+
   
 ggplot(cum_flux, aes(x = moisture_lvl, y = maxC*1000, color = trt))+
     geom_point(position = position_dodge(width = 0.5))+
-    geom_smooth(data = meanflux, aes(x = as.numeric(moisture_lvl), y = maxC*1000))+
+    geom_smooth(data = meanflux, aes(x = as.numeric(moisture_lvl), y = maxC*1000), linetype = "longdash", size=0.5)+
     geom_vline(xintercept = 6.5)+
     ylab("maximum flux_co2_nmol_gC_s")+
     facet_grid(soil_type~.)+
@@ -99,24 +184,26 @@ ggplot(cum_flux, aes(x = moisture_lvl, y = maxC*1000, color = trt))+
 ## using percent saturation
 ```{r perc_sat}
 
-ggplot(cum_flux, aes(x = perc_sat, y = cumC*1000, color = trt))+
+ggplot(cum_flux, aes(x = perc_sat, y = meanC*1000, color = trt))+
     geom_point(position = position_dodge(width = 0.5))+
-    geom_smooth(data = mean_percsat, aes(x = as.numeric(perc_sat), y = cumC*1000))+
+    geom_smooth(data = mean_percsat, aes(x = as.numeric(perc_sat), y = meanC*1000), linetype = "longdash", size = 0.5)+
    # geom_vline(xintercept = 6.5)+
-    ylab("cum flux_co2_nmol_gC_s")+
+    ylab("mean flux_co2_nmol_gC_s")+
     facet_grid(soil_type~.)+
     scale_x_reverse(name = "percent saturation")+
-    ggtitle("cumulative CO2 flux per g C")
+    ggtitle("mean CO2 flux per g C")
   
 ggplot(cum_flux, aes(x = perc_sat, y = maxC*1000, color = trt))+
     geom_point(position = position_dodge(width = 0.5))+
-    geom_smooth(data = mean_percsat, aes(x = as.numeric(perc_sat), y = maxC*1000))+
+    geom_smooth(data = mean_percsat, aes(x = as.numeric(perc_sat), y = maxC*1000), linetype = "longdash", size = 0.5)+
     # geom_vline(xintercept = 6.5)+
     ylab("max flux_co2_nmol_gC_s")+
     facet_grid(soil_type~.)+
     scale_x_reverse(name = "percent saturation")+
     ggtitle("max CO2 flux per g C")
 ```
+
+
 
 
 ## questions

@@ -10,7 +10,8 @@ source("3-picarro_data.R")
 #devtools::install_github("jakelawlor/PNWColors") 
 #library(PNWColors)
 
-core_key = read_core_key(file_in("data/Core_key.xlsx")) %>% 
+plan <- drake_plan(
+  core_key = read_core_key(file_in("data/Core_key.xlsx")) %>% 
   filter(is.na(skip)) %>% 
   dplyr::mutate(Moisture = dplyr::recode(Moisture,
                                          "100.0"="100",
@@ -29,20 +30,20 @@ core_key = read_core_key(file_in("data/Core_key.xlsx")) %>%
 #               perc_sat = if_else(moisture_lvl=="fm","fm", case_when(soil_type=="Soil"~as.character(as.integer(as.integer(as.character(moisture_lvl))/140*100)), soil_type=="Soil_sand"~as.character(as.integer(as.integer(as.character(moisture_lvl))/100*100))))),
                 perc_sat = if_else(moisture_lvl=="fm",as.integer(NA),
                                    case_when(soil_type=="Soil"~(as.integer(as.integer(as.character(moisture_lvl))/140*100)),
-                                             soil_type=="Soil_sand"~(as.integer(as.integer(as.character(moisture_lvl))/100*100)))))
+                                             soil_type=="Soil_sand"~(as.integer(as.integer(as.character(moisture_lvl))/100*100))))),
                                    
                                    
                                    
 
-core_dry_weights = read_core_dryweights(file_in("data/Core_weights.xlsx"), sheet = "initial")
+core_dry_weights = read_core_dryweights(file_in("data/Core_weights.xlsx"), sheet = "initial"),
 
 core_masses = read_core_masses(file_in("data/Core_weights.xlsx"),
-                               sheet = "Mass_tracking", core_key, core_dry_weights)
+                               sheet = "Mass_tracking", core_key, core_dry_weights),
 
-valve_key = filter(core_masses, Seq.Program == "CPCRW_SFDec2018.seq")
+valve_key = filter(core_masses, Seq.Program == "CPCRW_SFDec2018.seq"),
 
 
-plan <- drake_plan(
+
   # Picarro data
   # Using the 'trigger' argument below means we only re-read the Picarro raw
   # data when necessary, i.e. when the files change
@@ -62,29 +63,56 @@ plan <- drake_plan(
   ghg_fluxes = compute_ghg_fluxes(picarro_clean_matched, valve_key),
   qc3 = qc_fluxes(ghg_fluxes, valve_key),
   
-  # compute fluxes per gram of C
-  
+gf = 
+  ghg_fluxes %>% 
+  left_join(valve_key, by = "Core") %>% 
+  mutate(Sand = if_else(grepl("sand", Core_assignment), "Soil_sand", "Soil"),
+         Status = case_when(grepl("_D$", Core_assignment) ~ "Dry",
+                            grepl("_W$", Core_assignment) ~ "Wet",
+                            grepl("_fm$", Core_assignment) ~ "FM")) %>% 
+  filter(flux_co2_umol_g_s>=0) %>% 
+  left_join(select(core_key, Core,moisture_lvl,trt),by = "Core"),
+
   #summarizing  
   cum_flux = 
-    ghg_fluxes %>%
+    gf %>%
     group_by(Core) %>% 
     dplyr::summarise(cum = sum(flux_co2_umol_g_s),
                      max = max(flux_co2_umol_g_s),
                      cumC = sum(flux_co2_umol_gC_s),
                      maxC = max(flux_co2_umol_gC_s),
                      mean = mean(flux_co2_umol_g_s),
+                     meanC = mean(flux_co2_umol_gC_s),
+                     median = median(flux_co2_umol_g_s),
+                     medianC = median(flux_co2_umol_gC_s),
                      sd = sd(flux_co2_umol_g_s),
+                     sdC = sd(flux_co2_umol_gC_s),
+                     cv = sd/mean,
+                     cvC = sdC/meanC,
                      se = sd/sqrt(n()),
                      n = n()) %>% 
-    left_join(core_key, by = "Core"),
-  
+  left_join(core_key, by = "Core"),  
+
+#testing for outliers  
+  gf_test = gf %>% group_by(Core_assignment) %>% 
+  dplyr::mutate(mean_grp = mean(flux_co2_umol_g_s),
+                sd_grp = sd(flux_co2_umol_g_s)) %>% 
+  ungroup %>% 
+  dplyr::mutate(outlier = if_else((flux_co2_umol_g_s - mean_grp) > 4*sd_grp,"y",as.character(NA))) %>% 
+  dplyr::filter(is.na(outlier)),
+#  
+
   meanflux = 
     cum_flux %>% 
     group_by(soil_type,moisture_lvl,trt) %>% 
     dplyr::summarize(cum = mean(cum),
                      max = mean(max),
                      cumC = mean(cumC),
-                     maxC = mean(maxC)),
+                     maxC = mean(maxC),
+                     mean = mean(mean),
+                     meanC = mean(meanC),
+                     median = mean(median),
+                     medianC = mean(medianC)),
   
   mean_percsat = 
     cum_flux %>% 
@@ -92,18 +120,33 @@ plan <- drake_plan(
     dplyr::summarize(cum = mean(cum),
                      max = mean(max),
                      cumC = mean(cumC),
-                     maxC = mean(maxC)),
-  gf = 
-    ghg_fluxes %>% 
-    left_join(valve_key, by = "Core") %>% 
-    mutate(Sand = if_else(grepl("sand", Core_assignment), "Soil_sand", "Soil"),
-           Status = case_when(grepl("_D$", Core_assignment) ~ "Dry",
-                              grepl("_W$", Core_assignment) ~ "Wet",
-                              grepl("_fm$", Core_assignment) ~ "FM"))
+                     maxC = mean(maxC),
+                     mean = mean(mean),
+                     meanC = mean(meanC))
+  
   
   )
   
-make(plan)
+gf = readd(gf)
+
+gf %>% 
+  dplyr::select(Core, Core_assignment,Moisture_perc, Sand, Status, soil_type, moisture_lvl,trt,
+                DATETIME, flux_co2_umol_g_s, flux_co2_umol_gC_s) %>% 
+  group_by(Core_assignment) %>% 
+  dplyr::mutate(mean = mean(flux_co2_umol_g_s),
+                sd = sd(flux_co2_umol_g_s),
+                outlier = if_else((flux_co2_umol_g_s-mean)/sd > 3,"y",as.character(NA)))->gf_test
+
+
+
+ggplot(gf_test, aes(x = as.character(Core),y = flux_co2_umol_g_s*1000, color = outlier, shape = soil_type))+
+  geom_point()+
+  facet_wrap(~Core_assignment, scale = "free_x")
+
+
+
+
+
 
 ##  picarro_clean_matched = readd(picarro_clean_matched)
 ##  
