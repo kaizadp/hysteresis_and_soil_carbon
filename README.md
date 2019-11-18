@@ -1,7 +1,7 @@
 # hysteresis
 drying and wetting soils to various suctions
 
-	soils (2 levels): soil; soil+sand
+	soils (2 levels): soil (Sandy Clay Loam); soil+sand (Sandy Loam)
 
 	moisture (5 levels): saturated, 100% w/w, 75%, 50%, dry
 		+ field moist
