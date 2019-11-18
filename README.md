@@ -22,4 +22,12 @@ drying and wetting soils to various suctions
  - ignore tabs marked `x_`
  
  
+ 
+ TC = 8.34 % in SCL, 5.56% in SL
+
+||Soil_type 1|Soil_type 2|
+|--|--|--|
+Texture| SCL | SL|
+TC| 8.34 %| 5.56% |
+Saturation moisture| 140% w/w| 100% w/w
 
