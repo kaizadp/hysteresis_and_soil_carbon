@@ -1,7 +1,12 @@
 # hysteresis
 drying and wetting soils to various suctions
 
-	soils (2 levels): soil (Sandy Clay Loam SCL); soil+sand (Sandy Loam SL)
+
+||Soil_type 1|Soil_type 2|
+|--|--|--|
+Texture| SCL | SL|
+TC| 8.34 %| 5.56% |
+Saturation moisture| 140% w/w| 100% w/w
 
 	moisture (5 levels): saturated, 100% w/w, 75%, 50%, dry
 		+ field moist
@@ -23,11 +28,5 @@ drying and wetting soils to various suctions
  
  
  
- TC = 8.34 % in SCL, 5.56% in SL
 
-||Soil_type 1|Soil_type 2|
-|--|--|--|
-Texture| SCL | SL|
-TC| 8.34 %| 5.56% |
-Saturation moisture| 140% w/w| 100% w/w
 
