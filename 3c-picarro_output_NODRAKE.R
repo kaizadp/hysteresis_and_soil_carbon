@@ -71,9 +71,17 @@ gf =
                             grepl("_W$", Core_assignment) ~ "Wet",
                             grepl("_fm$", Core_assignment) ~ "FM")) %>% 
   filter(flux_co2_umol_g_s>=0) %>% 
-  left_join(select(core_key, Core,moisture_lvl,trt),by = "Core"),
+  left_join(select(core_key, Core,moisture_lvl,trt),by = "Core") %>% 
+  # remove outliers
+  group_by(Core_assignment) %>% 
+  dplyr::mutate(mean = mean(flux_co2_umol_g_s),
+                median = median(flux_co2_umol_g_s),
+                sd = sd(flux_co2_umol_g_s)) %>% 
+  ungroup %>% 
+  dplyr::mutate(outlier = if_else((flux_co2_umol_g_s - mean) > 4*sd,"y",as.character(NA))) %>% 
+  dplyr::filter(is.na(outlier)),
 
-  #summarizing  
+#summarizing  
   cum_flux = 
     gf %>%
     group_by(Core) %>% 
@@ -127,22 +135,22 @@ gf =
   
   )
   
-gf = readd(gf)
-
-gf %>% 
-  dplyr::select(Core, Core_assignment,Moisture_perc, Sand, Status, soil_type, moisture_lvl,trt,
-                DATETIME, flux_co2_umol_g_s, flux_co2_umol_gC_s) %>% 
-  group_by(Core_assignment) %>% 
-  dplyr::mutate(mean = mean(flux_co2_umol_g_s),
-                sd = sd(flux_co2_umol_g_s),
-                outlier = if_else((flux_co2_umol_g_s-mean)/sd > 3,"y",as.character(NA)))->gf_test
-
-
-
-ggplot(gf_test, aes(x = as.character(Core),y = flux_co2_umol_g_s*1000, color = outlier, shape = soil_type))+
-  geom_point()+
-  facet_wrap(~Core_assignment, scale = "free_x")
-
+      ##  gf = readd(gf)
+      ##  
+      ##  gf %>% 
+      ##    dplyr::select(Core, Core_assignment,Moisture_perc, Sand, Status, soil_type, moisture_lvl,trt,
+      ##                  DATETIME, flux_co2_umol_g_s, flux_co2_umol_gC_s) %>% 
+      ##    group_by(Core_assignment) %>% 
+      ##    dplyr::mutate(mean = mean(flux_co2_umol_g_s),
+      ##                  sd = sd(flux_co2_umol_g_s),
+      ##                  outlier = if_else((flux_co2_umol_g_s-mean)/sd > 3,"y",as.character(NA)))->gf_test
+      ##  
+      ##  
+      ##  
+      ##  ggplot(gf_test, aes(x = as.character(Core),y = flux_co2_umol_g_s*1000, color = outlier, shape = soil_type))+
+      ##    geom_point()+
+      ##    facet_wrap(~Core_assignment, scale = "free_x")
+      ##  
 
 
 
