@@ -1,7 +1,12 @@
 # hysteresis
 drying and wetting soils to various suctions
 
-	soils (2 levels): soil; soil+sand
+
+||Soil_type 1|Soil_type 2|
+|--|--|--|
+Texture| SCL | SL|
+TC| 8.34 %| 5.56% |
+Saturation moisture| 140% w/w| 100% w/w
 
 	moisture (5 levels): saturated, 100% w/w, 75%, 50%, dry
 		+ field moist
@@ -22,4 +27,6 @@ drying and wetting soils to various suctions
  - ignore tabs marked `x_`
  
  
+ 
+
 
