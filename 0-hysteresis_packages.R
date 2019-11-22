@@ -88,5 +88,5 @@ gg_vankrev <- function(data,mapping){
 # replace the initial `ggplot` function with `gg_vankrev` and use as normal
 
 ## CREATE OUTPUT FILES
-
-
+COREKEY = "data/processed/corekey.csv"
+WSOC = "data/processed/wsoc.csv"

@@ -1,20 +1,29 @@
 
 source("0-hysteresis_packages.R")
 
+### CONSTANT VALUES USED IN CALCULATIONS
 TC = 8.34 #carbon percentage
 GMOISTURE = 0.7123 # 71.23% w/w gravimetric moisture
 GMOISTURE_SAND = round(GMOISTURE*20/30,4)
+###
 
-core_weights = read_excel("data/Core_weights.xlsx", sheet = "initial") %>% 
+# process and clean the core_weights file
+core_weights = 
+  read_excel("data/Core_weights.xlsx", sheet = "initial") %>% 
   dplyr::select(Core, EmptyWt_g, Total_g,Soil_g, Sand_g) %>% 
   dplyr::mutate(DryWt_g = round((Soil_g/(GMOISTURE+1))+Sand_g,2),
                 Carbon_g = round((Soil_g/(GMOISTURE+1))*(TC/100),2))
 
-core_key = read_excel("data/Core_key.xlsx") %>% 
+# process and clean the core_key file
+core_key = 
+  read_excel("data/Core_key.xlsx") %>% 
   select(Core, soil_type, treatment, trt, Core_assignment, Moisture, skip) %>% 
+
 # create new columns for various factors
   
-  dplyr::mutate(Moisture2 = if_else(soil_type=="Soil"&Moisture=="fm",GMOISTURE*100,
+  dplyr::mutate(texture = case_when(soil_type=="Soil"~"SCL",
+                                    soil_type=="Soil_sand"~"SL"),
+                Moisture2 = if_else(soil_type=="Soil"&Moisture=="fm",GMOISTURE*100,
                                    if_else(soil_type=="Soil_sand"&Moisture=="fm",GMOISTURE_SAND*100,as.numeric(Moisture))),
                 
                 
@@ -41,3 +50,5 @@ core_key = read_excel("data/Core_key.xlsx") %>%
                 Moisture_perc = round(((Water_g / DryWt_g) * 100), 2)) %>% 
   dplyr::select(-(EmptyWt_g:Sand_g), -(MoistWt_g:Water_g))
 
+### OUTPUT
+write.csv(core_key,COREKEY, row.names = F,na = "")
