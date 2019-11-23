@@ -28,10 +28,11 @@ wsoc_processed =
   wsoc_raw %>% 
 # remove the appropriate rows
 # in this case, we want Remove==NA and Excluded==1
-  filter(is.na(Remove),
-         Excluded=="1") %>% 
+  filter(is.na(Remove)) %>% 
 # subset only the relevant columns, Sample Name and Area
   dplyr::select(`Sample Name`, Area) %>% 
+  group_by(`Sample Name`) %>% 
+  dplyr::summarise(Area = mean(Area)) %>% 
 # the `Sample Name`` column is actually vial numbers, recorded as "Vial 1", "Vial 2", etc. Create a new column Vial_no by removing the "Vial " string at the start of the name.
   mutate(Vial_no = str_remove(`Sample Name`, "Vial ")) %>%
 # now combine with the wsoc_key
@@ -102,17 +103,51 @@ wsoc_weights =
 
 wsoc_results = wsoc_samples %>% 
   left_join(wsoc_weights, by = "Core") %>% 
-  dplyr::mutate(wsoc_mg_g = round(npoc_mg_l * (40+WSOC_water_g)/(WSOC_drywt_g*1000),3)) %>% 
-  dplyr::select(Core,soil_type, texture, treatment, moisture_lvl, perc_sat, npoc_mg_l, wsoc_mg_g),
+  dplyr::mutate(wsoc_mg_g = round(npoc_mg_l * (40+WSOC_water_g)/(WSOC_drywt_g*1000),3),
+                wsoc_mg_gC = round(npoc_mg_l * (40+WSOC_water_g)/(Carbon_g*1000),3),
+                perc_sat_actual = case_when(soil_type=="Soil" ~ (gmoist/140)*100,
+                                            soil_type=="Soil_sand" ~ (gmoist/100)*100)) %>% 
+  dplyr::select(Core,soil_type, texture, treatment, moisture_lvl, perc_sat, gmoist,npoc_mg_l, wsoc_mg_g,wsoc_mg_gC,perc_sat_actual),
 
 write.csv(wsoc_results, WSOC, row.names = F, na=""))
 
-message("Now type: make(wsoc_plan)")
+message("Now type: clean(garbage_collection = T)
+and then: make(wsoc_plan)
+GRRR drake")
 
 
-WSOC = readd(WSOC)
-ggplot(WSOC, aes(x = perc_sat, y = wsoc_mg_g, color = treatment))+
+
+### post-drake processing
+wsoc_processed = readd(wsoc_processed)
+wsoc_raw = readd(wsoc_raw)
+wsoc_processed = readd(wsoc_processed)
+
+
+wsoc_results = readd(wsoc_results)
+
+ggplot(wsoc_results, aes(x = perc_sat, y = wsoc_mg_g, color = treatment))+
   geom_point()+
-  facet_wrap(~soil_type)+
-  scale_x_reverse(name = "percent saturation")
+  facet_grid(soil_type~.)+
+  labs(caption="normalized to soil weight (g)")+
+  scale_x_reverse(name = "percent saturation")+
+  theme_kp()
   
+ggplot(wsoc_results, aes(x = perc_sat, y = wsoc_mg_gC, color = treatment))+
+  geom_point()+
+  facet_grid(soil_type~.)+
+  labs(caption="normalized to Carbon (g)")+
+  scale_x_reverse(name = "percent saturation")+
+  theme_kp()
+
+ggplot(wsoc_results[!wsoc_results$treatment=="FM",], aes(x = gmoist, y = wsoc_mg_g, color = treatment))+
+  geom_point()+
+  geom_smooth(data = wsoc_results[!wsoc_results$moisture_lvl==5&!wsoc_results$treatment=="FM",],aes(x = gmoist, y = wsoc_mg_g, color = treatment))+
+  scale_x_reverse(name = "gmoist")+
+  theme_kp()
+
+ggplot(wsoc_results[!wsoc_results$treatment=="FM",], aes(x = perc_sat_actual, y = wsoc_mg_g, color = treatment))+
+  geom_point()+
+  geom_smooth(data = wsoc_results[!wsoc_results$moisture_lvl==5&!wsoc_results$treatment=="FM",],aes(x = perc_sat_actual, y = wsoc_mg_g, color = treatment))+
+  facet_grid(soil_type~.)+
+  scale_x_reverse(name = "percent saturation")+
+  theme_kp()

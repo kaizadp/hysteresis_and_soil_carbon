@@ -23,6 +23,9 @@ core_key =
   
   dplyr::mutate(texture = case_when(soil_type=="Soil"~"SCL",
                                     soil_type=="Soil_sand"~"SL"),
+                
+                treatment = if_else(Moisture=="fm", "FM", treatment),
+                  
                 Moisture2 = if_else(soil_type=="Soil"&Moisture=="fm",GMOISTURE*100,
                                    if_else(soil_type=="Soil_sand"&Moisture=="fm",GMOISTURE_SAND*100,as.numeric(Moisture))),
                 
@@ -38,8 +41,10 @@ core_key =
                                                        if_else(soil_type=="Soil_sand"&Moisture=="100","40",as.character((Moisture)))))),
                 
                 
-                perc_sat = case_when(soil_type=="Soil"~(as.integer(as.integer(as.character(moisture_lvl))/140*100)),
-                                             soil_type=="Soil_sand"~(as.integer(as.integer(as.character(moisture_lvl))/100*100)))) %>% 
+                perc_sat = case_when(!moisture_lvl=="fm"&soil_type=="Soil"~(as.integer(as.integer(as.character(moisture_lvl))/140*100)),
+                                     !moisture_lvl=="fm"&soil_type=="Soil_sand"~(as.integer(as.integer(as.character(moisture_lvl))/100*100)),
+                                     moisture_lvl=="fm"&soil_type=="Soil" ~ as.integer((GMOISTURE*100/140)*100),
+                                     moisture_lvl=="fm"&soil_type=="Soil_sand" ~ as.integer((GMOISTURE_SAND*100/140)*100)))%>% 
   
   
   dplyr::mutate(moisture_lvl = factor(moisture_lvl, levels = c("140","100","75","50","40","5","fm"))) %>% 
