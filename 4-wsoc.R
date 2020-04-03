@@ -106,7 +106,8 @@ wsoc_results = wsoc_samples %>%
   dplyr::mutate(wsoc_mg_g = round(npoc_mg_l * (40+WSOC_water_g)/(WSOC_drywt_g*1000),3),
                 wsoc_mg_gC = round(npoc_mg_l * (40+WSOC_water_g)/(Carbon_g*1000),3),
                 perc_sat_actual = case_when(soil_type=="Soil" ~ (gmoist/140)*100,
-                                            soil_type=="Soil_sand" ~ (gmoist/100)*100)) %>% 
+                                            soil_type=="Soil_sand" ~ (gmoist/100)*100),
+                perc_sat_actual = if_else(perc_sat_actual>100,100,perc_sat_actual)) %>% 
   dplyr::select(Core,soil_type, texture, treatment, moisture_lvl, perc_sat, gmoist,npoc_mg_l, wsoc_mg_g,wsoc_mg_gC,perc_sat_actual),
 
 write.csv(wsoc_results, WSOC, row.names = F, na=""))

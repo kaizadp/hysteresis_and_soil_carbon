@@ -1,0 +1,145 @@
+---
+title: "Hysteresis and Soil C"
+author: "Kaizad Patel"
+output: html_document
+---
+Run: `r Sys.Date()`
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(dpi = 300,
+                      echo=FALSE,message=FALSE,warning=FALSE,
+                      collapse = TRUE,
+                      comment = "#>", 
+                      fig.path = "images/")
+```
+
+
+```{r hyprop, fig.width=9, dpi=300}
+source("2-hyprop.R")
+
+ggplot(hyprop, aes(y = kPa, x = perc_sat, color = treatment, linetype=treatment))+
+  geom_path(size=1.5)+
+  scale_color_manual(labels = c("drying","rewetting"), values = c("darkorange2","gray40"), na.translate=F)+
+  scale_linetype_manual(labels = c("drying","rewetting"), values = c("solid","twodash"), na.translate=F)+
+  facet_wrap(.~soiltype)+
+  ylab ("tension, kPa")+
+  scale_x_reverse(name = "percent saturation")+
+  theme_kp()
+
+
+ggplot(hyprop, aes(y = kPa, x = perc_sat, color = treatment, linetype=treatment))+
+  geom_path(size=1.5)+
+  scale_color_manual(labels = c("drying","rewetting"), values = c("darkorange2","gray40"), na.translate=F)+
+  scale_linetype_manual(labels = c("drying","rewetting"), values = c("solid","twodash"), na.translate=F)+
+  facet_wrap(.~soiltype)+
+  ylab ("tension, kPa (log scale)")+
+  xlab ("percent saturation")+
+#  scale_x_reverse(name = "percent saturation")+
+  scale_y_log10()+
+ # xlim(0,100)+
+  theme_kp()
+```
+
+
+
+
+```{r picarro}
+source("3c-picarro_output_NODRAKE.R")
+make(plan)
+
+cum_flux = readd(cum_flux)
+gf = readd(gf)
+meanflux = readd(meanflux)
+mean_percsat = readd(mean_percsat)
+
+labels = c(`soil` = "Soil", `soil_sand` = "Soil+Sand")
+
+cum_flux %>% 
+  mutate(soil_type = dplyr::recode(soil_type, `Soil` = "Soil", `Soil_sand` = "Soil + Sand"))->
+  cum_flux
+
+mean_percsat %>% 
+  ungroup %>% 
+  mutate(soil_type = dplyr::recode(soil_type, `Soil` = "Soil", `Soil_sand` = "Soil + Sand"))->
+  mean_percsat
+```
+
+
+
+```{r respiration, fig.width=9}
+ggplot(cum_flux, aes(x = perc_sat, y = meanC*1000, color = trt, shape=trt))+
+  geom_point(position = position_dodge(width = 0.5), size=3, stroke=1.5)+
+  geom_smooth(data = mean_percsat, aes(x = as.numeric(perc_sat), y = meanC*1000), linetype = "longdash", size = 1, se=FALSE)+
+   # geom_vline(xintercept = 6.5)+
+  ylab("mean flux_co2_nmol_gC_s")+
+  scale_color_manual(labels = c("drying","rewetting"), values = c("darkorange2","gray40"), na.translate=F)+
+  scale_shape_manual(labels = c("drying","rewetting"), values = c(16,1), na.translate=F)+
+  facet_grid(.~soil_type)+
+  #scale_x_reverse(name = "percent saturation")+
+  ylab(expression(bold(paste("mean CO"[2]," flux, nmol g"^{-1}, "s"^{-1}))))+
+  xlab("percent saturation")+
+  #ggtitle("mean CO2 flux per g C")+
+  theme_kp()
+```
+
+```{r wsoc1}
+
+source("4-wsoc.R")
+make(wsoc_plan)
+
+
+wsoc_processed = readd(wsoc_processed)
+wsoc_raw = readd(wsoc_raw)
+wsoc_results = readd(wsoc_results)
+
+
+wsoc_results %>% 
+  mutate(soil_type = dplyr::recode(soil_type, `Soil` = "Soil", `Soil_sand` = "Soil + Sand"))->wsoc_results
+
+
+```
+
+```{r wsoc_graphs, fig.width=9}
+
+ggplot(wsoc_results, aes(x = perc_sat, y = wsoc_mg_g, color = treatment, shape = treatment))+
+  geom_point(size=3, stroke=1.5)+
+  scale_color_manual(labels = c("drying","field moist","rewetting"), values = c("darkorange2","black","gray40"), na.translate=F)+
+  scale_shape_manual(labels = c("drying","field moist","rewetting"), values = c(16,4,1), na.translate=F)+
+  facet_grid(.~soil_type)+
+  ylab(expression(bold(paste("WSOC, mg g"^{-1}))))+
+  xlab("percent saturation")+
+#  scale_x_reverse(name = "percent saturation")+
+  theme_kp()
+
+
+ggplot(wsoc_results[!wsoc_results$treatment=="FM",], aes(x = perc_sat_actual, y = wsoc_mg_g, color = treatment, shape = treatment))+
+  geom_point(size=3, stroke=1.5)+
+  geom_smooth(data = wsoc_results[!wsoc_results$moisture_lvl==5&!wsoc_results$treatment=="FM",],
+              aes(x = perc_sat_actual, y = wsoc_mg_g, color = treatment), linetype = "longdash", size = 1, se=FALSE)+
+  scale_color_manual(labels = c("drying","rewetting"), values = c("darkorange2","gray40"), na.translate=F)+
+  scale_shape_manual(labels = c("drying","rewetting"), values = c(16,1), na.translate=F)+
+  facet_grid(.~soil_type)+
+  ylab(expression(bold(paste("WSOC, mg g"^{-1}))))+
+  xlab("percent saturation")+
+  #scale_x_reverse(name = "percent saturation")+
+  theme_kp()
+
+```
+
+```{r}
+# merge wsoc_results and cum_flux
+
+merged = 
+  wsoc_results %>% 
+  mutate(Core = as.numeric(Core)) %>% 
+  left_join(cum_flux, by = "Core")
+
+names(merged)
+ 
+ggplot(merged[!merged$moisture_lvl.x==5,], aes(x = wsoc_mg_g, y = mean, color = perc_sat_actual))+
+  geom_point()+
+  facet_grid(treatment.y~soil_type.x)
+
+```
+
