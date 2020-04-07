@@ -1,0 +1,97 @@
+---
+title: "7-nmr_markdown"
+author: "Kaizad Patel"
+date: "4/7/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE,message=FALSE,warning=FALSE,
+                      collapse = TRUE,
+                      comment = "#>", 
+                      fig.path = "images/7b-nmr_markdown/"
+                      )
+
+source("0-hysteresis_packages.R")
+source("7a-nmr_spectra_setup.R")
+source("6b-nmr_peaks_relabund.R")
+```
+
+## SPECTRA 
+
+```{r}
+spectra = read.csv("data/processed/nmr_spectra.csv.gz")
+
+spectra_plot = 
+  spectra %>% 
+  dplyr::mutate(Core = as.character(Core)) %>% 
+    na.omit()
+```
+
+
+```{r nmr_spectra, fig.width=15, fig.height=10}
+gg_nmr+
+  geom_path(data=spectra_plot[spectra_plot$sat_level=="100",], aes(x = ppm, y = intensity, color = Core),
+            alpha = 0.5)+
+  ylim(-0.3,7)+
+  facet_grid(treatment~texture)+theme(legend.position = "none")+
+  ggtitle("100 % saturation")
+
+gg_nmr+
+  geom_path(data=spectra_plot[spectra_plot$sat_level=="75",], aes(x = ppm, y = intensity, color = Core),
+            alpha = 0.5)+
+  ylim(-0.3,7)+
+  facet_grid(treatment~texture)+theme(legend.position = "none")+
+  ggtitle("75 % saturation")
+
+gg_nmr+
+  geom_path(data=spectra_plot[spectra_plot$sat_level=="50",], aes(x = ppm, y = intensity, color = Core),
+            alpha = 0.5)+
+  ylim(-0.3,7)+
+  facet_grid(treatment~texture)+theme(legend.position = "none")+
+  ggtitle("50 % saturation")
+
+gg_nmr+
+  geom_path(data=spectra_plot[spectra_plot$sat_level=="35",], aes(x = ppm, y = intensity, color = Core),
+            alpha = 0.5)+
+  ylim(-0.3,7)+
+  facet_grid(treatment~texture)+theme(legend.position = "none")+
+  ggtitle("35 % saturation")
+
+gg_nmr+
+  geom_path(data=spectra_plot[spectra_plot$sat_level=="5",], 
+            aes(x = ppm, y = intensity, color = Core),
+            alpha = 0.5)+
+  ylim(-0.3,7)+
+  facet_grid(treatment~texture)+theme(legend.position = "none")+
+  ggtitle("5 % saturation")
+
+
+```
+
+
+## PEAKS
+relative abundance for each sample
+```{r, fig.width=30, fig.height=30}
+## plots ----
+ggplot(data=rel_abund[rel_abund$soil_type=="Soil"&!rel_abund$treatment=="FM",], aes(x="", y=relabund, fill=group)) +
+  geom_bar(stat="identity", alpha=0.7) +
+  #geom_text(aes(x= "", y=pos, label = relabund), size=4) +  # note y = pos
+  #facet_wrap(facets = .~source, labeller = label_value) +
+  facet_wrap(sat_level+treatment~Core)+
+  coord_polar(theta = "y")+
+  theme_bw()+
+  ggtitle("SCL")
+
+
+ggplot(data=rel_abund[rel_abund$soil_type=="Soil_sand"&!rel_abund$treatment=="FM",], aes(x="", y=relabund, fill=group)) +
+  geom_bar(stat="identity", alpha=0.7) +
+  #geom_text(aes(x= "", y=pos, label = relabund), size=4) +  # note y = pos
+  #facet_wrap(facets = .~source, labeller = label_value) +
+  facet_wrap(sat_level+treatment~Core)+
+  coord_polar(theta = "y")+
+  theme_bw()+
+  ggtitle("SL")
+
+```
+
