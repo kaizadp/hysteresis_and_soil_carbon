@@ -2,7 +2,7 @@
 title: "7-nmr_markdown"
 author: "Kaizad Patel"
 date: "4/7/2020"
-output: html_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
@@ -94,4 +94,5 @@ ggplot(data=rel_abund[rel_abund$soil_type=="Soil_sand"&!rel_abund$treatment=="FM
   ggtitle("SL")
 
 ```
+
 
