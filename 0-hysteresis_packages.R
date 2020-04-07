@@ -93,3 +93,8 @@ gg_vankrev <- function(data,mapping){
 ## CREATE OUTPUT FILES
 COREKEY = "data/processed/corekey.csv"
 WSOC = "data/processed/wsoc.csv"
+
+
+FTICR_LONG = "data/processed/fticr_longform.csv"
+FTICR_META = "data/processed/fticr_meta.csv"
+FTICR_META_HCOC = "data/processed/fticr_meta_hcoc.csv"
