@@ -44,10 +44,17 @@ core_key =
                 perc_sat = case_when(!moisture_lvl=="fm"&soil_type=="Soil"~(as.integer(as.integer(as.character(moisture_lvl))/140*100)),
                                      !moisture_lvl=="fm"&soil_type=="Soil_sand"~(as.integer(as.integer(as.character(moisture_lvl))/100*100)),
                                      moisture_lvl=="fm"&soil_type=="Soil" ~ as.integer((GMOISTURE*100/140)*100),
-                                     moisture_lvl=="fm"&soil_type=="Soil_sand" ~ as.integer((GMOISTURE_SAND*100/140)*100)))%>% 
+                                     moisture_lvl=="fm"&soil_type=="Soil_sand" ~ as.integer((GMOISTURE_SAND*100/140)*100)),
+                
+                sat_level = case_when(!treatment=="FM"& (perc_sat==100)~100,
+                                      !treatment=="FM"& (perc_sat==71|perc_sat==75)~75,
+                                      !treatment=="FM"& (perc_sat==50|perc_sat==53)~50,
+                                      !treatment=="FM"& (perc_sat==35|perc_sat==40)~35,
+                                      !treatment=="FM"& (perc_sat==3|perc_sat==5)~5))%>% 
   
   
-  dplyr::mutate(moisture_lvl = factor(moisture_lvl, levels = c("140","100","75","50","40","5","fm"))) %>% 
+  dplyr::mutate(moisture_lvl = factor(moisture_lvl, levels = c("140","100","75","50","40","5","fm")),
+                sat_level = factor(sat_level, levels = c("100", "75", "50", "35", "5"))) %>% 
   left_join(core_weights, by = "Core") %>% 
   filter(is.na(skip)) %>% # exclude the rows as needed
   dplyr::mutate(MoistWt_g = Total_g - EmptyWt_g,
