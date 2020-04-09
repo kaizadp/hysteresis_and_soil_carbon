@@ -93,8 +93,16 @@ spectra_Source =
   dplyr::select(value) %>% 
   rename(Source=value)
 
+spectra_Flags = 
+  spectra_temp1 %>% 
+  dplyr::select(starts_with("Flags")) %>% 
+  tidyr::gather() %>% 
+  dplyr::select(value) %>% 
+  rename(Flags=value)
+
+
 merged = 
-  cbind(spectra_Source, spectra_ppm, spectra_Intensity, spectra_Width,spectra_Area)
+  cbind(spectra_Source, spectra_ppm, spectra_Intensity, spectra_Width,spectra_Area, spectra_Flags)
 
 # now, clean up
 peaks = 
@@ -104,6 +112,9 @@ peaks =
 # remove solvent regions
   filter(!(ppm>DMSO_start & ppm<DMSO_stop)) %>% 
   filter(!is.na(ppm)) %>% 
+# remove peaks with 0 intensity, and peaks flagged as weak 
+  filter(Intensity > 0) %>% 
+  filter(!Flags=="Weak") %>% 
 # the source column has the entire path, including directories
 # delete the unnecessary strings
   dplyr::mutate(Source = str_replace_all(Source,"data/nmr_peaks//",""),

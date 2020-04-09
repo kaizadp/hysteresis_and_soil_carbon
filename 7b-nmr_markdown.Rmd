@@ -1,8 +1,8 @@
 ---
 title: "7-nmr_markdown"
-author: "Kaizad Patel"
-date: "4/7/2020"
-output: github_document
+author: "Kaizad Patel"  
+date: "4/7/2020"  
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
@@ -18,6 +18,9 @@ source("6b-nmr_peaks_relabund.R")
 ```
 
 ## SPECTRA 
+SCL = sandy clay loam (soil)  
+SL = sandy loam (soil + sand)  
+
 
 ```{r}
 spectra = read.csv("data/processed/nmr_spectra.csv.gz")
