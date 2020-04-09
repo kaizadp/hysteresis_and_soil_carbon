@@ -39,3 +39,4 @@ rel_abund_trt =
 
 ### OUTPUT ----
 write.csv(rel_abund_trt, "data/processed/nmr_rel_abund.csv", row.names = FALSE)
+write.csv(rel_abund, "data/processed/nmr_rel_abund_cores.csv", row.names = FALSE)
