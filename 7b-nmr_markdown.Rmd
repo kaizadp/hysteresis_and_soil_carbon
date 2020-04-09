@@ -170,3 +170,31 @@ ggbiplot(pca_sl, obs.scale = 1, var.scale = 1,
 
 ```
 
+
+## RELATIVE ABUNDANCE
+```{r}
+rel_abund = read.csv("data/processed/nmr_rel_abund.csv")
+```
+
+peaks in field moist soils
+
+```{r}
+rel_abund %>% 
+  filter(treatment == "FM") %>% 
+  dplyr::select(group, texture, relative_abundance) %>% 
+  spread(texture, relative_abundance) %>% 
+  knitr::kable(align = "r")
+```
+
+peaks in treatments
+
+```{r}
+rel_abund %>% 
+  filter(!treatment == "FM") %>% 
+  dplyr::mutate(var = paste0(texture,"-",treatment)) %>% 
+  dplyr::select(sat_level, group, var, relative_abundance) %>% 
+   
+  spread(var, relative_abundance) %>% 
+  knitr::kable(align = "r")
+```
+

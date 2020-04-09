@@ -2,15 +2,24 @@
 title: "9e-fticr_markdown"
 author: "Kaizad Patel"
 date: "4/8/2020"
-output: html_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo=FALSE,message=FALSE,warning=FALSE,
+                      collapse = TRUE,
+                      comment = "#>", 
+                      fig.path = "images/7b-nmr_markdown/"
+                      )
 ```
 
 ```{r}
 source("0-hysteresis_packages.R")
+
+fticr_data = read.csv(FTICR_LONG)
+fticr_meta = read.csv(FTICR_META)
+meta_hcoc = read.csv(FTICR_META_HCOC)
+
 
 relabund = read.csv("data/processed/fticr_relabund.csv")
 corekey = read.csv(COREKEY)
@@ -22,15 +31,41 @@ corekey_subset =
 
 ```
 
+## VAN KREVELEN PLOTS
+```{r}
+fticr = 
+  fticr_data %>% 
+  dplyr::mutate(sat_level = if_else(treatment == "FM", 50, as.numeric(sat_level))) %>% 
+  left_join(fticr_meta, by = "formula")
+
+gg_vankrev(fticr, aes(x = OC, y = HC, color = treatment))+
+  geom_point(alpha = 0.1)+
+  facet_grid(treatment+texture~sat_level)+
+  theme_kp()+
+  ggtitle("peaks seen in all 5 replicates")
+```
+
+
 ## RELATIVE ABUNDANCE
 
+field moist soils
+
 ```{r}
-relabund2 = 
-  relabund %>% 
-  dplyr::select(texture, treatment, sat_level, Class, relabund) %>% 
-  spread(treatment, relabund)  
+relabund %>% 
+  filter(treatment=="FM") %>% 
+  dplyr::select(Class, texture, relabund) %>% 
+  spread(texture, relabund) %>% 
   knitr::kable(align = "r")
+```
 
 
+```{r}
+relabund %>% 
+  filter(!treatment == "FM") %>% 
+  dplyr::mutate(var = paste0(texture,"-",treatment)) %>% 
+  dplyr::select(sat_level, Class, var, relabund) %>% 
+   
+  spread(var, relabund) %>% 
+  knitr::kable(align = "r")
 ```
 
