@@ -36,6 +36,8 @@ library(googlesheets)
 library(readxl)
 library(tidyr)
 library(dplyr)
+library(ggbiplot)
+
 
 # My 'picarro.data' package isn't on CRAN (yet) so need to install it via:
 # devtools::install_github("PNNL-TES/picarro.data")

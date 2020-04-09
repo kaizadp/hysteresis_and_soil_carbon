@@ -35,12 +35,6 @@ spectra2 =
   dplyr::rename(Core = source) %>% 
   left_join(key, by = "Core") 
 
-
-
-temp = 
-  spectra2 %>% 
-  filter(source=="data/nmr_spectra/111.csv")
-
 # OUTPUT ----
 crunch::write.csv.gz(spectra2, "data/processed/nmr_spectra.csv.gz", na = "")
 #

@@ -2,7 +2,7 @@
 title: "7-nmr_markdown"
 author: "Kaizad Patel"  
 date: "4/7/2020"  
-output: html_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
@@ -27,12 +27,23 @@ spectra = read.csv("data/processed/nmr_spectra.csv.gz")
 
 spectra_plot = 
   spectra %>% 
-  dplyr::mutate(Core = as.character(Core)) %>% 
-    na.omit()
+  dplyr::mutate(Core = as.character(Core))  %>% 
+  na.omit()
+```
+
+```{r field moist, fig.width=15, fig.height=5}
+gg_nmr+
+  geom_path(data=spectra[spectra$treatment=="FM",], aes(x = ppm, y = intensity, color = as.character(Core)),
+            alpha = 0.5)+
+  ylim(-0.3,7)+
+  facet_grid(.~texture)+theme(legend.position = "none")+
+  ggtitle("field moist")
 ```
 
 
+
 ```{r nmr_spectra, fig.width=15, fig.height=10}
+
 gg_nmr+
   geom_path(data=spectra_plot[spectra_plot$sat_level=="100",], aes(x = ppm, y = intensity, color = Core),
             alpha = 0.5)+
@@ -98,4 +109,64 @@ ggplot(data=rel_abund[rel_abund$soil_type=="Soil_sand"&!rel_abund$treatment=="FM
 
 ```
 
+
+
+## PCA
+```{r}
+rel_abund = read.csv("data/processed/nmr_rel_abund_cores.csv")
+
+
+relabund_pca=
+  rel_abund %>% 
+  ungroup %>% 
+  dplyr::select(Core, treatment, sat_level, texture, group, relabund) %>% 
+  spread(group, relabund) %>% 
+  replace(.,is.na(.),0)  %>% 
+  dplyr::mutate(sat_level = if_else(treatment=="FM","FM", as.character(sat_level))) %>% 
+  dplyr::select(-1)
+
+## 2. separate texture ----
+### scl
+relabund_pca_scl_num = 
+  relabund_pca %>% 
+  filter(texture=="SCL") %>% 
+  dplyr::select(.,-(1:3))
+
+relabund_pca_scl_grp = 
+  relabund_pca %>% 
+  filter(texture=="SCL") %>% 
+  dplyr::select(.,(1:3)) %>% 
+  dplyr::mutate(row = row_number())
+
+pca_scl = prcomp(relabund_pca_scl_num, scale. = T)
+summary(pca_scl)
+
+ggbiplot(pca_scl, obs.scale = 1, var.scale = 1, 
+         groups = relabund_pca_scl_grp$treatment, ellipse = TRUE, circle = F,
+         var.axes = TRUE)+
+  geom_point(size=2,stroke=2, aes(color = groups, shape = as.factor(relabund_pca_scl_grp$sat_level)))+
+  ggtitle("SCL texture")
+
+### sl
+relabund_pca_sl_num = 
+  relabund_pca %>% 
+  filter(texture=="SL") %>% 
+  dplyr::select(.,-(1:3))
+
+relabund_pca_sl_grp = 
+  relabund_pca %>% 
+  filter(texture=="SL") %>% 
+  dplyr::select(.,(1:3)) %>% 
+  dplyr::mutate(row = row_number())
+
+pca_sl = prcomp(relabund_pca_sl_num, scale. = T)
+summary(pca_sl)
+
+ggbiplot(pca_sl, obs.scale = 1, var.scale = 1, 
+         groups = relabund_pca_sl_grp$treatment, ellipse = TRUE, circle = F,
+         var.axes = TRUE)+
+  geom_point(size=2,stroke=2, aes(color = groups, shape = as.factor(relabund_pca_sl_grp$sat_level)))+
+  ggtitle("SL texture")
+
+```
 
