@@ -49,10 +49,6 @@ fticr_meta =
                 formula = paste0(formula_c,formula_h, formula_o, formula_n, formula_s, formula_p),
                 formula = str_replace_all(formula,"NA",""))
 
-gg_vankrev(fticr_meta, aes(x = OC, y = HC, color = Class))+
-  scale_color_viridis_d(option = "inferno")+
-  theme_kp()
-
 meta_hcoc = 
   fticr_meta %>% 
   dplyr::select(Mass, formula, HC, OC)
@@ -87,41 +83,10 @@ fticr_data =
                    presence = mean(presence)) %>% 
   filter(n==5) 
 
-
-# step 2. merge files ---- 
-fticr = 
-  fticr_data %>% 
-  left_join(fticr_meta, by = "formula")
-
-gg_vankrev(fticr, aes(x = OC, y = HC, color = treatment))+
-  facet_grid(treatment+texture~sat_level)+
-  theme_kp()+
-  ggtitle("peaks seen in all 5 replicates")
-
-
-
 ## OUTPUTS
 write.csv(fticr_data,FTICR_LONG, row.names = FALSE)
 write.csv(fticr_meta,FTICR_META, row.names = FALSE)
 write.csv(meta_hcoc,FTICR_META_HCOC, row.names = FALSE)
 
-
-
-##################
-##################
-
-
-
-## getting initial summary info
-fticr_summ = 
-  fticr %>% 
-  group_by(Core_assignment,treatment,texture, sat_level, Mass) %>% 
-  dplyr::summarise(n = n())
-
-
-
-ggplot(fticr_summ, aes(x = Mass, y = n))+
-  geom_point()+
-  facet_wrap(~Core_assignment)
 
 

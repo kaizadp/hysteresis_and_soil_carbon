@@ -31,7 +31,7 @@ spectra_plot =
   na.omit()
 ```
 
-```{r field moist, fig.width=15, fig.height=5}
+```{r nmr_spectra_fm, fig.width=15, fig.height=5}
 gg_nmr+
   geom_path(data=spectra[spectra$treatment=="FM",], aes(x = ppm, y = intensity, color = as.character(Core)),
             alpha = 0.5)+
@@ -86,8 +86,7 @@ gg_nmr+
 
 ## PEAKS
 relative abundance for each sample
-```{r, fig.width=30, fig.height=30}
-## plots ----
+```{r peaks, fig.width=30, fig.height=30}
 ggplot(data=rel_abund[rel_abund$soil_type=="Soil"&!rel_abund$treatment=="FM",], aes(x="", y=relabund, fill=group)) +
   geom_bar(stat="identity", alpha=0.7) +
   #geom_text(aes(x= "", y=pos, label = relabund), size=4) +  # note y = pos
@@ -112,7 +111,7 @@ ggplot(data=rel_abund[rel_abund$soil_type=="Soil_sand"&!rel_abund$treatment=="FM
 
 
 ## PCA
-```{r}
+```{r nmr_pca}
 rel_abund = read.csv("data/processed/nmr_rel_abund_cores.csv")
 
 
@@ -125,7 +124,6 @@ relabund_pca=
   dplyr::mutate(sat_level = if_else(treatment=="FM","FM", as.character(sat_level))) %>% 
   dplyr::select(-1)
 
-## 2. separate texture ----
 ### scl
 relabund_pca_scl_num = 
   relabund_pca %>% 
