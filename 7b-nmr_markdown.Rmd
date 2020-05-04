@@ -83,6 +83,33 @@ gg_nmr+
 
 ```
 
+representative spectra -- 50 % saturation
+
+```{r nmr_spectra2, fig.width=8, fig.height=5}
+subset_spectra = 
+  spectra_plot %>% 
+  filter(Core %in% c(120,115))
+  
+gg_nmr+
+  geom_path(data=subset_spectra[subset_spectra$treatment=="Drying",], 
+            aes(x = ppm, y = intensity))+
+    geom_path(data=subset_spectra[subset_spectra$treatment=="Wetting",], 
+            aes(x = ppm, y = intensity+1))+
+  annotate("text", label = "rewetting", x = 9, y = 1.1)+
+  annotate("text", label = "drying", x = 9, y = 0.1)+
+  ylim(-0.1,3.5)+
+  ylab("")+
+  ggtitle("50% saturation")+
+  
+  theme(legend.position = "none",
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        panel.grid.major = element_blank(), panel.grid.minor = element_blank()
+)
+
+```
+
+
 
 ## PEAKS
 relative abundance for each sample
@@ -189,10 +216,74 @@ peaks in treatments
 ```{r}
 rel_abund %>% 
   filter(!treatment == "FM") %>% 
-  dplyr::mutate(var = paste0(texture,"-",treatment)) %>% 
-  dplyr::select(sat_level, group, var, relative_abundance) %>% 
+  dplyr::mutate(sat_level = factor(sat_level, levels = c(5,35,50,75,100)),
+                var = paste0(sat_level,"-",treatment)) %>% 
+  dplyr::select(texture, group, var, relative_abundance) %>% 
    
   spread(var, relative_abundance) %>% 
   knitr::kable(align = "r")
+```
+
+
+## rel abund 
+
+```{r}
+rel_abund_cores = read.csv("data/processed/nmr_rel_abund_cores.csv")
+arom = 
+  rel_abund_cores %>% 
+  filter(group %in% c("aromatic", "aliphatic1", "aliphatic2")) %>% 
+  dplyr::select(Core, group, treatment, sat_level, texture, relabund) %>% 
+  spread(group, relabund) %>% 
+  dplyr::mutate(arom_aliph = aromatic/(aliphatic1+aliphatic2))
+
+
+ggplot(arom, aes(x = sat_level, y = arom_aliph, color = treatment))+
+  geom_point()+
+  geom_smooth()+
+  ylab("aromatic/aliphatic")+
+  facet_grid(.~texture)+
+  theme_kp()
+
+ggplot(arom, aes(x = sat_level, y = aromatic, color = treatment))+
+  geom_point()+
+  geom_smooth()+
+  ylab("aromatic")+
+  facet_grid(.~texture)+
+  theme_kp()
+  
+```
+
+
+### rel abund waffle plots
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(schrute)
+library(waffle)
+#library(ggtext)
+library(cowplot)
+library(patchwork)
+library(soilpalettes)
+
+rel_abund = read.csv("data/processed/nmr_rel_abund.csv")
+
+rel_abund_50_scl = 
+  rel_abund %>% 
+  filter(sat_level==50,
+         texture=="SCL") %>% 
+  ggplot()+
+  geom_waffle(aes(fill=group,values=rel_abund),n_rows = 5,size=1.5,color="white", flip = F) + 
+  coord_equal() +
+scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0))+
+  scale_fill_manual(values = soil_palette("podzol",4))+
+  #guides(color=F) +
+  facet_grid(treatment~.)+
+  theme_classic()+
+  theme(axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.line.y = element_blank())
+  
+ggdraw(rel_abund_50_scl)
 ```
 
