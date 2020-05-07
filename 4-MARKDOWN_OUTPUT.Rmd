@@ -1,7 +1,7 @@
 ---
 title: "Hysteresis and Soil C"
 author: "Kaizad Patel"
-output: word_document
+output: github_document
 ---
 Run: `r Sys.Date()`
 
