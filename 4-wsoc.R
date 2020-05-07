@@ -45,7 +45,7 @@ wsoc_calib =
 
 
 #
-# step 2.  calibration curves ---------------------------- ####
+# step 2. calibration curves ---------------------------- ####
 # plot calibration curve for each run 
 gg_calib = 
   ggplot(wsoc_calib, aes(x = Area, y = Calib_ppm))+
@@ -108,11 +108,11 @@ wsoc_results = wsoc_samples %>%
                 perc_sat_actual = case_when(soil_type=="Soil" ~ (gmoist/140)*100,
                                             soil_type=="Soil_sand" ~ (gmoist/100)*100),
                 perc_sat_actual = if_else(perc_sat_actual>100,100,perc_sat_actual)) %>% 
-  dplyr::select(Core,soil_type, texture, treatment, moisture_lvl, perc_sat, gmoist,npoc_mg_l, wsoc_mg_g,wsoc_mg_gC,perc_sat_actual),
+  dplyr::select(Core,soil_type, texture, treatment, sat_level, perc_sat, gmoist,npoc_mg_l, wsoc_mg_g,wsoc_mg_gC,perc_sat_actual),
 
 write.csv(wsoc_results, WSOC, row.names = F, na=""))
 
-message("Now type: clean(garbage_collection = T)
+message("Now type: clean(garbage_collection = TRUE)
 and then: make(wsoc_plan)
 GRRR drake")
 
@@ -126,29 +126,38 @@ wsoc_processed = readd(wsoc_processed)
 
 wsoc_results = readd(wsoc_results)
 
-ggplot(wsoc_results, aes(x = perc_sat, y = wsoc_mg_g, color = treatment))+
-  geom_point()+
-  facet_grid(soil_type~.)+
-  labs(caption="normalized to soil weight (g)")+
-  scale_x_reverse(name = "percent saturation")+
-  theme_kp()
-  
-ggplot(wsoc_results, aes(x = perc_sat, y = wsoc_mg_gC, color = treatment))+
-  geom_point()+
-  facet_grid(soil_type~.)+
-  labs(caption="normalized to Carbon (g)")+
-  scale_x_reverse(name = "percent saturation")+
-  theme_kp()
 
-ggplot(wsoc_results[!wsoc_results$treatment=="FM",], aes(x = gmoist, y = wsoc_mg_g, color = treatment))+
-  geom_point()+
-  geom_smooth(data = wsoc_results[!wsoc_results$moisture_lvl==5&!wsoc_results$treatment=="FM",],aes(x = gmoist, y = wsoc_mg_g, color = treatment))+
-  scale_x_reverse(name = "gmoist")+
-  theme_kp()
 
-ggplot(wsoc_results[!wsoc_results$treatment=="FM",], aes(x = perc_sat_actual, y = wsoc_mg_g, color = treatment))+
-  geom_point()+
-  geom_smooth(data = wsoc_results[!wsoc_results$moisture_lvl==5&!wsoc_results$treatment=="FM",],aes(x = perc_sat_actual, y = wsoc_mg_g, color = treatment))+
-  facet_grid(soil_type~.)+
-  scale_x_reverse(name = "percent saturation")+
-  theme_kp()
+#
+# step 5. stats  ---------------------------- ####
+## 5a. overall stats ----
+wsoc = read.csv(WSOC)
+aov = aov(wsoc_mg_g ~ treatment * texture * sat_level, data = wsoc[!wsoc$sat_level==5,])
+summary(aov)
+h = HSD.test(aov, "sat_level")
+
+## 5b. pairwise for each moisture level ----
+# anova 
+
+fit_aov_wsoc <- function(dat) {
+ a <-aov(wsoc_mg_g ~ treatment, data = dat)
+tibble(`p` = summary(a)[[1]][[1,"Pr(>F)"]])
+} 
+
+
+wsoc_stats_temp = 
+  wsoc %>% 
+  filter(!treatment=="FM") %>% 
+  group_by(texture, sat_level) %>% 
+  dplyr::summarise(wsoc_mg_g = max(wsoc_mg_g)+0.02)
+
+wsoc_stats = 
+  wsoc %>% 
+  filter(!treatment=="FM") %>% 
+  group_by(texture, sat_level) %>% 
+  do(fit_aov_wsoc(.)) %>% 
+  dplyr::mutate(p = round(p,4),
+                asterisk = if_else(p<0.05,"*",as.character(NA))) %>% 
+  left_join(wsoc_stats_temp, by = c("texture", "sat_level"))
+
+
