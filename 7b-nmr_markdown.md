@@ -13,6 +13,14 @@ sand)
 
 ![](images/7b-nmr_markdown/nmr_spectra-1.png)<!-- -->![](images/7b-nmr_markdown/nmr_spectra-2.png)<!-- -->![](images/7b-nmr_markdown/nmr_spectra-3.png)<!-- -->![](images/7b-nmr_markdown/nmr_spectra-4.png)<!-- -->![](images/7b-nmr_markdown/nmr_spectra-5.png)<!-- -->
 
+representative spectra – 50 % saturation
+
+![](images/7b-nmr_markdown/nmr_spectra_50_perc-1.png)<!-- -->
+
+representative spectra – 5 % saturation
+
+![](images/7b-nmr_markdown/nmr_spectra_5_perc-1.png)<!-- -->
+
 ## PEAKS
 
 relative abundance for each sample
@@ -62,3 +70,22 @@ treatments
 |      SL |     alphah |           NA |   3.1 ± 1.27 |           NA |           NA | 24.11 ± 1.98 | 31.23 ± 4.93 |           NA |            NA |           NA |           NA |
 |      SL |      amide |           NA |   0.74 ± 0.2 |           NA |           NA |  0.81 ± 0.07 |    1.06 ± NA |           NA |            NA |           NA |           NA |
 |      SL |   aromatic | 17.61 ± 7.05 | 47.12 ± 4.62 | 26.32 ± 6.45 | 58.93 ± 7.33 | 19.95 ± 5.62 | 23.72 ± 5.53 | 16.61 ± 4.22 |  64.33 ± 7.09 |   19.9 ± 5.5 |    72 ± 3.65 |
+
+## rel abund
+
+![](images/7b-nmr_markdown/unnamed-chunk-5-1.png)<!-- -->![](images/7b-nmr_markdown/unnamed-chunk-5-2.png)<!-- -->
+
+### rel abund waffle plots
+
+![](images/7b-nmr_markdown/unnamed-chunk-6-1.png)<!-- -->
+
+all waffle plots
+![](images/7b-nmr_markdown/unnamed-chunk-7-1.png)<!-- -->
+
+air-dry waffle plots
+
+![](images/7b-nmr_markdown/unnamed-chunk-8-1.png)<!-- -->
+
+field moist waffle plots
+
+![](images/7b-nmr_markdown/unnamed-chunk-9-1.png)<!-- -->

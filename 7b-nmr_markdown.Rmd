@@ -85,7 +85,7 @@ gg_nmr+
 
 representative spectra -- 50 % saturation
 
-```{r nmr_spectra2, fig.width=8, fig.height=5}
+```{r nmr_spectra_50_perc, fig.width=8, fig.height=5}
 subset_spectra = 
   spectra_plot %>% 
   filter(Core %in% c(120,115))
@@ -97,6 +97,9 @@ gg_nmr+
             aes(x = ppm, y = intensity+1))+
   annotate("text", label = "rewetting", x = 9, y = 1.1)+
   annotate("text", label = "drying", x = 9, y = 0.1)+
+  annotate("text", label = "core 115", x = 10, y = 0.95, size=3, hjust=0)+
+  annotate("text", label = "core 120", x = 10, y = -0.05, size=3, hjust=0)+
+
   ylim(-0.1,3.5)+
   ylab("")+
   ggtitle("50% saturation")+
@@ -109,7 +112,33 @@ gg_nmr+
 
 ```
 
+representative spectra -- 5 % saturation
 
+```{r nmr_spectra_5_perc, fig.width=8, fig.height=5}
+subset_spectra_5 = 
+  spectra_plot %>% 
+  filter(Core %in% c(38,43))
+  
+gg_nmr+
+  geom_path(data=subset_spectra_5[subset_spectra_5$treatment=="Drying",], 
+            aes(x = ppm, y = intensity))+
+    geom_path(data=subset_spectra_5[subset_spectra_5$treatment=="Wetting",], 
+            aes(x = ppm, y = intensity+1))+
+  annotate("text", label = "rewetting", x = 9, y = 1.1)+
+  annotate("text", label = "drying", x = 9, y = 0.1)+
+  annotate("text", label = "core 38", x = 10, y = 0.95, size=3, hjust=0)+
+  annotate("text", label = "core 43", x = 10, y = -0.05, size=3, hjust=0)+
+  ylim(-0.1,3.5)+
+  ylab("")+
+  ggtitle("5% saturation")+
+  
+  theme(legend.position = "none",
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        panel.grid.major = element_blank(), panel.grid.minor = element_blank()
+)
+
+```
 
 ## PEAKS
 relative abundance for each sample
@@ -279,11 +308,96 @@ scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0))+
   scale_fill_manual(values = soil_palette("podzol",4))+
   #guides(color=F) +
   facet_grid(treatment~.)+
+  ggtitle("50% saturation")+
   theme_classic()+
   theme(axis.text.y = element_blank(),
         axis.ticks.y = element_blank(),
-        axis.line.y = element_blank())
+        axis.line.y = element_blank(),
+        panel.spacing = unit(1.5, "lines"), #facet spacing for x axis
+        strip.background = element_blank(), #facet formatting
+        strip.text.y = element_text(size=12, face="bold", angle = 270) #facet labels
+
+
+)
   
 ggdraw(rel_abund_50_scl)
 ```
 
+
+all waffle plots
+```{r}
+rel_abund_scl = 
+  rel_abund %>% 
+  filter(texture=="SL",
+         treatment %in% c("Drying", "Wetting")) %>% 
+  ggplot()+
+  geom_waffle(aes(fill=group,values=rel_abund),n_rows = 5,size=1.5,color="white", flip = F) + 
+  coord_equal() +
+scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0))+
+  scale_fill_manual(values = soil_palette("podzol"))+
+  #guides(color=F) +
+  facet_grid(sat_level~treatment)+
+  theme_kp()+
+  theme(axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.line.y = element_blank())
+  
+ggdraw(rel_abund_scl)
+```
+
+air-dry waffle plots 
+
+```{r}
+rel_abund_scl = 
+  rel_abund %>% 
+  filter(texture=="SCL",
+         sat_level %in% c(5)) %>% 
+  ggplot()+
+  geom_waffle(aes(fill=group,values=rel_abund),n_rows = 5,size=1.5,color="white", flip = F) + 
+  coord_equal() +
+scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0))+
+  scale_fill_manual(values = soil_palette("podzol"))+
+  #guides(color=F) +
+  facet_grid(treatment~.)+
+  ggtitle("5% saturation") +
+  theme_classic()+
+  theme(axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.line.y = element_blank(),
+        panel.spacing = unit(1.5, "lines"), #facet spacing for x axis
+        strip.background = element_blank(), #facet formatting
+        strip.text.y = element_text(size=12, face="bold", angle = 270) #facet labels
+
+        )
+  
+ggdraw(rel_abund_scl)
+```
+
+field moist waffle plots 
+
+```{r}
+rel_abund_scl_fm = 
+  rel_abund %>% 
+  filter(texture=="SCL",
+         treatment %in% "FM") %>% 
+  ggplot()+
+  geom_waffle(aes(fill=group,values=rel_abund),n_rows = 5,size=1.5,color="white", flip = F) + 
+  coord_equal() +
+scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0))+
+  #scale_fill_manual(values = soil_palette("podzol"))+
+  scale_fill_manual(values = c("#351821", "#9F2519", "#FFC87A"))+
+  #guides(color=F) +
+  facet_grid(treatment~.)+
+  ggtitle("field moist") +
+  theme_classic()+
+  theme(axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.line.y = element_blank(),
+        panel.spacing = unit(1.5, "lines"), #facet spacing for x axis
+        strip.background = element_blank(), #facet formatting
+        strip.text.y = element_text(size=12, face="bold", angle = 270) #facet labels
+
+        )
+  
+ggdraw(rel_abund_scl_fm)
+```
