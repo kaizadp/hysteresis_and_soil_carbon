@@ -2,11 +2,10 @@
 .Rhistory
 .RData
 .Ruserdata
-
 # OS files
 .DS_Store
 Icon*
-
 # Script products
 outputs/
 data/processed/wsoc_calibration_curves.tiff
+fticr.png
