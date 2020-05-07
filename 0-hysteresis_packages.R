@@ -73,7 +73,7 @@ theme_kp <- function() {  # this for all the elements common across plots
 gg_vankrev <- function(data,mapping){
   ggplot(data,mapping) +
     # plot points
-    geom_point(size=2, alpha = 0.2) + # set size and transparency
+    geom_point(size=2.5, alpha = 0.2) + # set size and transparency
     # axis labels
     ylab("H/C") +
     xlab("O/C") +
