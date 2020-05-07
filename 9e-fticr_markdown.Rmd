@@ -33,7 +33,7 @@ corekey_subset =
 
 ## VAN KREVELEN DOMAINS
 
-```{r vk_domains, fig.asp=1}
+```{r vk_domains, fig.asp=1, fig.height=5}
 gg_vankrev(fticr_meta, aes(x = OC, y = HC, color = Class))+
   scale_color_viridis_d(option = "inferno")+
   theme_kp()
@@ -54,6 +54,42 @@ gg_vankrev(fticr, aes(x = OC, y = HC, color = treatment))+
   ggtitle("peaks seen in all 5 replicates")
 ```
 
+```{r vk2, fig.height = 6, fig.width=10}
+fticr_subset = 
+  fticr %>% 
+  filter(sat_level %in% c(50,100)) %>% 
+  filter(!(sat_level==50 & (treatment == "Drying"|treatment=="Wetting")))
+
+gg_fm = gg_vankrev(fticr_subset[fticr_subset$treatment=="FM",], aes(x = OC, y = HC, color = treatment))+
+  theme_kp()
+
+gg_100_d = 
+  fticr_subset %>% 
+  filter(sat_level==100) %>% 
+  #dplyr::mutate(treatment = factor(treatment, levels = c("Wetting", "Drying"))) %>% 
+  gg_vankrev( 
+             aes(x = OC, y = HC, color = treatment, group = rev(treatment)))+
+  scale_color_manual(values = c("darkorange2", "grey40"))+
+  #geom_point(size=0.5, alpha = 0.4)+
+  #facet_grid(.~treatment)+
+  theme_kp()
+  aes(group=rev(treatment))
+
+
+library(patchwork)
+gg_fm + gg_100
+
+```
+
+```{r vk2_marginal, fig.height=5, fig.width=5}
+
+ggMarginal(gg_fm,groupColour = TRUE,groupFill = TRUE)
+```
+
+```{r vk2_marginal2, fig.height=5, fig.width=5}
+ggMarginal(gg_100,groupColour = TRUE,groupFill = TRUE)
+
+```
 
 ## RELATIVE ABUNDANCE
 

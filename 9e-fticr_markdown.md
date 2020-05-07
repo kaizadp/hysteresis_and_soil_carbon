@@ -11,6 +11,12 @@ Kaizad Patel
 
 ![](images/9-fticr_markdown/vk-1.png)<!-- -->
 
+![](images/9-fticr_markdown/vk2-1.png)<!-- -->
+
+![](images/9-fticr_markdown/vk2_marginal-1.png)<!-- -->
+
+![](images/9-fticr_markdown/vk2_marginal2-1.png)<!-- -->
+
 ## RELATIVE ABUNDANCE
 
 field moist soils
