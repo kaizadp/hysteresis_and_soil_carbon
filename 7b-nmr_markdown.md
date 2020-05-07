@@ -46,6 +46,8 @@ relative abundance for each sample
 
 ## RELATIVE ABUNDANCE
 
+### tables
+
 peaks in field moist soils
 
 |      group |          SCL |           SL |
@@ -71,7 +73,7 @@ treatments
 |      SL |      amide |           NA |   0.74 ± 0.2 |           NA |           NA |  0.81 ± 0.07 |    1.06 ± NA |           NA |            NA |           NA |           NA |
 |      SL |   aromatic | 17.61 ± 7.05 | 47.12 ± 4.62 | 26.32 ± 6.45 | 58.93 ± 7.33 | 19.95 ± 5.62 | 23.72 ± 5.53 | 16.61 ± 4.22 |  64.33 ± 7.09 |   19.9 ± 5.5 |    72 ± 3.65 |
 
-## rel abund
+### rel abund hysteresis?
 
 ![](images/7b-nmr_markdown/unnamed-chunk-5-1.png)<!-- -->![](images/7b-nmr_markdown/unnamed-chunk-5-2.png)<!-- -->
 
@@ -89,3 +91,7 @@ air-dry waffle plots
 field moist waffle plots
 
 ![](images/7b-nmr_markdown/unnamed-chunk-9-1.png)<!-- -->
+
+### more viz
+
+![](images/7b-nmr_markdown/relabund_bubble-1.png)<!-- -->

@@ -226,6 +226,7 @@ ggbiplot(pca_sl, obs.scale = 1, var.scale = 1,
 
 
 ## RELATIVE ABUNDANCE
+### tables
 ```{r}
 rel_abund = read.csv("data/processed/nmr_rel_abund.csv")
 ```
@@ -254,7 +255,7 @@ rel_abund %>%
 ```
 
 
-## rel abund 
+### rel abund hysteresis?
 
 ```{r}
 rel_abund_cores = read.csv("data/processed/nmr_rel_abund_cores.csv")
@@ -401,3 +402,29 @@ scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0))+
   
 ggdraw(rel_abund_scl_fm)
 ```
+
+### more viz
+```{r relabund_bubble, fig.width=15, fig.height=7}
+rel_abund = read.csv("data/processed/nmr_rel_abund.csv")
+
+ggplot(rel_abund %>% 
+         filter(!treatment=="FM"),
+       aes(x = treatment, y = group, color = group, size = rel_abund))+
+  geom_point()+
+  geom_text(data = rel_abund %>% 
+              filter(!treatment=="FM",
+              rel_abund>15),
+         aes(label = round(rel_abund,0)), color = "black", size=3)+
+  facet_grid(texture ~ sat_level)+
+  scale_size_area(max_size = 20)+
+  theme_bw()
+  
+```
+
+
+
+
+
+
+
+
