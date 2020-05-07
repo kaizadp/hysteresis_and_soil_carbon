@@ -1,11 +1,12 @@
+source("0-hysteresis_packages.R")
 library(ggbiplot)
 
 
 
 rel_abund = read.csv("data/processed/nmr_rel_abund_cores.csv")
+rel_abund_trt = read.csv("data/processed/nmr_rel_abund.csv")
 
-
-
+#
 # PART II: RELATIVE ABUNDANCE PCA ----
 
 relabund_pca=
@@ -18,7 +19,7 @@ relabund_pca=
   dplyr::select(-1)
 
 #
-## 1. overall PCA ---
+## 1. overall PCA ----
 relabund_pca_num = 
   relabund_pca %>% 
   dplyr::select(.,-(1:3))
@@ -85,3 +86,106 @@ ggbiplot(pca_sl, obs.scale = 1, var.scale = 1,
          var.axes = TRUE)+
   geom_point(size=2,stroke=2, aes(color = groups, shape = as.factor(relabund_pca_sl_grp$sat_level)))+
   ggtitle("SL texture")
+
+#
+# PART III: summary stats ----
+# anova 
+
+fit_aov_nmr <- function(dat) {
+  a <-aov(relabund ~ treatment, data = dat)
+  tibble(`p` = summary(a)[[1]][[1,"Pr(>F)"]])
+} 
+
+
+nmr_aov = 
+  rel_abund %>% 
+  filter(!treatment=="FM") %>% 
+  #group_by(texture, sat_level, group, treatment) %>% 
+  #dplyr::mutate(n = n()) %>% 
+  filter(!group %in% c("amide", "alphah")) %>% 
+  ungroup %>% 
+  group_by(texture, sat_level, group) %>% 
+  do(fit_aov_nmr(.)) %>% 
+  dplyr::mutate(p = round(p,4),
+                asterisk = if_else(p<0.05,"*",as.character(NA)),
+                treatment="Wetting") %>% 
+  dplyr::select(-p)
+
+nmr_summary = 
+  rel_abund_trt %>% 
+  left_join(nmr_aov, by = c("texture","sat_level","treatment","group")) %>% 
+  dplyr::mutate(
+                relabund = paste(relative_abundance, asterisk))
+
+#
+
+
+# bray distance ----
+library(vegan)
+library(ape)
+
+bray_distance = vegdist(relabund_pca_num, method="euclidean")
+principal_coordinates = pcoa(bray_distance)
+pcoa_plot = data.frame(principal_coordinates$vectors[,])
+pcoa_plot_merged = merge(pcoa_plot, relabund_pca_grp, by="row.names")
+
+####### Calculate percent variation explained by PC1, PC2
+
+PC1 <- 100*(principal_coordinates$values$Eigenvalues[1]/sum(principal_coordinates$values$Eigenvalues))
+PC2 <- 100*(principal_coordinates$values$Eigenvalues[2]/sum(principal_coordinates$values$Eigenvalues))
+PC3 <- 100*(principal_coordinates$values$Eigenvalues[3]/sum(principal_coordinates$values$Eigenvalues))
+
+
+grp = 
+  relabund_pca_grp %>% 
+  dplyr::mutate(grp = paste0(texture,"-",sat_level,"-",treatment))
+  #dplyr::select(row, grp)
+matrix = as.matrix(bray_distance)
+
+matrix2 = 
+  matrix %>% 
+  melt() %>% 
+  left_join(grp, by = c("Var1"="row")) %>% 
+  #rename(grp1 = grp) %>% 
+  left_join(grp, by = c("Var2"="row")) %>% 
+  filter(grp.x==grp.y) %>% 
+  group_by(grp.x,grp.y,sat_level.x, texture.x,treatment.x,treatment.y) %>% 
+  dplyr::summarise(distance  =mean(value)) %>%
+  ungroup %>% 
+  rename(sat_level = sat_level.x) %>% 
+  dplyr::mutate(sat_level = if_else(treatment.x=="FM","FM",sat_level),
+                sat_level = factor(sat_level, levels = c(5,35,50,75,100,"FM")))
+
+
+matrix3 = 
+  matrix %>% 
+  melt() %>% 
+  left_join(grp, by = c("Var1"="row")) %>% 
+  #rename(grp1 = grp) %>% 
+  left_join(grp, by = c("Var2"="row")) %>% 
+  filter(!grp.x==grp.y) %>% 
+  filter(sat_level.x == sat_level.y) %>% 
+  filter(texture.x == texture.y) %>% 
+  group_by(grp.x,grp.y,sat_level.x, texture.x,treatment.x,treatment.y) %>% 
+  dplyr::summarise(distance  =mean(value)) %>%
+  ungroup %>% 
+  rename(sat_level = sat_level.x) %>% 
+  dplyr::mutate(sat_level = factor(sat_level, levels = c(5,35,50,75,100)))
+
+ggplot(matrix3, aes(x = sat_level, y = distance))+
+  geom_point(size=3)+
+  geom_segment(aes(x = sat_level, xend = sat_level, y = 0, yend = distance))+
+  
+  facet_grid(.~texture.x)+
+  ylim(0,80)+
+  ylab("drying-rewetting \n Bray distance")+
+  geom_hline(yintercept = 17.52, linetype = "dashed")+
+  annotate("text", label = "avg within-group distance", x = 2, y = 15)+
+  theme_kp()
+
+ggplot(matrix2, aes(x = sat_level, y = mean(distance), color = treatment.x, shape = texture.x))+
+  geom_point(size = 3)+
+#  facet_grid(treatment.x.~texture.x)+
+  ylim(0,80)+
+  theme_kp()
+mean(matrix2$distance)
