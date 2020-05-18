@@ -50,8 +50,8 @@ library(drake)
 TC = 8.34 #carbon percentage
 
 read_core_key <- function(filename) {
-  readxl::read_excel("data/Core_key.xlsx") %>%
-    dplyr::select(Core, soil_type, treatment, trt, Core_assignment, Moisture, skip)
+  read_csv(COREKEY) %>%
+    dplyr::select(Core, texture, treatment, Core_assignment, perc_sat, sat_level, Moisture_perc, skip)
 }
 ca <- read_core_key("data/Core_key.xlsx")
 
@@ -68,7 +68,7 @@ read_core_masses <- function(filename, sheet, core_key, core_dry_weights) {
     left_join(core_dry_weights, by = "Core") %>% 
     filter(is.na(skip)) %>% # exclude the rows as needed
     dplyr::select(Core, Start_datetime, Stop_datetime, Seq.Program, Valve,
-                  Core_assignment, EmptyWt_g, DryWt_g, Mass_g, Carbon_g, Moisture) %>% 
+                  Core_assignment, EmptyWt_g, DryWt_g, Mass_g, Carbon_g, Moisture_perc) %>% 
     dplyr::mutate(Start_datetime = mdy_hm(Start_datetime, tz = "America/Los_Angeles"),
                   Stop_datetime = mdy_hm(Stop_datetime, tz = "America/Los_Angeles"),
                   # calculate moisture content for each core
