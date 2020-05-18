@@ -131,8 +131,11 @@ mean_flux =
 
 ## OUTPUT ----
 make(plan)
-fluxes = readd(gf_clean) %>% write.csv("data/processed/picarro_fluxes.csv", row.names = FALSE)
-mean_flux = readd(meanflux) %>% write.csv("data/processed/picarro_meanfluxes.csv", row.names = FALSE)
+corekey_subset = readd(corekey_subset)
+fluxes = readd(gf_clean) %>% left_join(corekey_subset, by ="Core") %>% 
+  write.csv("data/processed/picarro_fluxes.csv", row.names = FALSE)
+mean_flux = readd(meanflux) %>%
+  write.csv("data/processed/picarro_meanfluxes.csv", row.names = FALSE)
 
 
 
