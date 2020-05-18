@@ -11,30 +11,10 @@ source("3-picarro_data.R")
 #library(PNWColors)
 
 plan <- drake_plan(
-  core_key = read_core_key(file_in("data/Core_key.xlsx")) %>% 
-  filter(is.na(skip)) %>% 
-  dplyr::mutate(Moisture = dplyr::recode(Moisture,
-                                         "100.0"="100",
-                                         "75.0"="75",
-                                         "50.0"="50")) %>% 
-  dplyr::mutate(Status = case_when(grepl("_D$", Core_assignment) ~ "Dry",
-                                   grepl("_W$", Core_assignment) ~ "Wet",
-                                   grepl("_fm$", Core_assignment) ~ "FM"),
-                moisture_lvl = if_else(soil_type=="Soil"&Moisture=="sat","140",
-                                       if_else(soil_type=="Soil_sand"&Moisture=="sat","100",
-                                               if_else(Moisture=="dry","5",
-                                                       if_else(soil_type=="Soil_sand"&Moisture=="100","40",as.character((Moisture))))))) %>% 
-  dplyr::mutate(moisture_lvl = factor(moisture_lvl, levels = c("140","100","75","50","40","5","fm"))) %>% 
-  ungroup %>% group_by(soil_type) %>% 
-  dplyr::mutate(moist = as.numeric(as.character(moisture_lvl)),
-#               perc_sat = if_else(moisture_lvl=="fm","fm", case_when(soil_type=="Soil"~as.character(as.integer(as.integer(as.character(moisture_lvl))/140*100)), soil_type=="Soil_sand"~as.character(as.integer(as.integer(as.character(moisture_lvl))/100*100))))),
-                perc_sat = if_else(moisture_lvl=="fm",as.integer(NA),
-                                   case_when(soil_type=="Soil"~(as.integer(as.integer(as.character(moisture_lvl))/140*100)),
-                                             soil_type=="Soil_sand"~(as.integer(as.integer(as.character(moisture_lvl))/100*100))))),
-                                   
-                                   
-                                   
-
+  
+core_key = read_core_key(file_in(COREKEY)), 
+corekey_subset = core_key %>% dplyr::select(Core, Core_assignment, texture, treatment, sat_level),
+  
 core_dry_weights = read_core_dryweights(file_in("data/Core_weights.xlsx"), sheet = "initial"),
 
 core_masses = read_core_masses(file_in("data/Core_weights.xlsx"),
@@ -65,76 +45,99 @@ valve_key = filter(core_masses, Seq.Program == "CPCRW_SFDec2018.seq"),
   
 gf = 
   ghg_fluxes %>% 
-  left_join(valve_key, by = "Core") %>% 
-  mutate(Sand = if_else(grepl("sand", Core_assignment), "Soil_sand", "Soil"),
-         Status = case_when(grepl("_D$", Core_assignment) ~ "Dry",
-                            grepl("_W$", Core_assignment) ~ "Wet",
-                            grepl("_fm$", Core_assignment) ~ "FM")) %>% 
+  left_join(dplyr::select(valve_key, Core, Core_assignment), by = "Core") %>% 
+              # mutate(Sand = if_else(grepl("sand", Core_assignment), "Soil_sand", "Soil"),
+              #        Status = case_when(grepl("_D$", Core_assignment) ~ "Dry",
+              #                           grepl("_W$", Core_assignment) ~ "Wet",
+              #                           grepl("_fm$", Core_assignment) ~ "FM")) %>% 
   filter(flux_co2_umol_g_s>=0) %>% 
-  left_join(select(core_key, Core,moisture_lvl,trt),by = "Core") %>% 
-  # remove outliers
+              #  left_join(select(core_key, Core,sat_level,treatment),by = "Core") %>% 
+  # flag outliers
   group_by(Core_assignment) %>% 
   dplyr::mutate(mean = mean(flux_co2_umol_g_s),
                 median = median(flux_co2_umol_g_s),
                 sd = sd(flux_co2_umol_g_s)) %>% 
   ungroup %>% 
-  dplyr::mutate(outlier = if_else((flux_co2_umol_g_s - mean) > 4*sd,"y",as.character(NA))) %>% 
-  dplyr::filter(is.na(outlier)),
+  dplyr::mutate(outlier = ((flux_co2_umol_g_s - mean) > 4*sd)),
 
-#summarizing  
-  cum_flux = 
-    gf %>%
-    group_by(Core) %>% 
-    dplyr::summarise(cum = sum(flux_co2_umol_g_s),
-                     max = max(flux_co2_umol_g_s),
-                     cumC = sum(flux_co2_umol_gC_s),
-                     maxC = max(flux_co2_umol_gC_s),
-                     mean = mean(flux_co2_umol_g_s),
-                     meanC = mean(flux_co2_umol_gC_s),
-                     median = median(flux_co2_umol_g_s),
-                     medianC = median(flux_co2_umol_gC_s),
-                     sd = sd(flux_co2_umol_g_s),
-                     sdC = sd(flux_co2_umol_gC_s),
-                     cv = sd/mean,
-                     cvC = sdC/meanC,
-                     se = sd/sqrt(n()),
-                     n = n()) %>% 
-  left_join(core_key, by = "Core"),  
+# remove outliers and unnecessary columns
+gf_clean = 
+  gf %>% 
+  filter(outlier==FALSE) %>% 
+  dplyr::select(1:8),
 
-#testing for outliers  
-  gf_test = gf %>% group_by(Core_assignment) %>% 
-  dplyr::mutate(mean_grp = mean(flux_co2_umol_g_s),
-                sd_grp = sd(flux_co2_umol_g_s)) %>% 
-  ungroup %>% 
-  dplyr::mutate(outlier = if_else((flux_co2_umol_g_s - mean_grp) > 4*sd_grp,"y",as.character(NA))) %>% 
-  dplyr::filter(is.na(outlier)),
-#  
 
-  meanflux = 
-    cum_flux %>% 
-    group_by(soil_type,moisture_lvl,trt) %>% 
-    dplyr::summarize(cum = mean(cum),
-                     max = mean(max),
-                     cumC = mean(cumC),
-                     maxC = mean(maxC),
-                     mean = mean(mean),
-                     meanC = mean(meanC),
-                     median = mean(median),
-                     medianC = mean(medianC)),
-  
-  mean_percsat = 
-    cum_flux %>% 
-    group_by(soil_type,perc_sat,trt) %>% 
-    dplyr::summarize(cum = mean(cum),
-                     max = mean(max),
-                     cumC = mean(cumC),
-                     maxC = mean(maxC),
-                     mean = mean(mean),
-                     meanC = mean(meanC))
-  
+mean_flux = 
+  gf_clean %>% 
+  left_join(corekey_subset, by = "Core") %>% 
+  group_by(Core_assignment, texture, treatment, sat_level) %>% 
+  dplyr::summarise(flux_co2_umol_g_s = mean(flux_co2_umol_g_s),
+                   flux_co2_umol_gC_s = mean(flux_co2_umol_gC_s))
+
+
+            # summarizing  
+            ##   cum_flux = 
+            ##     gf %>%
+            ##     group_by(Core) %>% 
+            ##     dplyr::summarise(cum = sum(flux_co2_umol_g_s),
+            ##                      max = max(flux_co2_umol_g_s),
+            ##                      cumC = sum(flux_co2_umol_gC_s),
+            ##                      maxC = max(flux_co2_umol_gC_s),
+            ##                      mean = mean(flux_co2_umol_g_s),
+            ##                      meanC = mean(flux_co2_umol_gC_s),
+            ##                      median = median(flux_co2_umol_g_s),
+            ##                      medianC = median(flux_co2_umol_gC_s),
+            ##                      sd = sd(flux_co2_umol_g_s),
+            ##                      sdC = sd(flux_co2_umol_gC_s),
+            ##                      cv = sd/mean,
+            ##                      cvC = sdC/meanC,
+            ##                      se = sd/sqrt(n()),
+            ##                      n = n()) %>% 
+            ##   left_join(core_key, by = "Core"),  
+            ## 
+            ## #testing for outliers  
+            ##   gf_test = gf %>% group_by(Core_assignment) %>% 
+            ##   dplyr::mutate(mean_grp = mean(flux_co2_umol_g_s),
+            ##                 sd_grp = sd(flux_co2_umol_g_s)) %>% 
+            ##   ungroup %>% 
+            ##   dplyr::mutate(outlier = if_else((flux_co2_umol_g_s - mean_grp) > 4*sd_grp,"y",as.character(NA))) %>% 
+            ##   dplyr::filter(is.na(outlier)),
+            ## #  
+            ## 
+            ##   meanflux = 
+            ##     cum_flux %>% 
+            ##     group_by(soil_type,moisture_lvl,trt) %>% 
+            ##     dplyr::summarize(cum = mean(cum),
+            ##                      max = mean(max),
+            ##                      cumC = mean(cumC),
+            ##                      maxC = mean(maxC),
+            ##                      mean = mean(mean),
+            ##                      meanC = mean(meanC),
+            ##                      median = mean(median),
+            ##                      medianC = mean(medianC)),
+            ##   
+            ##   mean_percsat = 
+            ##     cum_flux %>% 
+            ##     group_by(soil_type,perc_sat,trt) %>% 
+            ##     dplyr::summarize(cum = mean(cum),
+            ##                      max = mean(max),
+            ##                      cumC = mean(cumC),
+            ##                      maxC = mean(maxC),
+            ##                      mean = mean(mean),
+            ##                      meanC = mean(meanC))
+            ##   
   
   )
-  
+
+## OUTPUT ----
+make(plan)
+fluxes = readd(gf_clean) %>% write.csv("data/processed/picarro_fluxes.csv", row.names = FALSE)
+mean_flux = readd(meanflux) %>% write.csv("data/processed/picarro_meanfluxes.csv", row.names = FALSE)
+
+
+
+#
+### UNNECESSARY CODE BELOW ### ####  
       ##  gf = readd(gf)
       ##  
       ##  gf %>% 
