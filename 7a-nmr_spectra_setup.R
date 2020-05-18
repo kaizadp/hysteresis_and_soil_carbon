@@ -19,7 +19,9 @@ bins2 =
   # here we select only the BINSET we chose above
   dplyr::select(group,startstop,BINSET) %>% 
   na.omit %>% 
-  spread(startstop,BINSET)
+  spread(startstop,BINSET) %>% 
+  arrange(start) %>% 
+  dplyr::mutate(number = row_number())
 
 
 #
@@ -27,7 +29,7 @@ bins2 =
 WATER_start = 3
 WATER_stop = 4
 
-DMSO_start = 2.25
+DMSO_start = 2.20
 DMSO_stop = 2.75
 
 ## bins for relative abundance
@@ -51,27 +53,23 @@ DMSO_stop = 2.75
 
 
 ## 3. spectra plot parameters ----
-gg_nmr = 
+gg_nmr =
   ggplot()+
-  geom_rect(data=bins2, aes(xmin=start, xmax=stop, ymin=-Inf, ymax=+Inf, fill=group), color="grey70",alpha=0.1)+
+  # stagger bracketing lines for odd vs. even rows  
+  geom_rect(data=bins2 %>% dplyr::filter(row_number() %% 2 == 0), 
+            aes(xmin=start, xmax=stop, ymin=3, ymax=3), color = "black")+
+  geom_rect(data=bins2 %>% dplyr::filter(row_number() %% 2 == 1), 
+            aes(xmin=start, xmax=stop, ymin=2.8, ymax=2.8), color = "black")+
+  # stagger numbering like the lines
+  geom_text(data=bins2 %>% dplyr::filter(row_number() %% 2 == 0), 
+            aes(x = (start+stop)/2, y = 3.1, label = number))+
+  geom_text(data=bins2 %>% dplyr::filter(row_number() %% 2 == 1), 
+            aes(x = (start+stop)/2, y = 2.9, label = number))+
   scale_x_reverse(limits = c(10,0))+
   xlab("shift, ppm")+
   ylab("intensity")+
   
-  # labels:
-  annotate("text", label = "aliphatic", x = 1.4, y = -0.1)+
-  annotate("text", label = "O-alkyl", x = 3.5, y = -0.1)+
-  annotate("text", label = "alpha-H", x = 4.45, y = -0.1)+
-  annotate("text", label = "aromatic", x = 7, y = -0.1)+
-  annotate("text", label = "amide", x = 8.1, y = -0.1)+
-  annotate("text", label = "\n\nWATER", x = 3.5, y = Inf)+
-  annotate("text", label = "\n\nDMSO", x = 2.48, y = Inf)+
-  geom_vline(xintercept = WATER_start, linetype="longdash")+
-  geom_vline(xintercept = WATER_stop, linetype="longdash")+
-  geom_vline(xintercept = DMSO_start, linetype="dashed")+
-  geom_vline(xintercept = DMSO_stop, linetype="dashed")+
-  
-  theme_bw() %+replace%
+  theme_classic() %+replace%
   theme(legend.position = "right",
         legend.key=element_blank(),
         legend.title = element_blank(),
@@ -91,6 +89,5 @@ gg_nmr =
         strip.text.x = element_text(size=12, face="bold"), #facet labels
         strip.text.y = element_text(size=12, face="bold", angle = 270) #facet labels
   )
-
 #
 
