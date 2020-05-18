@@ -18,6 +18,7 @@ source("6b-nmr_peaks_relabund.R")
 ```
 
 ## SPECTRA 
+#### spectra
 SCL = sandy clay loam (soil)  
 SL = sandy loam (soil + sand)  
 
@@ -83,7 +84,7 @@ gg_nmr+
 
 ```
 
-representative spectra -- 50 % saturation
+#### representative spectra -- 50 % saturation
 
 ```{r nmr_spectra_50_perc, fig.width=8, fig.height=5}
 subset_spectra = 
@@ -93,12 +94,16 @@ subset_spectra =
 gg_nmr+
   geom_path(data=subset_spectra[subset_spectra$treatment=="Drying",], 
             aes(x = ppm, y = intensity))+
-    geom_path(data=subset_spectra[subset_spectra$treatment=="Wetting",], 
+  geom_path(data=subset_spectra[subset_spectra$treatment=="Wetting",], 
             aes(x = ppm, y = intensity+1))+
   annotate("text", label = "rewetting", x = 9, y = 1.1)+
   annotate("text", label = "drying", x = 9, y = 0.1)+
   annotate("text", label = "core 115", x = 10, y = 0.95, size=3, hjust=0)+
   annotate("text", label = "core 120", x = 10, y = -0.05, size=3, hjust=0)+
+  
+  geom_rect(data = subset_spectra, 
+            aes(xmin = DMSO_start, xmax = WATER_stop, ymin = -0.1, ymax = 3.5),
+            fill = "grey90", alpha = 0.015)+
 
   ylim(-0.1,3.5)+
   ylab("")+
@@ -111,6 +116,7 @@ gg_nmr+
 )
 
 ```
+
 
 representative spectra -- 5 % saturation
 
@@ -407,15 +413,21 @@ ggdraw(rel_abund_scl_fm)
 ```{r relabund_bubble, fig.width=15, fig.height=7}
 rel_abund = read.csv("data/processed/nmr_rel_abund.csv")
 
-ggplot(rel_abund %>% 
-         filter(!treatment=="FM"),
+rel_abund2 = 
+  rel_abund %>% 
+  dplyr::mutate(sat_level = if_else(treatment=="FM", "FM", as.character(sat_level)),
+                sat_level = factor(sat_level, levels = 
+                                     c("FM", "5", "35", "50", "75", "100"))) 
+  
+  
+ggplot(rel_abund2,
        aes(x = treatment, y = group, color = group, size = rel_abund))+
   geom_point()+
-  geom_text(data = rel_abund %>% 
-              filter(!treatment=="FM",
+  geom_text(data = rel_abund2 %>% 
+              filter(
               rel_abund>15),
-         aes(label = round(rel_abund,0)), color = "black", size=3)+
-  facet_grid(texture ~ sat_level)+
+         aes(label = round(rel_abund,0)), color = "black", size=4)+
+  facet_grid(texture ~ sat_level, scales = "free_x")+
   scale_size_area(max_size = 20)+
   theme_bw()
   
