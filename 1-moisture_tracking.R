@@ -51,7 +51,8 @@ TC = 8.34 #carbon percentage
 
 read_core_key <- function(filename) {
   read_csv(COREKEY) %>%
-    dplyr::select(Core, texture, treatment, Core_assignment, perc_sat, sat_level, Moisture_perc, skip)
+    dplyr::select(Core, texture, treatment, Core_assignment, perc_sat, sat_level, Moisture_perc, skip) %>% 
+    filter(is.na(skip)) %>%  dplyr::select(-skip)
 }
 ca <- read_core_key("data/Core_key.xlsx")
 
@@ -66,7 +67,7 @@ read_core_masses <- function(filename, sheet, core_key, core_dry_weights) {
     filter(!is.na(Site), Site != "AMB", Core != "0") %>% # remove unnecessary crap
     left_join(core_key, by = "Core") %>% 
     left_join(core_dry_weights, by = "Core") %>% 
-    filter(is.na(skip)) %>% # exclude the rows as needed
+    #filter(is.na(skip)) %>% # exclude the rows as needed
     dplyr::select(Core, Start_datetime, Stop_datetime, Seq.Program, Valve,
                   Core_assignment, EmptyWt_g, DryWt_g, Mass_g, Carbon_g, Moisture_perc) %>% 
     dplyr::mutate(Start_datetime = mdy_hm(Start_datetime, tz = "America/Los_Angeles"),
