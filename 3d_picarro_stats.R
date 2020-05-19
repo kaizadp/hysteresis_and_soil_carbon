@@ -1,31 +1,33 @@
-source("3c-picarro_output_NODRAKE.R")
+# HYSTERESIS AND SOIL CARBON
+# picarro_stats
+# Kaizad F. Patel
+# 2020
 
-make(plan)
+## this script will use processed Picarro data and calculate statistics.
 
-cum_flux = readd(cum_flux)
-gf = readd(gf)
-mean_percsat = readd(mean_percsat)
-
-
-gf %>% 
-  dplyr::select(Core, DATETIME, Core_assignment, soil_type, moisture_lvl, trt,
-                flux_co2_umol_g_s, flux_co2_umol_gC_s) %>% 
-  dplyr::mutate(flux_co2_nmol_g_s = flux_co2_umol_g_s*1000,
-                flux_co2_nmol_gC_s = flux_co2_umol_gC_s*1000)->
-  gf_select
+# 1. load packages and files ----
+source("0-hysteresis_packages.R")
+fluxes = read.csv("data/processed/picarro_fluxes.csv", stringsAsFactors = F)
+meanfluxes = read.csv("data/processed/picarro_meanfluxes.csv", stringsAsFactors = F)
 
 
-gf_select %>% 
-  group_by(moisture_lvl, trt, soil_type) %>% 
-  dplyr::summarise(flux_gC = round(mean(flux_co2_nmol_gC_s),3),
-                   se = round(sd(flux_co2_nmol_gC_s)/sqrt(n()),3),
-                   mean_se = paste(flux_gC,"\u00B1",se)) %>% 
-  ungroup %>% 
-  dplyr::mutate(trt = if_else(moisture_lvl=="fm","W",trt))->temp
+#
 
-### anova
+# 2. overall anova ----
+# test the effect of treatment, sat_level, texture on CO2 flux
+
+aov1 = aov(flux_co2_nmol_g_s ~ treatment*texture*sat_level, data = fluxes)
+summary(aov1)
+
+aov2 = aov(flux_co2_nmol_gC_s ~ treatment*texture*sat_level, data = fluxes)
+summary(aov2)
+
+#
+
+# 3. anova ----
+# create anova function 
 fit_anova <- function(dat) {
-  a <-anova(lm(flux_co2_nmol_gC_s~trt, data = dat))
+  a <-anova(lm(flux_co2_nmol_gC_s~treatment, data = dat))
   #create a tibble with one column for each treatment
   # column 4 has the pvalue
   t = tibble(pval = a$`Pr(>F)`[1])
@@ -35,22 +37,37 @@ fit_anova <- function(dat) {
     dplyr::mutate(p = if_else(pval<0.05, "*","")) %>% 
     # remove the pval column
     dplyr::select(-pval) %>% 
-    dplyr::mutate(trt = "D")->
+    dplyr::mutate(treatment = "Drying")->
     # spread the p (asterisks) column bnack into the three columns
     # spread(trt, p)  ->
     t
 }
 
-gf_select[!is.na(gf_select$trt),] %>% 
-  group_by(moisture_lvl, soil_type) %>% 
-  do(fit_anova(.))->
+# apply this to `fluxes`
+fluxes_anova = 
+  fluxes %>% 
+  filter(!is.na(sat_level)) %>% 
+  group_by(texture, sat_level) %>% 
+  do(fit_anova(.))
   #melt(id = c("site","Class"), value.name = "dunnett", variable.name = "treatment")-> #gather columns 4-7 (treatment levels)
-  anova_p
 
-temp %>% 
-  ungroup %>% 
-  left_join(anova_p, by = c("moisture_lvl", "trt","soil_type")) %>% 
-  dplyr::mutate(summary = paste(mean_se, p)) %>% 
-  dplyr::mutate(var = paste(soil_type,trt)) %>% 
-  dplyr::select(var, moisture_lvl, summary) %>% 
-  spread(var, summary)  ->gf_summary
+fluxes_summary = 
+  meanfluxes %>% 
+  dplyr::select(-flux_co2_nmol_g_s) %>% 
+  dplyr::mutate(flux_nmol_gC_s = paste(round(flux_co2_nmol_gC_s,3), "\u00b1", round(se_C,3))) %>% 
+  left_join(fluxes_anova, by = c("texture", "sat_level", "treatment")) %>% 
+  dplyr::mutate(flux_nmol_gC_s = paste(flux_nmol_gC_s, p),
+                flux_nmol_gC_s = str_replace(flux_nmol_gC_s, "NA","")) %>% 
+  dplyr::select(-p)
+  
+#
+
+# 4. OUTPUT ----
+write.csv(fluxes_summary, "data/processed/picarro_meanfluxes_summary.csv", row.names = F)
+  
+
+
+
+
+
+
