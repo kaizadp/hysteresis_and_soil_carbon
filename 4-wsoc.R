@@ -141,7 +141,8 @@ h = HSD.test(aov, "sat_level")
 
 fit_aov_wsoc <- function(dat) {
  a <-aov(wsoc_mg_g ~ treatment, data = dat)
-tibble(`p` = summary(a)[[1]][[1,"Pr(>F)"]])
+t = tibble(`p` = summary(a)[[1]][[1,"Pr(>F)"]])
+t = t %>% dplyr::mutate(treatment="Drying")
 } 
 
 
@@ -149,15 +150,21 @@ wsoc_stats_temp =
   wsoc %>% 
   filter(!treatment=="FM") %>% 
   group_by(texture, sat_level) %>% 
-  dplyr::summarise(wsoc_mg_g = max(wsoc_mg_g)+0.02)
-
-wsoc_stats = 
-  wsoc %>% 
-  filter(!treatment=="FM") %>% 
-  group_by(texture, sat_level) %>% 
   do(fit_aov_wsoc(.)) %>% 
   dplyr::mutate(p = round(p,4),
-                asterisk = if_else(p<0.05,"*",as.character(NA))) %>% 
-  left_join(wsoc_stats_temp, by = c("texture", "sat_level"))
+                asterisk = if_else(p<0.05,"*",as.character(NA))) 
 
+wsoc_summary = 
+  wsoc %>% 
+  filter(!treatment=="FM") %>% 
+  group_by(texture, sat_level, treatment) %>% 
+  dplyr::summarise(se = sd(wsoc_mg_g)/sqrt(n()),
+                   wsoc = mean(wsoc_mg_g),
+                   wsoc_mg_g = paste(round(wsoc,3), "\u00b1", round(se,3))) %>% 
+  left_join(wsoc_stats_temp, by = c("texture", "sat_level", "treatment")) %>% 
+  ungroup %>% 
+  dplyr::mutate(wsoc_mg_g = paste(wsoc_mg_g, asterisk),
+                wsoc_mg_g = str_replace_all(wsoc_mg_g, "NA", ""))
+
+write.csv(wsoc_summary, "data/processed/wsoc_summary.csv", row.names = F)
 
