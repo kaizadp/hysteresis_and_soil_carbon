@@ -103,84 +103,36 @@ ggplot(fluxes, aes(x = sat_level, y = flux_co2_nmol_gC_s, color = treatment, sha
   theme_kp()
 ```
 
-```{r wsoc1}
-
-source("4-wsoc.R")
-make(wsoc_plan)
-
-
-wsoc_processed = readd(wsoc_processed)
-wsoc_raw = readd(wsoc_raw)
-wsoc_results = readd(wsoc_results)
-
-wsoc_results = read.csv(WSOC)
-
-wsoc_results %>% 
-  mutate(soil_type = dplyr::recode(soil_type, `Soil` = "Soil", `Soil_sand` = "Soil + Sand"))->wsoc_results
-
-
+# WSOC
+```{r wsoc_files}
+wsoc = read.csv(WSOC, stringsAsFactors = F) %>% 
+  dplyr::mutate(sat_level = if_else(treatment=="FM", as.integer(53), sat_level))
+wsoc_summary = read.csv("data/processed/wsoc_summary.csv", stringsAsFactors = F)
+wsoc_label =
+  wsoc_summary %>%
+  group_by(texture, sat_level) %>% 
+  dplyr::mutate(y = max(wsoc)+0.05) %>% 
+  na.omit()
 ```
 
 ```{r wsoc_graphs, fig.width=9}
 
-ggplot(wsoc_results, aes(x = perc_sat, y = wsoc_mg_g, color = treatment, shape = treatment))+
+ggplot(wsoc, aes(x = sat_level, y = wsoc_mg_g, color = treatment, shape = treatment))+
   geom_point(size=3, stroke=1.5)+
-  scale_color_manual(labels = c("drying","field moist","rewetting"), values = c("darkorange2","black","gray40"), na.translate=F)+
+  geom_text(data = wsoc_label %>% na.omit(), aes(x = sat_level, y = y, label = asterisk), color = "black", size=12)+
+  scale_color_manual(labels = c("drying","field moist","rewetting"), 
+                     values = c("darkorange2","black","gray40"), na.translate=F)+
   scale_shape_manual(labels = c("drying","field moist","rewetting"), values = c(16,4,1), na.translate=F)+
-  facet_grid(.~soil_type)+
-  ylab(expression(bold(paste("WSOC, mg g"^{-1}))))+
-  xlab("percent saturation")+
-#  scale_x_reverse(name = "percent saturation")+
-  theme_kp()
-
-
-ggplot(wsoc_results[!wsoc_results$treatment=="FM",], aes(x = perc_sat_actual, y = wsoc_mg_g, color = treatment, shape = treatment))+
-  geom_point(size=3, stroke=1.5)+
-  geom_smooth(data = wsoc_results[!wsoc_results$moisture_lvl==5&!wsoc_results$treatment=="FM",],
-              aes(x = perc_sat_actual, y = wsoc_mg_g, color = treatment), linetype = "longdash", size = 1, se=FALSE)+
-  scale_color_manual(labels = c("drying","rewetting"), values = c("darkorange2","gray40"), na.translate=F)+
-  scale_shape_manual(labels = c("drying","rewetting"), values = c(16,1), na.translate=F)+
-  facet_grid(.~soil_type)+
-  ylab(expression(bold(paste("WSOC, mg g"^{-1}))))+
-  xlab("percent saturation")+
-  #scale_x_reverse(name = "percent saturation")+
-  theme_kp()
-
-```
-
-
-```{r wsoc_graphs2}
-wsoc_results2 = 
-  wsoc_results %>% 
-  dplyr::mutate(sat_level = factor(sat_level, levels = c(5,35,50,75,100)))
-
-wsoc_stats = 
-  wsoc_stats %>% 
-  ungroup %>% 
-  dplyr::mutate(sat_level = factor(sat_level, levels = c(5,35,50,75,100)))
-
-ggplot()+
-  geom_point(data = wsoc_results2[!wsoc_results2$treatment=="FM",], 
-             aes(x = sat_level, y = wsoc_mg_g, color = treatment, shape = treatment),
-             size=2, stroke = 1, color = "black", position = position_dodge(0.7))+
-  geom_boxplot(data = wsoc_results2[!wsoc_results2$treatment=="FM",], 
-               aes(x = sat_level, y = wsoc_mg_g, color = treatment, shape = treatment),
-               position = "dodge", fill = NA, width = 0.7, size=1)+
-  geom_text(data = wsoc_stats, aes(x = sat_level, y = wsoc_mg_g, label = asterisk), size = 7)+
-  
-#  geom_dotplot(binaxis = "y", size = 1)+
-  scale_color_manual(labels = c("drying","rewetting"), values = c("darkorange2","gray40"), na.translate=F)+
-  scale_shape_manual(labels = c("drying","rewetting"), values = c(16,1), na.translate=F)+
   facet_grid(.~texture)+
   ylab(expression(bold(paste("WSOC, mg g"^{-1}))))+
   xlab("percent saturation")+
 #  scale_x_reverse(name = "percent saturation")+
-  
   theme_kp()
 
 ```
 
-```{r}
+
+```{r, include=F}
 # merge wsoc_results and cum_flux
 
 merged = 
