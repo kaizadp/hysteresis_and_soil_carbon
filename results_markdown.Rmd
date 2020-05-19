@@ -5,18 +5,20 @@ output: html_document
 ---
 Run: `r Sys.Date()`
 
+Results for HYPROP, Picarro, WEOC
+
 ```{r setup, include=FALSE}
 
 knitr::opts_chunk$set(dpi = 300,
                       echo=FALSE,message=FALSE,warning=FALSE,
                       collapse = TRUE,
                       comment = "#>", 
-                      fig.path = "images/")
+                      fig.path = "images/markdown/")
 
 source("0-hysteresis_packages.R")
 ```
 
-
+# HYPROP
 ```{r hyprop, fig.width=9, dpi=300}
 source("2-hyprop.R")
 
@@ -60,42 +62,42 @@ ggplot(hyprop, aes(y = kPa, x = perc_sat, color = treatment, linetype=treatment)
 ```
 
 
+# PICARRO
 
-
-```{r picarro}
-source("3c-picarro_output_NODRAKE.R")
-make(plan)
-
-cum_flux = readd(cum_flux)
-gf = readd(gf)
-meanflux = readd(meanflux)
-mean_percsat = readd(mean_percsat)
-
-labels = c(`soil` = "Soil", `soil_sand` = "Soil+Sand")
-
-cum_flux %>% 
-  mutate(soil_type = dplyr::recode(soil_type, `Soil` = "Soil", `Soil_sand` = "Soil + Sand"))->
-  cum_flux
-
-mean_percsat %>% 
-  ungroup %>% 
-  mutate(soil_type = dplyr::recode(soil_type, `Soil` = "Soil", `Soil_sand` = "Soil + Sand"))->
-  mean_percsat
+```{r picarro_files}
+fluxes = read.csv("data/processed/picarro_fluxes.csv", stringsAsFactors = F) %>% 
+  dplyr::mutate(sat_level = if_else(treatment=="FM", as.integer(53), sat_level))
+meanfluxes_summary = read.csv("data/processed/picarro_meanfluxes_summary.csv", stringsAsFactors = F)
 ```
 
-
+```{r picarro_anova}
+aov2 = aov(flux_co2_nmol_gC_s ~ treatment*texture*sat_level, data = fluxes)
+summary(aov2)
+```
 
 ```{r respiration, fig.width=9}
-ggplot(cum_flux, aes(x = perc_sat, y = meanC*1000, color = trt, shape=trt))+
-  geom_point(position = position_dodge(width = 0.5), size=3, stroke=1.5)+
-  geom_smooth(data = mean_percsat, aes(x = as.numeric(perc_sat), y = meanC*1000), linetype = "longdash", size = 1, se=FALSE)+
+
+label = tibble(x = c(50, 75, 100, 100),
+               y = c(0.80, 1.10, 1.10, 0.90),
+               texture = c("SCL", "SCL", "SCL", "SL"),
+               label = c("*","*","*","*"),
+               treatment = c("Drying", "Drying", "Drying", "Drying"))
+
+ggplot(fluxes, aes(x = sat_level, y = flux_co2_nmol_gC_s, color = treatment, shape=treatment))+
+  geom_point(position = position_dodge(width = 0.5), size=4, stroke=1.5)+
+  geom_smooth(data = meanfluxes %>% filter(!treatment=="FM"), 
+              aes(x = as.numeric(sat_level), y = flux_co2_nmol_gC_s), 
+              linetype = "longdash", size = 1, se=FALSE)+
+  geom_text(data = label, aes(x = x, y = y, label = label), size=12, color = "black")+
    # geom_vline(xintercept = 6.5)+
   ylab("mean flux_co2_nmol_gC_s")+
-  scale_color_manual(labels = c("drying","rewetting"), values = c("darkorange2","gray40"), na.translate=F)+
-  scale_shape_manual(labels = c("drying","rewetting"), values = c(16,1), na.translate=F)+
-  facet_grid(.~soil_type)+
+  scale_color_manual(breaks = c("Drying","Wetting", "FM"),
+                     labels = c("drying","rewetting", "field moist"), values = c("darkorange2","gray40", "black"), na.translate=F)+
+  scale_shape_manual(breaks = c("Drying","Wetting", "FM"),
+                     labels = c("drying","rewetting", "field moist"), values = c(16,1, 4), na.translate=F)+
+  facet_grid(.~texture)+
   #scale_x_reverse(name = "percent saturation")+
-  ylab(expression(bold(paste("mean CO"[2]," flux, nmol g"^{-1}, "s"^{-1}))))+
+  ylab(expression(bold(paste("mean CO"[2]," flux, nmol g"^{-1}, "C s"^{-1}))))+
   xlab("percent saturation")+
   #ggtitle("mean CO2 flux per g C")+
   theme_kp()
