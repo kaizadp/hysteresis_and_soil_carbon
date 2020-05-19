@@ -78,8 +78,11 @@ gf_nm  =
 mean_flux = 
   gf_nm %>% 
   group_by(Core_assignment, texture, treatment, sat_level) %>% 
-  dplyr::summarise(flux_co2_nmol_g_s = mean(flux_co2_nmol_g_s),
-                   flux_co2_nmol_gC_s = mean(flux_co2_nmol_gC_s))
+  dplyr::summarise(se = sd(flux_co2_nmol_g_s)/sqrt(n()),
+                   se_C = sd(flux_co2_nmol_gC_s)/sqrt(n()),
+                   flux_co2_nmol_g_s = mean(flux_co2_nmol_g_s),
+                   flux_co2_nmol_gC_s = mean(flux_co2_nmol_gC_s)
+                   )
 
 
             # summarizing  
@@ -139,7 +142,7 @@ mean_flux =
 ## OUTPUT ----
 make(plan)
 fluxes = readd(gf_nm) %>% write.csv("data/processed/picarro_fluxes.csv", row.names = FALSE)
-mean_flux = readd(meanflux) %>% write.csv("data/processed/picarro_meanfluxes.csv", row.names = FALSE)
+mean_flux = readd(mean_flux) %>% write.csv("data/processed/picarro_meanfluxes.csv", row.names = FALSE)
 
 
 
