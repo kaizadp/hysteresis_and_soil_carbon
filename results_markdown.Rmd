@@ -111,20 +111,27 @@ wsoc_summary = read.csv("data/processed/wsoc_summary.csv", stringsAsFactors = F)
 wsoc_label =
   wsoc_summary %>%
   group_by(texture, sat_level) %>% 
-  dplyr::mutate(y = max(wsoc)+0.05) %>% 
+  dplyr::mutate(y = max(wsoc)+0.15) %>% 
   na.omit()
+```
+
+```{r wsoc_anova}
+wsoc = read.csv(WSOC)
+aov = aov(wsoc_mg_g ~ treatment * texture * sat_level, data = wsoc[!wsoc$sat_level==5,])
+summary(aov)
+
 ```
 
 ```{r wsoc_graphs, fig.width=9}
 
-ggplot(wsoc, aes(x = sat_level, y = wsoc_mg_g, color = treatment, shape = treatment))+
+ggplot(wsoc, aes(x = sat_level, y = wsoc_mg_gC, color = treatment, shape = treatment))+
   geom_point(size=3, stroke=1.5)+
   geom_text(data = wsoc_label %>% na.omit(), aes(x = sat_level, y = y, label = asterisk), color = "black", size=12)+
   scale_color_manual(labels = c("drying","field moist","rewetting"), 
                      values = c("darkorange2","black","gray40"), na.translate=F)+
   scale_shape_manual(labels = c("drying","field moist","rewetting"), values = c(16,4,1), na.translate=F)+
   facet_grid(.~texture)+
-  ylab(expression(bold(paste("WSOC, mg g"^{-1}))))+
+  ylab(expression(bold(paste("WSOC, mg gC"^{-1}))))+
   xlab("percent saturation")+
 #  scale_x_reverse(name = "percent saturation")+
   theme_kp()
