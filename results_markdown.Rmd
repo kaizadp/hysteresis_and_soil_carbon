@@ -1,11 +1,10 @@
 ---
-title: "Hysteresis and Soil C"
-author: "Kaizad Patel"
-output: html_document
+title: "[Hysteresis and Soil C]"
+output: github_document
 ---
-Run: `r Sys.Date()`
 
-Results for HYPROP, Picarro, WEOC
+# Soil carbon dynamics during drying vs. rewetting: importance of antecedent moisture conditions  
+## results
 
 ```{r setup, include=FALSE}
 
@@ -15,11 +14,28 @@ knitr::opts_chunk$set(dpi = 300,
                       comment = "#>", 
                       fig.path = "images/markdown/")
 
-source("0-hysteresis_packages.R")
+source("code/0-hysteresis_packages.R")
 ```
 
-# HYPROP
-```{r hyprop, fig.width=9, dpi=300}
+```{r, eval=TRUE}
+pal2 = PNWColors::pnw_palette("Bay",2)
+pal3 = c("#dd4124", "#00496f", "#edd746") #bay
+
+  ## pal2=soilpalettes::soil_palette("gley",2)
+  ## pal3=c(soilpalettes::soil_palette("gley",2), "black") 
+  ##   
+  ## pal = soilpalettes::soil_palette("eutrostox",3)
+  ## PNWColors::pnw_palette("Bay",3)
+  ## pal = c("#ed8b00", "#00496f") 
+  ## pal = c("#d2848d", "#6e7cb9") 
+  ## pal = c("#f9ad2a", "#1d457f")
+```
+
+---
+
+## WATER RETENTION CURVES
+
+```{r hyprop1, fig.width=9, dpi=300, eval=FALSE}
 source("2-hyprop.R")
 
 ggplot(hyprop, aes(y = kPa, x = perc_sat, color = treatment, linetype=treatment))+
@@ -61,12 +77,44 @@ ggplot(hyprop, aes(y = kPa, x = perc_sat, color = treatment, linetype=treatment)
 
 ```
 
+```{r hyprop, fig.width=9, dpi=300}
+wrc = read.csv("data/processed/wrc.csv")
 
-# PICARRO
+ggplot(wrc, aes(y = kPa, x = perc_sat, linetype=treatment, color = treatment))+
+  geom_path(size=1)+
+  scale_color_manual(labels = c("drying","rewetting"), 
+                     values = rev(pal2), 
+                     na.translate=F)+
+  scale_linetype_manual(labels = c("drying","rewetting"), 
+                        values = c("solid","dashed"), 
+                        na.translate=F)+
+  
+  facet_wrap(.~texture)+
+  ylab ("tension, kPa")+
+  xlab ("percent saturation")+
+  scale_y_continuous(trans = scales::log10_trans(), 
+                     labels = scales::comma, 
+                     sec.axis = sec_axis(~ .^-1 * 300, 
+                                         name = "pore size (um)", 
+                                         labels = scales::comma))+
+  geom_vline(xintercept = 5, size=0.5, color = "grey80")+
+  geom_vline(xintercept = 35, size=0.5, color = "grey80")+
+  geom_vline(xintercept = 50, size=0.5, color = "grey80")+
+  geom_vline(xintercept = 75, size=0.5, color = "grey80")+
+  theme_kp()+
+  theme(panel.grid = element_blank())+
+  NULL
+
+```
+
+---
+
+## RESPIRATION
 
 ```{r picarro_files}
 fluxes = read.csv("data/processed/picarro_fluxes.csv", stringsAsFactors = F) %>% 
   dplyr::mutate(sat_level = if_else(treatment=="FM", as.integer(53), sat_level))
+
 meanfluxes_summary = read.csv("data/processed/picarro_meanfluxes_summary.csv", stringsAsFactors = F)
 ```
 
@@ -75,7 +123,7 @@ aov2 = aov(flux_co2_nmol_gC_s ~ treatment*texture*sat_level, data = fluxes)
 summary(aov2)
 ```
 
-```{r respiration, fig.width=9}
+```{r respiration_graph, fig.width=9}
 
 label = tibble(x = c(50, 75, 100, 100),
                y = c(0.80, 1.10, 1.10, 0.90),
@@ -83,27 +131,29 @@ label = tibble(x = c(50, 75, 100, 100),
                label = c("*","*","*","*"),
                treatment = c("Drying", "Drying", "Drying", "Drying"))
 
-ggplot(fluxes, aes(x = sat_level, y = flux_co2_nmol_gC_s, color = treatment, shape=treatment))+
-  geom_point(position = position_dodge(width = 0.5), size=4, stroke=1.5)+
-  geom_smooth(data = meanfluxes %>% filter(!treatment=="FM"), 
-              aes(x = as.numeric(sat_level), y = flux_co2_nmol_gC_s), 
-              linetype = "longdash", size = 1, se=FALSE)+
-  geom_text(data = label, aes(x = x, y = y, label = label), size=12, color = "black")+
-   # geom_vline(xintercept = 6.5)+
-  ylab("mean flux_co2_nmol_gC_s")+
-  scale_color_manual(breaks = c("Drying","Wetting", "FM"),
-                     labels = c("drying","rewetting", "field moist"), values = c("darkorange2","gray40", "black"), na.translate=F)+
+ggplot(fluxes, aes(x = sat_level, y = flux_co2_nmol_gC_s, shape=treatment, color = treatment))+
+  geom_point(position = position_dodge(width = 0.5), size=3, stroke=1)+
+#  geom_smooth(data = meanfluxes %>% filter(!treatment=="FM"), 
+#              aes(x = as.numeric(sat_level), y = flux_co2_nmol_gC_s), 
+#              linetype = "longdash", size = 1, se=FALSE)+
+  geom_text(data = label, aes(x = x, y = y, label = label), size=10, color = "black")+
+  scale_color_manual(values = (pal3),
+                     breaks = c("Drying","Wetting", "FM"),
+                     labels = c("drying","rewetting", "field moist"), 
+                     na.translate=F)+
   scale_shape_manual(breaks = c("Drying","Wetting", "FM"),
-                     labels = c("drying","rewetting", "field moist"), values = c(16,1, 4), na.translate=F)+
+                     labels = c("drying","rewetting", "field moist"), 
+                     values = c(16,1, 4), na.translate=F)+
   facet_grid(.~texture)+
-  #scale_x_reverse(name = "percent saturation")+
   ylab(expression(bold(paste("mean CO"[2]," flux, nmol g"^{-1}, "C s"^{-1}))))+
   xlab("percent saturation")+
-  #ggtitle("mean CO2 flux per g C")+
-  theme_kp()
+  theme_kp()+
+  NULL
 ```
 
-# WSOC
+---
+
+## WSOC
 ```{r wsoc_files}
 wsoc = read.csv(WSOC, stringsAsFactors = F) %>% 
   dplyr::mutate(sat_level = if_else(treatment=="FM", as.integer(53), sat_level))
@@ -124,34 +174,359 @@ summary(aov)
 
 ```{r wsoc_graphs, fig.width=9}
 
-ggplot(wsoc, aes(x = sat_level, y = wsoc_mg_gC, color = treatment, shape = treatment))+
-  geom_point(size=3, stroke=1.5)+
-  geom_text(data = wsoc_label %>% na.omit(), aes(x = sat_level, y = y, label = asterisk), color = "black", size=12)+
-  scale_color_manual(labels = c("drying","field moist","rewetting"), 
-                     values = c("darkorange2","black","gray40"), na.translate=F)+
-  scale_shape_manual(labels = c("drying","field moist","rewetting"), values = c(16,4,1), na.translate=F)+
+ggplot(wsoc, aes(x = sat_level, y = wsoc_mg_gC, shape = treatment, color = treatment))+
+  geom_point(size=3, stroke=1)+
+  geom_text(data = wsoc_label %>% na.omit(), 
+            aes(x = sat_level, y = y, label = asterisk), color = "black", size=10)+
+  scale_color_manual(values = pal3,
+                     breaks = c("Drying","Wetting", "FM"),
+                     labels = c("drying","rewetting", "field moist"), 
+                    na.translate=F)+
+  scale_shape_manual(breaks = c("Drying","Wetting", "FM"),
+                     labels = c("drying","rewetting", "field moist"), 
+                     values = c(16,1,4), na.translate=F)+
   facet_grid(.~texture)+
   ylab(expression(bold(paste("WSOC, mg gC"^{-1}))))+
   xlab("percent saturation")+
 #  scale_x_reverse(name = "percent saturation")+
-  theme_kp()
+  theme_kp()+
+  NULL
+
+```
+
+---
+
+## FTICR
+
+```{r}
+fticr_data = read.csv(FTICR_LONG)
+#fticr_meta = read.csv(FTICR_META)
+meta_hcoc = read.csv(FTICR_META_HCOC)
+
+#relabund = read.csv("data/processed/fticr_relabund.csv")
+corekey = read.csv(COREKEY)
+
+corekey_subset = 
+  corekey %>% 
+  dplyr::select(Core, texture, treatment, perc_sat, sat_level,Core_assignment) %>% 
+  dplyr::mutate(Core = as.factor(Core))
+
+fticr = 
+  fticr_data %>% 
+  dplyr::mutate(sat_level = if_else(treatment == "FM", 50, as.numeric(sat_level))) %>% 
+  left_join(meta_hcoc, by = "formula")
+```
+
+```{r vk2, fig.height = 6, fig.width=10}
+fticr_subset = 
+  fticr %>% 
+  filter(sat_level %in% c(50,100)) %>% 
+  filter(!(sat_level==50 & (treatment == "Drying"|treatment=="Wetting")))
+
+gg_fm = gg_vankrev(fticr_subset[fticr_subset$treatment=="FM",], aes(x = OC, y = HC, color = treatment))+
+  scale_color_manual(values = "#edd746")+
+  annotate("text", label = "aliphatic", x = 0.2, y = 1.75)+
+   annotate("text", label = "highly unsaturated/ \n lignin-like", x = 0.2, y = 1.25)+
+   annotate("text", label = "aromatic", x = 0.2, y = 0.85)+
+   annotate("text", label = "condensed aromatic", x = 0.2, y = 0.35)+
+  theme_kp()+
+  theme(legend.position = c(0.7, 0.1))
+
+gg_100 = 
+  fticr_subset %>% 
+  filter(sat_level==100) %>% 
+  #dplyr::mutate(treatment = factor(treatment, levels = c("Wetting", "Drying"))) %>% 
+  gg_vankrev( 
+             aes(x = OC, y = HC, color = treatment, group = rev(treatment)))+
+  scale_color_manual(values = rev(pal2))+
+  #geom_point(size=0.5, alpha = 0.4)+
+  #facet_grid(.~treatment)+
+  theme_kp()+
+  theme(legend.position = c(0.7, 0.1),
+        legend.text.align = 1)+
+  guides(colour = guide_legend(override.aes = list(alpha=1),nrow = 1))
+```
+
+```{r vk_marginal, fig.height=5, fig.width=10}
+
+gg_marg_fm = ggMarginal(gg_fm,groupColour = TRUE,groupFill = TRUE)
+gg_marg_100 = ggMarginal(gg_100,groupColour = TRUE,groupFill = TRUE)
+
+plot_grid(gg_marg_fm, gg_marg_100, nrow = 1, ncol = 2)
+```
+
+---
+
+## NMR
+
+### spectra 
+```{r, eval=FALSE}
+spectra = read.csv("data/processed/nmr_spectra.csv.gz")
+
+spectra_plot = 
+  spectra %>% 
+  dplyr::mutate(Core = as.character(Core))  %>% 
+  na.omit()
+```
+
+#### representative spectra -- 50 % saturation
+
+```{r nmr_spectra_50_perc, fig.width=8, fig.height=5, eval=FALSE}
+subset_spectra = 
+  spectra_plot %>% 
+  filter(Core %in% c(120,115))
+  
+gg_nmr+
+  geom_path(data=subset_spectra[subset_spectra$treatment=="Drying",], 
+            aes(x = ppm, y = intensity))+
+  geom_path(data=subset_spectra[subset_spectra$treatment=="Wetting",], 
+            aes(x = ppm, y = intensity+1))+
+  annotate("text", label = "rewetting", x = 9, y = 1.1)+
+  annotate("text", label = "drying", x = 9, y = 0.1)+
+  annotate("text", label = "core 115", x = 10, y = 0.95, size=3, hjust=0)+
+  annotate("text", label = "core 120", x = 10, y = -0.05, size=3, hjust=0)+
+  
+  geom_rect(data = subset_spectra, 
+            aes(xmin = DMSO_start, xmax = WATER_stop, ymin = -0.1, ymax = 3.5),
+            fill = "grey90", alpha = 0.015)+
+
+  ylim(-0.1,3.5)+
+  ylab("")+
+  ggtitle("50% saturation")+
+  
+  theme(legend.position = "none",
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        panel.grid.major = element_blank(), panel.grid.minor = element_blank()
+)
 
 ```
 
 
-```{r, include=F}
-# merge wsoc_results and cum_flux
+representative spectra -- 5 % saturation
 
-merged = 
-  wsoc_results %>% 
-  mutate(Core = as.numeric(Core)) %>% 
-  left_join(cum_flux, by = "Core")
+```{r nmr_spectra_5_perc, fig.width=8, fig.height=5, eval=FALSE}
+subset_spectra_5 = 
+  spectra_plot %>% 
+  filter(Core %in% c(38,43))
+  
+gg_nmr+
+  geom_path(data=subset_spectra_5[subset_spectra_5$treatment=="Drying",], 
+            aes(x = ppm, y = intensity))+
+    geom_path(data=subset_spectra_5[subset_spectra_5$treatment=="Wetting",], 
+            aes(x = ppm, y = intensity+1))+
+  annotate("text", label = "rewetting", x = 9, y = 1.1)+
+  annotate("text", label = "drying", x = 9, y = 0.1)+
+  annotate("text", label = "core 38", x = 10, y = 0.95, size=3, hjust=0)+
+  annotate("text", label = "core 43", x = 10, y = -0.05, size=3, hjust=0)+
+  
+  geom_rect(data = subset_spectra, 
+            aes(xmin = DMSO_start, xmax = WATER_stop, ymin = -0.1, ymax = 3.5),
+            fill = "grey90", alpha = 0.015)+
 
-names(merged)
- 
-ggplot(merged[!merged$moisture_lvl.x==5,], aes(x = wsoc_mg_g, y = mean, color = perc_sat_actual))+
-  geom_point()+
-  facet_grid(treatment.y~soil_type.x)
+  ylim(-0.1,3.5)+
+  ylab("")+
+  ggtitle("5% saturation")+
+  
+  theme(legend.position = "none",
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        panel.grid.major = element_blank(), panel.grid.minor = element_blank()
+)
 
 ```
+
+
+### PCA
+```{r nmr_pca}
+rel_abund_cores = read.csv("data/processed/nmr_rel_abund_cores.csv")
+
+# pca ----
+relabund_pca=
+  rel_abund_cores %>% 
+  ungroup %>% 
+  dplyr::select(Core, treatment, sat_level, texture, group, relabund) %>% 
+  spread(group, relabund) %>% 
+  replace(.,is.na(.),0)  %>% 
+  dplyr::mutate(sat_level = if_else(treatment=="FM","FM", as.character(sat_level))) %>% 
+  dplyr::select(-1)
+
+# pca scl ----
+relabund_pca_scl_num = 
+  relabund_pca %>% 
+  filter(texture=="SCL") %>% 
+  dplyr::select(.,-(1:3))
+
+relabund_pca_scl_grp = 
+  relabund_pca %>% 
+  filter(texture=="SCL") %>% 
+  dplyr::select(.,(1:3)) %>% 
+  dplyr::mutate(row = row_number())
+
+pca_scl = prcomp(relabund_pca_scl_num, scale. = T)
+#summary(pca_scl)
+
+## biplot scl ----
+ggbiplot_scl = 
+    ggbiplot(pca_scl, obs.scale = 1, var.scale = 1, 
+         groups = relabund_pca_scl_grp$treatment, ellipse = TRUE, circle = F,
+         var.axes = TRUE,
+         )+
+    geom_point(size=2,stroke=2, 
+               aes(color = groups,
+                   shape = as.factor(relabund_pca_scl_grp$sat_level)))+
+    scale_color_manual(values = (pal3),
+                     breaks = c("Drying","Wetting", "FM"),
+                     labels = c("drying","rewetting", "field moist"), 
+                     na.translate=F)+
+    scale_shape_manual(values = c(18, 17, 3, 15, 16, 4),
+                       breaks = c(5, 35, 50, 75, 100, "FM"))+
+    ggtitle("SCL texture")+
+    theme_kp()+
+    theme(panel.grid = element_blank(),
+          title = element_text(hjust = 0.5))+
+    NULL
+
+
+# pca sl ----
+relabund_pca_sl_num = 
+  relabund_pca %>% 
+  filter(texture=="SL") %>% 
+  dplyr::select(.,-(1:3))
+
+relabund_pca_sl_grp = 
+  relabund_pca %>% 
+  filter(texture=="SL") %>% 
+  dplyr::select(.,(1:3)) %>% 
+  dplyr::mutate(row = row_number())
+
+pca_sl = prcomp(relabund_pca_sl_num, scale. = T)
+#summary(pca_sl)
+
+## biplot sl ----
+ggbiplot_sl = 
+  ggbiplot(pca_sl, obs.scale = 1, var.scale = 1,
+           groups = relabund_pca_sl_grp$treatment, ellipse = TRUE, circle = F,
+           var.axes = TRUE)+
+   geom_point(size=2,stroke=2, 
+              aes(color = groups,
+                  shape = as.factor(relabund_pca_sl_grp$sat_level)))+
+    scale_color_manual(values = (pal3),
+                     breaks = c("Drying","Wetting", "FM"),
+                     labels = c("drying","rewetting", "field moist"), 
+                     na.translate=F)+
+    scale_shape_manual(values = c(18, 17, 3, 15, 16, 4),
+                       breaks = c(5, 35, 50, 75, 100, "FM"))+
+  ggtitle("SL texture")+
+    theme_kp()+
+    theme(panel.grid = element_blank(),
+          title = element_text(hjust = 0.5))+  
+  NULL
+
+
+# combined biplots ----
+library(patchwork)
+ggbiplot_scl+ggbiplot_sl +
+  plot_layout(guides = "collect") & theme(legend.position = "bottom")
+```
+
+
+
+### RELATIVE ABUNDANCE
+
+### tables
+```{r}
+rel_abund = read.csv("data/processed/nmr_rel_abund.csv")
+```
+
+peaks in field moist soils
+
+```{r}
+rel_abund %>% 
+  filter(treatment == "FM") %>% 
+  dplyr::select(group, texture, relative_abundance) %>% 
+  spread(texture, relative_abundance) %>% 
+  knitr::kable(align = "r")
+```
+
+peaks in treatments
+
+```{r}
+rel_abund %>% 
+  filter(!treatment == "FM") %>% 
+  dplyr::mutate(sat_level = factor(sat_level, levels = c(5,35,50,75,100)),
+                var = paste0(sat_level,"-",treatment)) %>% 
+  dplyr::select(texture, group, var, relative_abundance) %>% 
+   
+  spread(var, relative_abundance) %>% 
+  knitr::kable(align = "r")
+```
+
+
+
+### more viz
+```{r nmr_relabund, fig.width=9, fig.height=7}
+rel_abund2 = 
+  rel_abund %>% 
+  dplyr::mutate(sat_level = if_else(treatment=="FM", "FM", as.character(sat_level)),
+                sat_level = factor(sat_level, levels = 
+                                     c("FM", "5", "35", "50", "75", "100"))) 
+
+nmr_label <- tribble(
+  ~texture, ~sat_level, ~treatment, ~group, ~rel_abund, ~color,
+  "SCL", "35", "Wetting", "aliphatic1", 80, "white",
+  "SCL", "35", "Wetting", "aromatic", 30, "black",
+  "SCL", "50", "Wetting", "aromatic", 30, "black",
+  "SCL", "100", "Wetting", "aliphatic2", 80, "white",
+  "SL", "35", "Wetting", "aromatic", 30, "black",
+  "SL", "50", "Wetting", "aliphatic1", 80, "white",
+  "SL", "75", "Wetting", "aromatic", 30, "black",
+  "SL", "75", "Wetting", "aliphatic1", 80, "white",
+  "SL", "100", "Wetting", "aromatic", 30, "black",
+  "SL", "100", "Wetting", "aliphatic1", 80, "white"
+) %>% 
+  dplyr::mutate(sat_level = if_else(treatment=="FM", "FM", as.character(sat_level)),
+                sat_level = factor(sat_level, levels = 
+                                     c("FM", "5", "35", "50", "75", "100"))) 
+
+
+ggplot(rel_abund2,
+       aes(x = treatment, y = rel_abund, fill = group))+
+  geom_bar(stat = "identity")+
+  geom_text(data = nmr_label, 
+            aes(x = treatment, y = rel_abund, color = color), 
+            label = "*", size=7,
+            show.legend = F)+
+  facet_grid(texture ~ sat_level, scales = "free_x")+
+  scale_x_discrete(position = "bottom") +
+  labs(x = "",
+       y = "relative abundance (%)",
+       subtitle = "% saturation")+
+  #scale_fill_viridis_d()+
+  scale_fill_manual(values = soilpalettes::soil_palette("paleustalf",5))+
+#  scale_fill_manual(values = PNWColors::pnw_palette("Sunset",5))+
+#  scale_fill_manual(values = PNWColors::pnw_palette("Sunset2"))+
+  scale_color_manual(values = c("black", "white"))+
+  theme_kp()+
+  theme(
+    plot.subtitle = element_text(size=14, face = "bold", hjust=0.5),
+    panel.border = element_rect(color="black",size=0.5, fill = NA),
+    strip.background = element_blank(), #facet formatting
+    panel.spacing.x = unit(0.5, "lines"), #facet spacing for x axis
+    panel.spacing.y = unit(1, "lines"), #facet spacing for x axis
+    strip.text.x = element_text(size=12, face = "bold"), #facet labels
+    strip.text.y = element_text(size=12, face = "bold", angle = 270)
+    )
+```
+
+---
+### Session Info
+
+Run: `r Sys.Date()`
+
+```{r}
+sessionInfo()
+```
+
+
 
