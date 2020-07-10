@@ -89,7 +89,27 @@ ggbiplot(pca_sl, obs.scale = 1, var.scale = 1,
 
 #
 # PART III: summary stats ----
-# anova 
+## 1. MANOVA ----
+
+rel_abund2 = 
+  rel_abund %>% 
+  dplyr::select(Core, texture, treatment, sat_level, group, relabund) %>% 
+  spread(group, relabund) %>% 
+  replace(is.na(.),0) 
+
+rel_abund2$DV = as.matrix(rel_abund2[,5:9])
+
+# since the relative abundances are not strictly independent and all add to 100 %,
+# use the isometric log ratio transformation
+# http://www.sthda.com/english/wiki/manova-test-in-r-multivariate-analysis-of-variance#import-your-data-into-r
+
+library(compositions)
+
+man = manova(ilr(clo(DV)) ~ treatment, data = rel_abund2)
+summary(man)
+
+#
+## 2. relative abundance ANOVA ---- 
 
 fit_aov_nmr <- function(dat) {
   a <-aov(relabund ~ treatment, data = dat)
