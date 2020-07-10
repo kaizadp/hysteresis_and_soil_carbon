@@ -7,7 +7,7 @@
  ## generate clean files that can be used for subsequent analysis.
  ## each dataset will generate longform files of (a) all cores, (b) summarized data for each treatment (i.e. cores combined) 
 
-source("0-hysteresis_packages.R")
+source("code/0-hysteresis_packages.R")
 
 #install.packages("devtools") 
 #devtools::install_github("jakelawlor/PNWColors") 
@@ -81,7 +81,7 @@ fticr_data =
   group_by(Core_assignment,treatment, texture, sat_level,formula) %>% 
   dplyr::summarize(n = n(),
                    presence = mean(presence)) %>% 
-  filter(n==5) 
+  filter(n>=3) 
 
 ## OUTPUTS
 write.csv(fticr_data,FTICR_LONG, row.names = FALSE)
