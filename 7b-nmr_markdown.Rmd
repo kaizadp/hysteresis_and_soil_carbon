@@ -134,6 +134,11 @@ gg_nmr+
   annotate("text", label = "drying", x = 9, y = 0.1)+
   annotate("text", label = "core 38", x = 10, y = 0.95, size=3, hjust=0)+
   annotate("text", label = "core 43", x = 10, y = -0.05, size=3, hjust=0)+
+  
+  geom_rect(data = subset_spectra, 
+            aes(xmin = DMSO_start, xmax = WATER_stop, ymin = -0.1, ymax = 3.5),
+            fill = "grey90", alpha = 0.015)+
+
   ylim(-0.1,3.5)+
   ylab("")+
   ggtitle("5% saturation")+
@@ -201,10 +206,12 @@ relabund_pca_scl_grp =
 pca_scl = prcomp(relabund_pca_scl_num, scale. = T)
 summary(pca_scl)
 
-ggbiplot(pca_scl, obs.scale = 1, var.scale = 1, 
+ggbiplot_scl = 
+  ggbiplot(pca_scl, obs.scale = 1, var.scale = 1, 
          groups = relabund_pca_scl_grp$treatment, ellipse = TRUE, circle = F,
          var.axes = TRUE)+
   geom_point(size=2,stroke=2, aes(color = groups, shape = as.factor(relabund_pca_scl_grp$sat_level)))+
+  theme_kp()+
   ggtitle("SCL texture")
 
 ### sl
@@ -222,12 +229,17 @@ relabund_pca_sl_grp =
 pca_sl = prcomp(relabund_pca_sl_num, scale. = T)
 summary(pca_sl)
 
-ggbiplot(pca_sl, obs.scale = 1, var.scale = 1, 
+ggbiplot_sl = 
+  ggbiplot(pca_sl, obs.scale = 1, var.scale = 1, 
          groups = relabund_pca_sl_grp$treatment, ellipse = TRUE, circle = F,
          var.axes = TRUE)+
   geom_point(size=2,stroke=2, aes(color = groups, shape = as.factor(relabund_pca_sl_grp$sat_level)))+
+  theme_kp()+
   ggtitle("SL texture")
 
+library(patchwork)
+ggbiplot_scl+ggbiplot_sl +
+  plot_layout(guides = "collect") & theme(legend.position = "bottom")
 ```
 
 
@@ -430,6 +442,43 @@ ggplot(rel_abund2,
   facet_grid(texture ~ sat_level, scales = "free_x")+
   scale_size_area(max_size = 20)+
   theme_bw()
+
+
+nmr_label <- tribble(
+  ~texture, ~sat_level, ~treatment, ~group, ~rel_abund, ~color,
+  "SCL", "35", "Wetting", "aliphatic1", 80, "white",
+  "SCL", "35", "Wetting", "aromatic", 30, "black",
+  "SCL", "50", "Wetting", "aromatic", 30, "black",
+  "SCL", "100", "Wetting", "aliphatic2", 80, "white",
+  "SL", "35", "Wetting", "aromatic", 30, "black",
+  "SL", "50", "Wetting", "aliphatic1", 80, "white",
+  "SL", "75", "Wetting", "aromatic", 30, "black",
+  "SL", "75", "Wetting", "aliphatic1", 80, "white",
+  "SL", "100", "Wetting", "aromatic", 30, "black",
+  "SL", "100", "Wetting", "aliphatic1", 80, "white"
+) %>% 
+  dplyr::mutate(sat_level = if_else(treatment=="FM", "FM", as.character(sat_level)),
+                sat_level = factor(sat_level, levels = 
+                                     c("FM", "5", "35", "50", "75", "100"))) 
+
+  
+
+
+ggplot(rel_abund2,
+       aes(x = treatment, y = rel_abund, fill = group))+
+  geom_bar(stat = "identity")+
+  geom_text(data = nmr_label, 
+            aes(x = treatment, y = rel_abund, color = color), 
+            label = "*", size=7,
+            show.legend = F)+
+  facet_grid(texture ~ sat_level, scales = "free_x")+
+  scale_x_discrete(position = "top") +
+  labs(x = "% saturation")+
+  #scale_fill_viridis_d()+
+  scale_fill_manual(values = soil_palette("paleustalf",5))+
+  scale_color_manual(values = c("black", "white"))+
+  theme_bw()
+  
   
 ```
 

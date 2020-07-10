@@ -5,15 +5,16 @@ Kaizad Patel
 
 ## SPECTRA
 
+#### spectra
+
 SCL = sandy clay loam (soil)  
-SL = sandy loam (soil +
-sand)
+SL = sandy loam (soil + sand)
 
 ![](images/7b-nmr_markdown/nmr_spectra_fm-1.png)<!-- -->
 
 ![](images/7b-nmr_markdown/nmr_spectra-1.png)<!-- -->![](images/7b-nmr_markdown/nmr_spectra-2.png)<!-- -->![](images/7b-nmr_markdown/nmr_spectra-3.png)<!-- -->![](images/7b-nmr_markdown/nmr_spectra-4.png)<!-- -->![](images/7b-nmr_markdown/nmr_spectra-5.png)<!-- -->
 
-representative spectra – 50 % saturation
+#### representative spectra – 50 % saturation
 
 ![](images/7b-nmr_markdown/nmr_spectra_50_perc-1.png)<!-- -->
 
@@ -33,16 +34,13 @@ relative abundance for each sample
     #> Standard deviation     1.4709 1.2435 0.8293 0.7762 0.0002099
     #> Proportion of Variance 0.4327 0.3093 0.1376 0.1205 0.0000000
     #> Cumulative Proportion  0.4327 0.7419 0.8795 1.0000 1.0000000
-
-![](images/7b-nmr_markdown/nmr_pca-1.png)<!-- -->
-
     #> Importance of components:
     #>                           PC1    PC2    PC3     PC4       PC5
     #> Standard deviation     1.4545 1.2844 0.9090 0.63921 0.0001483
     #> Proportion of Variance 0.4231 0.3299 0.1653 0.08172 0.0000000
     #> Cumulative Proportion  0.4231 0.7530 0.9183 1.00000 1.0000000
 
-![](images/7b-nmr_markdown/nmr_pca-2.png)<!-- -->
+![](images/7b-nmr_markdown/nmr_pca-1.png)<!-- -->
 
 ## RELATIVE ABUNDANCE
 
@@ -57,8 +55,7 @@ peaks in field moist soils
 |     alphah |    0.64 ± NA |    1.36 ± NA |
 |   aromatic | 47.62 ± 7.38 | 26.39 ± 3.71 |
 
-peaks in
-treatments
+peaks in treatments
 
 | texture |      group |   100-Drying |  100-Wetting |    35-Drying |   35-Wetting |     5-Drying |    5-Wetting |    50-Drying |    50-Wetting |    75-Drying |   75-Wetting |
 | ------: | ---------: | -----------: | -----------: | -----------: | -----------: | -----------: | -----------: | -----------: | ------------: | -----------: | -----------: |
@@ -94,4 +91,4 @@ field moist waffle plots
 
 ### more viz
 
-![](images/7b-nmr_markdown/relabund_bubble-1.png)<!-- -->
+![](images/7b-nmr_markdown/relabund_bubble-1.png)<!-- -->![](images/7b-nmr_markdown/relabund_bubble-2.png)<!-- -->
