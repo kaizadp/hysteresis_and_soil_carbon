@@ -174,7 +174,7 @@ summary(aov)
 
 ```{r wsoc_graphs, fig.width=9}
 
-ggplot(wsoc, aes(x = sat_level, y = wsoc_mg_gC, shape = treatment, color = treatment))+
+ggplot(wsoc, aes(x = sat_level, y = wsoc_mg_g, shape = treatment, color = treatment))+
   geom_point(size=3, stroke=1)+
   geom_text(data = wsoc_label %>% na.omit(), 
             aes(x = sat_level, y = y, label = asterisk), color = "black", size=10)+
@@ -193,6 +193,15 @@ ggplot(wsoc, aes(x = sat_level, y = wsoc_mg_gC, shape = treatment, color = treat
   NULL
 
 ```
+
+For field moist conditions, WSOC was significantly greater in SL than in SCL soils. 
+
+```{r, echo=TRUE}
+aov_wsoc_fm = aov(wsoc_mg_g ~ texture, data = wsoc %>% filter(treatment=="FM"))
+summary(aov_wsoc_fm)
+h = agricolae::HSD.test(aov_wsoc_fm, trt = "texture");h
+```
+
 
 ---
 
