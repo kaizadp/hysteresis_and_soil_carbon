@@ -21,17 +21,21 @@ library(agricolae)
 #library(googlesheets)
 #library(gsheet)
 library(multcomp)
-library(DescTools)
+#library(DescTools)
 
 library(drake)
 pkgconfig::set_config("drake::strings_in_dots" = "literals")
-library(ggbiplot)
-library(tidyverse)
 
 # My 'picarro.data' package isn't on CRAN (yet) so need to install it via:
 # devtools::install_github("PNNL-TES/picarro.data")
 library(picarro.data)
 
+#devtools::install_github("miraKlein/ggbiplot")
+library(ggbiplot)
+library(tidyverse)
+
+#devtools::install_github("kaizadp/soilpalettes")
+library(soilpalettes)
 
 # ggplot customizations ---------------------------------------------------
 
