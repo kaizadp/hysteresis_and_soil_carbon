@@ -1,0 +1,73 @@
+---
+title: "Soil carbon dynamics during drying vs. rewetting: importance of antecedent moisture conditions"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(dpi = 300,
+                      echo=FALSE,message=FALSE,warning=FALSE,
+                      collapse = TRUE,
+                      comment = "#>"
+                      )
+```
+
+How are soil carbon dynamics influenced by drying vs. wetting events? 
+
+```{r map, fig.width=1.5, fig.height=1.5}
+library(ggplot2)
+library(usmap)
+
+test_data <- data.frame(lon = -123.976, lat = 46.907)
+transformed_data <- usmap_transform(test_data)
+plot_usmap(include = c("WA")) + 
+  geom_point(data = transformed_data, 
+             aes(x = lon.1, y = lat.1), 
+             color = "black",
+             size = 2)+
+  annotate("text", label = "Beaver Creek \n 46.907 N \n -123.976 W", x = -1670500, y = 482693.1, size=1.5)
+```
+
+||Soil 1|Soil 2|
+|--|--|--|
+|| BC soil | BC + Accusand|
+Texture| SCL | SL|
+Total C (%)| 8.34 %| 5.56% |
+Saturation moisture| 140% w/w| 100% w/w
+
+	moisture (5 levels): 100% saturated, 75% w/w, 50%, 35%, 5% (air dry)
+		+ field moist  
+	treatment (2 levels): wetting, drying  
+	texture (2 levels): sandy clay loam (SCL), sandy loam (SL)  
+
+----
+
+## code
+`1-moisture_tracking.R`:	tracks moisture in cores for pre-incubation drying  
+`2-hyprop`: water retention curves  
+`3-picarro`: respiration  
+`4-wsoc`: water soluble organic carbon analysis
+
+
+## data
+`core_key` core assignments
+
+`core_weights` 
+
+ - `initial` initial weights when cores were packed. includes empty weights
+ - `Mass_tracking` core weights for pre-incubation drying. Also includes Picarro valve assignments.
+ - ignore tabs marked `x_`
+ 
+ 
+----
+ 
+<details>
+  <summary>Session Info</summary>
+
+date: `r Sys.Date()`
+  
+```{r}
+sessionInfo()
+```
+
+</details>
+
