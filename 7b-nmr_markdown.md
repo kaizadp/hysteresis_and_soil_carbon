@@ -8,9 +8,17 @@
 SCL = sandy clay loam (soil)  
 SL = sandy loam (soil + sand)
 
+![](images/7b-nmr_markdown/nmr_spectra_overlay-1.png)<!-- -->
+
+<details>
+
+<summary>overlay plots split by treatment</summary>
+
 ![](images/7b-nmr_markdown/nmr_spectra_fm-1.png)<!-- -->
 
 ![](images/7b-nmr_markdown/nmr_spectra-1.png)<!-- -->![](images/7b-nmr_markdown/nmr_spectra-2.png)<!-- -->![](images/7b-nmr_markdown/nmr_spectra-3.png)<!-- -->![](images/7b-nmr_markdown/nmr_spectra-4.png)<!-- -->![](images/7b-nmr_markdown/nmr_spectra-5.png)<!-- -->
+
+</details>
 
 #### representative spectra – 50 % saturation
 
@@ -101,7 +109,7 @@ field moist waffle plots
 
 <summary>Session Info</summary>
 
-date run: 2020-07-21
+date run: 2020-07-22
 
     #> R version 4.0.2 (2020-06-22)
     #> Platform: x86_64-apple-darwin17.0 (64-bit)

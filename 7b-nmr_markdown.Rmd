@@ -20,7 +20,6 @@ source("code/7a-nmr_spectra_setup.R")
 SCL = sandy clay loam (soil)  
 SL = sandy loam (soil + sand)  
 
-
 ```{r}
 spectra = read.csv("data/processed/nmr_spectra.csv.gz")
 
@@ -30,6 +29,25 @@ spectra_plot =
   na.omit()
 ```
 
+
+```{r nmr_spectra_overlay, fig.width=15, fig.height=28}
+gg_nmr+
+  geom_path(data=spectra_plot, aes(x = ppm, y = intensity, group = Core, color = treatment),
+            alpha = 0.5)+
+  ylim(-0.3,7)+
+  geom_rect(data = spectra_plot, 
+            aes(xmin = DMSO_start, xmax = WATER_stop, ymin = -0.1, ymax = 6.5),
+            fill = "grey90", alpha = 0.015)+
+
+  facet_grid(sat_level~texture)+theme(legend.position = "top")
+```
+
+
+
+
+<details>
+  <summary>overlay plots split by treatment</summary>
+  
 ```{r nmr_spectra_fm, fig.width=15, fig.height=5}
 gg_nmr+
   geom_path(data=spectra[spectra$treatment=="FM",], aes(x = ppm, y = intensity, color = as.character(Core)),
@@ -38,8 +56,6 @@ gg_nmr+
   facet_grid(.~texture)+theme(legend.position = "none")+
   ggtitle("field moist")
 ```
-
-
 
 ```{r nmr_spectra, fig.width=15, fig.height=10}
 
@@ -81,6 +97,8 @@ gg_nmr+
 
 
 ```
+
+</details>
 
 #### representative spectra -- 50 % saturation
 
@@ -151,6 +169,7 @@ gg_nmr+
 
 
 ---
+
 
 ## RELATIVE ABUNDANCE
 
@@ -501,6 +520,7 @@ ggplot(rel_abund2,
 
 ## peak comparisons
 
+
 ```{r}
 peak = read.csv("data/processed/nmr_peaks.csv")
 core_key = read.csv(COREKEY) %>% 
@@ -509,16 +529,25 @@ core_key = read.csv(COREKEY) %>%
 peak2 = 
   peak %>% 
   left_join(core_key, by = "Core") %>% 
-  filter(!treatment=="FM") %>% 
+  #filter(!treatment=="FM") %>% 
   group_by(Core, ppm, treatment, texture, sat_level) %>% 
   dplyr::summarise(n = n()) %>% 
   group_by(ppm, treatment, texture, sat_level) %>% 
   dplyr::summarise(n = n()) %>% 
-  spread(treatment, n) %>% 
-  ungroup()
+  mutate(y = case_when(sat_level==5 & treatment=="Drying" ~ 0.5,
+                       sat_level==5 & treatment=="Wetting" ~ 0.6,
+                       sat_level==35 & treatment=="Drying" ~ 1.0,
+                       sat_level==35 & treatment=="Wetting" ~ 1.1,
+                       sat_level==50 & treatment=="Drying" ~ 1.5,
+                       sat_level==50 & treatment=="Wetting" ~ 1.6,
+                       sat_level==75 & treatment=="Drying" ~ 2.0,
+                       sat_level==75 & treatment=="Wetting" ~ 2.1,
+                       sat_level==100 & treatment=="Drying" ~ 2.5,
+                       sat_level==100 & treatment=="Wetting" ~ 2.6,
+                       treatment=="FM" ~ 0.1))
 ```
 
-```{r peak_comparisons}
+```{r peak_comparisons, fig.width=10}
 (gg_peaks = 
   gg_nmr+
   labs(y = "",
@@ -529,60 +558,20 @@ peak2 =
   annotate("text", label="50%", x = 9.5, y = 1.55)+
   annotate("text", label="75%", x = 9.5, y = 2.05)+
   annotate("text", label="100%", x = 9.5, y = 2.55)+
-  annotate("text", label="rewetting", x = 9.5, y = 2.8, color = "blue")+
-  annotate("text", label="drying", x = 9.5, y = 2.7, color = "red")+
+  annotate("text", label="FM", x = 9.5, y = 0.1)+
+
+  #annotate("text", label="rewetting", x = 9.5, y = 2.8, color = "blue")+
+  #annotate("text", label="drying", x = 9.5, y = 2.7, color = "red")+
   
   theme(axis.text.y = element_blank(),
         axis.ticks.y = element_blank())+
-  #facet_grid(.~texture)+
-  # 5%
-  geom_point(data = peak2 %>% 
-               filter(sat_level==5) %>% 
-               dplyr::select(ppm, Drying, texture) %>% na.omit(), 
-             aes(x = ppm, y = 0.5), color = "red")+
-  geom_point(data = peak2 %>% 
-               filter(sat_level==5) %>% 
-               dplyr::select(ppm, Wetting) %>% na.omit(), 
-             aes(x = ppm, y = 0.6), color = "blue")+
-  # 35%
-  geom_point(data = peak2 %>% 
-               filter(sat_level==35) %>% 
-               dplyr::select(ppm, Drying) %>% na.omit(), 
-             aes(x = ppm, y = 1.0), color = "red")+
-  geom_point(data = peak2 %>% 
-               filter(sat_level==35) %>% 
-               dplyr::select(ppm, Wetting) %>% na.omit(), 
-             aes(x = ppm, y = 1.1), color = "blue")+
-  # 50%
-  geom_point(data = peak2 %>% 
-               filter(sat_level==50) %>% 
-               dplyr::select(ppm, Drying) %>% na.omit(), 
-             aes(x = ppm, y = 1.5), color = "red")+
-  geom_point(data = peak2 %>% 
-               filter(sat_level==50) %>% 
-               dplyr::select(ppm, Wetting) %>% na.omit(), 
-             aes(x = ppm, y = 1.6), color = "blue")+
-  # 75%
-  geom_point(data = peak2 %>% 
-               filter(sat_level==75) %>% 
-               dplyr::select(ppm, Drying) %>% na.omit(), 
-             aes(x = ppm, y = 2.0), color = "red")+
-  geom_point(data = peak2 %>% 
-               filter(sat_level==75) %>% 
-               dplyr::select(ppm, Wetting) %>% na.omit(), 
-             aes(x = ppm, y = 2.1), color = "blue")+
-  # 100%
-  geom_point(data = peak2 %>% 
-               filter(sat_level==100) %>% 
-               dplyr::select(ppm, Drying) %>% na.omit(), 
-             aes(x = ppm, y = 2.5), color = "red")+
-  geom_point(data = peak2 %>% 
-               filter(sat_level==100) %>% 
-               dplyr::select(ppm, Wetting) %>% na.omit(), 
-             aes(x = ppm, y = 2.6), color = "blue")+
+  geom_point(data = peak2, aes(x = ppm, y = y, color = treatment))+
   geom_rect(data = peak2, 
-            aes(xmin = DMSO_start, xmax = WATER_stop, ymin = 0.2, ymax = 3.5),
+            aes(xmin = DMSO_start, xmax = WATER_stop, ymin = 0, ymax = 3.5),
             fill = "grey90", alpha = 0.015)+
+  facet_grid(.~texture)+
+  
+  
   NULL
 )
 
@@ -599,6 +588,13 @@ gg_peaks+
   geom_vline(xintercept = 6.7, linetype = "dashed")
   
 ```
+
+
+
+
+
+
+
 
 ---
 
