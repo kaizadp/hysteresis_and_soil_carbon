@@ -1,7 +1,5 @@
 ---
 title: "7-nmr_markdown"
-author: "Kaizad Patel"  
-date: "4/7/2020"  
 output: github_document
 ---
 
@@ -151,8 +149,14 @@ gg_nmr+
 
 ```
 
-## PEAKS
-relative abundance for each sample
+
+---
+
+## RELATIVE ABUNDANCE
+
+<details>
+  <summary>relative abundance for each sample</summary>
+  
 ```{r peaks, fig.width=30, fig.height=30}
 rel_abund = read.csv("data/processed/nmr_rel_abund_cores.csv")
 
@@ -177,9 +181,11 @@ ggplot(data=rel_abund[rel_abund$soil_type=="Soil_sand"&!rel_abund$treatment=="FM
 
 ```
 
+</details>
 
 
-## PCA
+
+### PCA
 ```{r nmr_pca}
 
 relabund_pca=
@@ -243,7 +249,6 @@ ggbiplot_scl+ggbiplot_sl +
 ```
 
 
-## RELATIVE ABUNDANCE
 ### tables
 ```{r}
 rel_abund = read.csv("data/processed/nmr_rel_abund.csv")
@@ -491,6 +496,9 @@ ggplot(rel_abund2,
 
 
 
+
+---
+
 ## peak comparisons
 
 ```{r}
@@ -580,7 +588,27 @@ peak2 =
 
 gg_peaks+
   scale_x_reverse(limits = c(2.5,0))+
-  labs(title = "NMR peaks present -- aliphatic")
+  labs(title = "NMR peaks present -- aliphatic")+
+  geom_vline(xintercept = 0.8, linetype = "dashed")+
+  geom_vline(xintercept = 1.2, linetype = "dashed")
+  
+
+gg_peaks+
+  scale_x_reverse(limits = c(8,6))+
+  labs(title = "NMR peaks present -- aromatic")+
+  geom_vline(xintercept = 6.7, linetype = "dashed")
   
 ```
 
+---
+
+<details>
+  <summary>Session Info</summary>
+
+date run: `r Sys.Date()`
+
+```{r}
+sessionInfo()
+```
+
+</details>
