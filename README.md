@@ -8,7 +8,7 @@ antecedent moisture conditions
 
 <img align="center" height = "300" width = "300" src="readme_files/figure-gfm/map-1.png">
 
-<img align="left" height = "300" width = "200" src="readme_files/Mopang_BC15.jpg">
+<img align="left" height = "300" width = "200" src="readme_files/Mopang_BC15.JPG">
 
 **Mopang Silt Loam**
 
