@@ -2,9 +2,16 @@ Soil carbon dynamics during drying vs. rewetting: importance of
 antecedent moisture conditions
 ================
 
-How are soil carbon dynamics influenced by drying vs. wetting events?
+### How are soil carbon dynamics influenced by drying vs. wetting events?
 
-![](readme_files/figure-gfm/map-1.png)<!-- -->
+-----
+
+<img align="center" height = "300" width = "300" src="readme_files/figure-gfm/map-1.png">
+<img align="left" height = "300" width = "200" src="readme_files/Mopang_BC15.jpg">
+
+**Mopang Silt Loam**
+
+-----
 
 |                     | Soil 1   | Soil 2        |
 | ------------------- | -------- | ------------- |
@@ -22,7 +29,7 @@ texture (2 levels): sandy clay loam (SCL), sandy loam (SL)
 
 -----
 
-## code
+### code/
 
 `1-moisture_tracking.R`: tracks moisture in cores for pre-incubation
 drying  
@@ -30,7 +37,7 @@ drying
 `3-picarro`: respiration  
 `4-wsoc`: water soluble organic carbon analysis
 
-## data
+### data/
 
 `core_key` core assignments
 
@@ -64,19 +71,10 @@ date: 2020-07-21
     #> attached base packages:
     #> [1] stats     graphics  grDevices utils     datasets  methods   base     
     #> 
-    #> other attached packages:
-    #> [1] usmap_0.5.0   ggplot2_3.3.2
-    #> 
     #> loaded via a namespace (and not attached):
-    #>  [1] pillar_1.4.6     compiler_4.0.2   tools_4.0.2      digest_0.6.25   
-    #>  [5] evaluate_0.14    lifecycle_0.2.0  tibble_3.0.3     gtable_0.3.0    
-    #>  [9] lattice_0.20-41  pkgconfig_2.0.3  rlang_0.4.7      yaml_2.2.1      
-    #> [13] rgdal_1.5-12     xfun_0.15        withr_2.2.0      dplyr_1.0.0     
-    #> [17] stringr_1.4.0    knitr_1.29       generics_0.0.2   vctrs_0.3.2     
-    #> [21] grid_4.0.2       tidyselect_1.1.0 glue_1.4.1       R6_2.4.1        
-    #> [25] foreign_0.8-80   rmarkdown_2.3    sp_1.4-2         purrr_0.3.4     
-    #> [29] farver_2.0.3     magrittr_1.5     scales_1.1.1     ellipsis_0.3.1  
-    #> [33] htmltools_0.5.0  maptools_1.0-1   colorspace_1.4-1 labeling_0.3    
-    #> [37] stringi_1.4.6    munsell_0.5.0    crayon_1.3.4
+    #>  [1] compiler_4.0.2  magrittr_1.5    tools_4.0.2     htmltools_0.5.0
+    #>  [5] yaml_2.2.1      stringi_1.4.6   rmarkdown_2.3   knitr_1.29     
+    #>  [9] stringr_1.4.0   xfun_0.15       digest_0.6.25   rlang_0.4.7    
+    #> [13] evaluate_0.14
 
 </details>

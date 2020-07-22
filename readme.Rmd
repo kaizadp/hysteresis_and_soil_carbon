@@ -11,9 +11,11 @@ knitr::opts_chunk$set(dpi = 300,
                       )
 ```
 
-How are soil carbon dynamics influenced by drying vs. wetting events? 
+### How are soil carbon dynamics influenced by drying vs. wetting events? 
 
-```{r map, fig.width=1.5, fig.height=1.5}
+---
+
+```{r map, fig.width=1.5, fig.height=1.5, eval=FALSE}
 library(ggplot2)
 library(usmap)
 
@@ -26,6 +28,14 @@ plot_usmap(include = c("WA")) +
              size = 2)+
   annotate("text", label = "Beaver Creek \n 46.907 N \n -123.976 W", x = -1670500, y = 482693.1, size=1.5)
 ```
+
+<img align="center" height = "300" width = "300" src="readme_files/figure-gfm/map-1.png">
+<img align="left" height = "300" width = "200" src="readme_files/Mopang_BC15.jpg">
+
+
+**Mopang Silt Loam**  
+
+---
 
 ||Soil 1|Soil 2|
 |--|--|--|
@@ -41,14 +51,14 @@ Saturation moisture| 140% w/w| 100% w/w
 
 ----
 
-## code
+### code/
 `1-moisture_tracking.R`:	tracks moisture in cores for pre-incubation drying  
 `2-hyprop`: water retention curves  
 `3-picarro`: respiration  
 `4-wsoc`: water soluble organic carbon analysis
 
 
-## data
+### data/
 `core_key` core assignments
 
 `core_weights` 
