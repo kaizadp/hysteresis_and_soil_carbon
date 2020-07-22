@@ -29,8 +29,8 @@ plot_usmap(include = c("WA")) +
   annotate("text", label = "Beaver Creek \n 46.907 N \n -123.976 W", x = -1670500, y = 482693.1, size=1.5)
 ```
 
-<img align="center" height = "300" width = "300" src="readme_files/figure-gfm/map-1.png">
 <img align="left" height = "300" width = "200" src="readme_files/Mopang_BC15.JPG">
+<img align="center" height = "300" width = "300" src="readme_files/figure-gfm/map-1.png">
 
 
 **Mopang Silt Loam**  
