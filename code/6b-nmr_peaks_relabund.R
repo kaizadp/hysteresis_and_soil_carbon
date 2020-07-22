@@ -1,5 +1,5 @@
 
-source("6a-nmr_peaks.R")
+source("code/6a-nmr_peaks.R")
 
 # first, add metadata for Cores
 corekey = read.csv(COREKEY)

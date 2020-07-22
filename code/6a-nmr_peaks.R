@@ -1,5 +1,5 @@
 
-source("0-hysteresis_packages.R")
+source("code/0-hysteresis_packages.R")
 
 
 # PART I. SETTING UP THE PARAMETERS ----
@@ -125,6 +125,4 @@ peaks =
 
 ## OUTPUT ----
 write_csv(peaks, "data/processed/nmr_peaks.csv")
-  
-  
-  
+
