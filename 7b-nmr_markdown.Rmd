@@ -12,9 +12,9 @@ knitr::opts_chunk$set(echo=FALSE,message=FALSE,warning=FALSE,
                       fig.path = "images/7b-nmr_markdown/"
                       )
 
-source("0-hysteresis_packages.R")
-source("7a-nmr_spectra_setup.R")
-source("6b-nmr_peaks_relabund.R")
+source("code/0-hysteresis_packages.R")
+source("code/7a-nmr_spectra_setup.R")
+#source("code/6b-nmr_peaks_relabund.R")
 ```
 
 ## SPECTRA 
@@ -154,6 +154,8 @@ gg_nmr+
 ## PEAKS
 relative abundance for each sample
 ```{r peaks, fig.width=30, fig.height=30}
+rel_abund = read.csv("data/processed/nmr_rel_abund_cores.csv")
+
 ggplot(data=rel_abund[rel_abund$soil_type=="Soil"&!rel_abund$treatment=="FM",], aes(x="", y=relabund, fill=group)) +
   geom_bar(stat="identity", alpha=0.7) +
   #geom_text(aes(x= "", y=pos, label = relabund), size=4) +  # note y = pos
@@ -179,8 +181,6 @@ ggplot(data=rel_abund[rel_abund$soil_type=="Soil_sand"&!rel_abund$treatment=="FM
 
 ## PCA
 ```{r nmr_pca}
-rel_abund = read.csv("data/processed/nmr_rel_abund_cores.csv")
-
 
 relabund_pca=
   rel_abund %>% 
@@ -304,7 +304,9 @@ ggplot(arom, aes(x = sat_level, y = aromatic, color = treatment))+
 
 ### rel abund waffle plots
 
-```{r}
+```{r, eval=FALSE}
+#devtools::install_github("hrbrmstr/waffle")
+
 library(ggplot2)
 library(dplyr)
 library(schrute)
@@ -344,7 +346,7 @@ ggdraw(rel_abund_50_scl)
 
 
 all waffle plots
-```{r}
+```{r, eval=FALSE}
 rel_abund_scl = 
   rel_abund %>% 
   filter(texture=="SL",
@@ -366,7 +368,7 @@ ggdraw(rel_abund_scl)
 
 air-dry waffle plots 
 
-```{r}
+```{r, eval=FALSE}
 rel_abund_scl = 
   rel_abund %>% 
   filter(texture=="SCL",
@@ -394,7 +396,7 @@ ggdraw(rel_abund_scl)
 
 field moist waffle plots 
 
-```{r}
+```{r, eval=FALSE}
 rel_abund_scl_fm = 
   rel_abund %>% 
   filter(texture=="SCL",
@@ -423,7 +425,7 @@ ggdraw(rel_abund_scl_fm)
 
 ### more viz
 ```{r relabund_bubble, fig.width=15, fig.height=7}
-rel_abund = read.csv("data/processed/nmr_rel_abund.csv")
+#rel_abund = read.csv("data/processed/nmr_rel_abund.csv")
 
 rel_abund2 = 
   rel_abund %>% 
@@ -479,7 +481,6 @@ ggplot(rel_abund2,
   scale_color_manual(values = c("black", "white"))+
   theme_bw()
   
-  
 ```
 
 
@@ -488,4 +489,98 @@ ggplot(rel_abund2,
 
 
 
+
+
+## peak comparisons
+
+```{r}
+peak = read.csv("data/processed/nmr_peaks.csv")
+core_key = read.csv(COREKEY) %>% 
+  dplyr::select(Core, treatment, texture, sat_level)
+
+peak2 = 
+  peak %>% 
+  left_join(core_key, by = "Core") %>% 
+  filter(!treatment=="FM") %>% 
+  group_by(Core, ppm, treatment, texture, sat_level) %>% 
+  dplyr::summarise(n = n()) %>% 
+  group_by(ppm, treatment, texture, sat_level) %>% 
+  dplyr::summarise(n = n()) %>% 
+  spread(treatment, n) %>% 
+  ungroup()
+```
+
+```{r peak_comparisons}
+(gg_peaks = 
+  gg_nmr+
+  labs(y = "",
+       title = "NMR peaks present")+
+#  xlim(0,2.5)+
+  annotate("text", label="5%", x = 9.5, y = 0.55)+
+  annotate("text", label="35%", x = 9.5, y = 1.05)+
+  annotate("text", label="50%", x = 9.5, y = 1.55)+
+  annotate("text", label="75%", x = 9.5, y = 2.05)+
+  annotate("text", label="100%", x = 9.5, y = 2.55)+
+  annotate("text", label="rewetting", x = 9.5, y = 2.8, color = "blue")+
+  annotate("text", label="drying", x = 9.5, y = 2.7, color = "red")+
+  
+  theme(axis.text.y = element_blank(),
+        axis.ticks.y = element_blank())+
+  #facet_grid(.~texture)+
+  # 5%
+  geom_point(data = peak2 %>% 
+               filter(sat_level==5) %>% 
+               dplyr::select(ppm, Drying, texture) %>% na.omit(), 
+             aes(x = ppm, y = 0.5), color = "red")+
+  geom_point(data = peak2 %>% 
+               filter(sat_level==5) %>% 
+               dplyr::select(ppm, Wetting) %>% na.omit(), 
+             aes(x = ppm, y = 0.6), color = "blue")+
+  # 35%
+  geom_point(data = peak2 %>% 
+               filter(sat_level==35) %>% 
+               dplyr::select(ppm, Drying) %>% na.omit(), 
+             aes(x = ppm, y = 1.0), color = "red")+
+  geom_point(data = peak2 %>% 
+               filter(sat_level==35) %>% 
+               dplyr::select(ppm, Wetting) %>% na.omit(), 
+             aes(x = ppm, y = 1.1), color = "blue")+
+  # 50%
+  geom_point(data = peak2 %>% 
+               filter(sat_level==50) %>% 
+               dplyr::select(ppm, Drying) %>% na.omit(), 
+             aes(x = ppm, y = 1.5), color = "red")+
+  geom_point(data = peak2 %>% 
+               filter(sat_level==50) %>% 
+               dplyr::select(ppm, Wetting) %>% na.omit(), 
+             aes(x = ppm, y = 1.6), color = "blue")+
+  # 75%
+  geom_point(data = peak2 %>% 
+               filter(sat_level==75) %>% 
+               dplyr::select(ppm, Drying) %>% na.omit(), 
+             aes(x = ppm, y = 2.0), color = "red")+
+  geom_point(data = peak2 %>% 
+               filter(sat_level==75) %>% 
+               dplyr::select(ppm, Wetting) %>% na.omit(), 
+             aes(x = ppm, y = 2.1), color = "blue")+
+  # 100%
+  geom_point(data = peak2 %>% 
+               filter(sat_level==100) %>% 
+               dplyr::select(ppm, Drying) %>% na.omit(), 
+             aes(x = ppm, y = 2.5), color = "red")+
+  geom_point(data = peak2 %>% 
+               filter(sat_level==100) %>% 
+               dplyr::select(ppm, Wetting) %>% na.omit(), 
+             aes(x = ppm, y = 2.6), color = "blue")+
+  geom_rect(data = peak2, 
+            aes(xmin = DMSO_start, xmax = WATER_stop, ymin = 0.2, ymax = 3.5),
+            fill = "grey90", alpha = 0.015)+
+  NULL
+)
+
+gg_peaks+
+  scale_x_reverse(limits = c(2.5,0))+
+  labs(title = "NMR peaks present -- aliphatic")
+  
+```
 

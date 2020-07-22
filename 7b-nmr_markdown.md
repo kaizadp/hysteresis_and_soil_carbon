@@ -76,19 +76,16 @@ peaks in treatments
 
 ### rel abund waffle plots
 
-![](images/7b-nmr_markdown/unnamed-chunk-6-1.png)<!-- -->
-
 all waffle plots
-![](images/7b-nmr_markdown/unnamed-chunk-7-1.png)<!-- -->
 
 air-dry waffle plots
 
-![](images/7b-nmr_markdown/unnamed-chunk-8-1.png)<!-- -->
-
 field moist waffle plots
-
-![](images/7b-nmr_markdown/unnamed-chunk-9-1.png)<!-- -->
 
 ### more viz
 
 ![](images/7b-nmr_markdown/relabund_bubble-1.png)<!-- -->![](images/7b-nmr_markdown/relabund_bubble-2.png)<!-- -->
+
+## peak comparisons
+
+![](images/7b-nmr_markdown/peak_comparisons-1.png)<!-- -->![](images/7b-nmr_markdown/peak_comparisons-2.png)<!-- -->
