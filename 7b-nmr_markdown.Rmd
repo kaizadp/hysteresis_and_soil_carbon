@@ -565,7 +565,7 @@ peak2 =
   
   theme(axis.text.y = element_blank(),
         axis.ticks.y = element_blank())+
-  geom_point(data = peak2, aes(x = ppm, y = y, color = treatment))+
+  geom_point(data = peak2, aes(x = ppm, y = y, color = as.character(n), shape=treatment), size=2)+
   geom_rect(data = peak2, 
             aes(xmin = DMSO_start, xmax = WATER_stop, ymin = 0, ymax = 3.5),
             fill = "grey90", alpha = 0.015)+
@@ -579,13 +579,21 @@ gg_peaks+
   scale_x_reverse(limits = c(2.5,0))+
   labs(title = "NMR peaks present -- aliphatic")+
   geom_vline(xintercept = 0.8, linetype = "dashed")+
-  geom_vline(xintercept = 1.2, linetype = "dashed")
+  geom_vline(xintercept = 1.2, linetype = "dashed")+
+    geom_vline(xintercept = 1.8, linetype = "dashed")
+
   
 
 gg_peaks+
   scale_x_reverse(limits = c(8,6))+
   labs(title = "NMR peaks present -- aromatic")+
-  geom_vline(xintercept = 6.7, linetype = "dashed")
+  geom_vline(xintercept = 6.7, linetype = "dashed")+
+  geom_vline(xintercept = 6.6, linetype = "dotted")+
+  geom_vline(xintercept = 7.0, linetype = "dotted")+
+  geom_vline(xintercept = 7.2, linetype = "dotted")+
+  annotate("text", label = "aromatic amino acids", x = 7.3, y = 3, angle=90)+
+  annotate("text", label = "aromatic lignin", x = 6.75, y = 1.5, angle=90)
+  
   
 ```
 
