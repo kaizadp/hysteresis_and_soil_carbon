@@ -1,4 +1,4 @@
-source("0-hysteresis_packages.R")
+source("code/0-hysteresis_packages.R")
 library(ggbiplot)
 
 
@@ -107,6 +107,11 @@ library(compositions)
 
 man = manova(ilr(clo(DV)) ~ treatment, data = rel_abund2)
 summary(man)
+
+#
+## 1b. PERMANOVA ----
+library(vegan)
+adonis2(rel_abund2$DV ~ treatment*sat_level, data = rel_abund2)
 
 #
 ## 2. relative abundance ANOVA ---- 
