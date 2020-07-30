@@ -439,14 +439,132 @@ ggbiplot_scl+ggbiplot_sl +
   plot_layout(guides = "collect") & theme(legend.position = "bottom")
 ```
 
+```{r nmr_euclidean, fig.height=3.5, fig.width=6.5}
+## 1. overall PCA ----
+relabund_pca_num = 
+  relabund_pca %>% 
+  dplyr::select(.,-(1:3))
 
+relabund_pca_grp = 
+  relabund_pca %>% 
+  dplyr::select(.,(1:3)) %>% 
+  dplyr::mutate(row = row_number())
+
+# euclidean distance ----
+library(vegan)
+library(ape)
+
+bray_distance = vegdist(relabund_pca_num, method="euclidean")
+principal_coordinates = pcoa(bray_distance)
+pcoa_plot = data.frame(principal_coordinates$vectors[,])
+pcoa_plot_merged = merge(pcoa_plot, relabund_pca_grp, by="row.names")
+
+# Calculate percent variation explained by PC1, PC2
+
+# PC1 <- 100*(principal_coordinates$values$Eigenvalues[1]/sum(principal_coordinates$values$Eigenvalues))
+# PC2 <- 100*(principal_coordinates$values$Eigenvalues[2]/sum(principal_coordinates$values$Eigenvalues))
+# PC3 <- 100*(principal_coordinates$values$Eigenvalues[3]/sum(principal_coordinates$values$Eigenvalues))
+
+
+grp = 
+  relabund_pca_grp %>% 
+  dplyr::mutate(grp = paste0(texture,"-",sat_level,"-",treatment))
+  #dplyr::select(row, grp)
+matrix = as.matrix(bray_distance)
+
+matrix2 = 
+  matrix %>% 
+  melt() %>% 
+  left_join(grp, by = c("Var1"="row")) %>% 
+  #rename(grp1 = grp) %>% 
+  left_join(grp, by = c("Var2"="row")) %>% 
+  filter(grp.x==grp.y) %>% 
+  group_by(grp.x,grp.y,sat_level.x, texture.x,treatment.x,treatment.y) %>% 
+  dplyr::summarise(distance  =mean(value)) %>%
+  ungroup %>% 
+  rename(sat_level = sat_level.x) %>% 
+  dplyr::mutate(sat_level = if_else(treatment.x=="FM","FM",sat_level),
+                sat_level = factor(sat_level, levels = c(5,35,50,75,100,"FM")))
+
+matrix3 = 
+  matrix %>% 
+  melt() %>% 
+  left_join(grp, by = c("Var1"="row")) %>% 
+  #rename(grp1 = grp) %>% 
+  left_join(grp, by = c("Var2"="row")) %>% 
+  filter(!grp.x==grp.y) %>% 
+  filter(sat_level.x == sat_level.y) %>% 
+  filter(texture.x == texture.y) %>% 
+  group_by(grp.x,grp.y,sat_level.x, texture.x,treatment.x,treatment.y) %>% 
+  dplyr::summarise(distance  =mean(value)) %>%
+  ungroup %>% 
+  rename(sat_level = sat_level.x) %>% 
+  dplyr::mutate(sat_level = factor(sat_level, levels = c(5,35,50,75,100)))
+
+
+eucl_label = tribble(
+  ~x, ~xend, ~y, ~yend, ~texture.x, ~type,
+  0.7, NA , 30, NA, "SCL", "text",
+  0.7, 0.7, 19, 28, "SCL", "curve"
+)
+  
+
+ggplot(matrix3, aes(x = sat_level, y = distance))+
+  geom_point(size=3)+
+  geom_segment(aes(x = sat_level, xend = sat_level, y = 0, yend = distance))+
+  
+  ylim(0,80)+
+  labs(x = "% saturation",
+       y = "drying-rewetting \n Euclidean distance")+
+  geom_hline(yintercept = 17.52, linetype = "dashed")+
+  
+  geom_text(data = eucl_label %>% filter(type=="text"), aes(x = x, y = y), 
+            label = "avg. within-group distance", angle=90, hjust="left", size=3)+
+  geom_curve(data = eucl_label %>% filter(type=="curve"), aes(x = x, xend = xend, y = y, yend = yend),
+             curvature = -0.2)+
+  
+    facet_grid(.~texture.x)+
+
+  #annotate("text", label = "avg within-group distance", x = 0.7, y = 30, angle=90, size=3, hjust="left")+
+  #annotate("curve", x = 0.7, xend = 0.7, y = 19, yend = 28, curvature=-0.2)+
+  theme_kp()
+
+  # within-treatment variation
+  # ggplot(matrix2, aes(x = sat_level, y = mean(distance), color = treatment.x, shape = texture.x))+
+  #   geom_point(size = 3)+
+  #   ylim(0,80)+
+  #   theme_kp()
+# mean(matrix2$distance)
+```
 
 ### RELATIVE ABUNDANCE
 
-### tables
+
 ```{r}
 rel_abund = read.csv("data/processed/nmr_rel_abund.csv")
+rel_abund_cores = read.csv("data/processed/nmr_rel_abund_cores.csv")
+
 ```
+
+### stats
+PERMANOVA: treatment and moisture level had a significant influence
+
+```{r nmr_permanova}
+rel_abund2 = 
+  rel_abund_cores %>% 
+  dplyr::select(Core, texture, treatment, sat_level, group, relabund) %>% 
+  spread(group, relabund) %>% 
+  replace(is.na(.),0) 
+
+rel_abund2$DV = as.matrix(rel_abund2[,5:9])
+
+library(vegan)
+adonis2(rel_abund2$DV ~ treatment*sat_level +sat_level*texture + treatment*texture, data = rel_abund2)
+```
+
+
+
+### tables
 
 peaks in field moist soils
 
@@ -509,12 +627,12 @@ ggplot(rel_abund2,
   facet_grid(texture ~ sat_level, scales = "free_x")+
   scale_x_discrete(position = "bottom") +
   labs(x = "",
-       y = "relative abundance (%)",
+       y = "relative contribution (%)",
        subtitle = "% saturation")+
-  #scale_fill_viridis_d()+
-  scale_fill_manual(values = soilpalettes::soil_palette("paleustalf",5))+
+#  scale_fill_viridis_d()+
+#  scale_fill_manual(values = soilpalettes::soil_palette("paleustalf",5))+
 #  scale_fill_manual(values = PNWColors::pnw_palette("Sunset",5))+
-#  scale_fill_manual(values = PNWColors::pnw_palette("Sunset2"))+
+  scale_fill_manual(values = PNWColors::pnw_palette("Sailboat",5))+
   scale_color_manual(values = c("black", "white"))+
   theme_kp()+
   theme(
