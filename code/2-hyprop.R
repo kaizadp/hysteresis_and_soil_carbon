@@ -4,11 +4,11 @@
 
 source("code/0-hysteresis_packages.R")
 
-# load files ----
+          ###  load files ----
 filePaths <- list.files(path = "data/wrc/vg_pdi",pattern = "*.xlsx", full.names = TRUE)
 
 
-# fitted data -------------------------------------------------------------
+          ###  fitted data -------------------------------------------------------------
 wrc <- do.call(rbind, lapply(filePaths, function(path) {
   df <- read_excel(path, sheet="Fitting-Retention Θ(pF)")
   df[["source"]] <- rep(path, nrow(df))
@@ -65,7 +65,7 @@ wrc_processed %>%
 
 #
 
-# unfitted data -----------------------------------------------------------
+          ###  unfitted data -----------------------------------------------------------
 
 wrc_unfit <- do.call(rbind, lapply(filePaths, function(path) {
   df <- read_excel(path, sheet="Evaluation-Retention Θ(pF)")
@@ -180,56 +180,56 @@ wrc_processed_unfit %>%
 
 
 #
-# old ---------------------------------------------------------------------
+          ###  old ---------------------------------------------------------------------
 
 
-# input file
+          ###  input file
 
-hyprop = 
-  read_csv("data/hyprop_fitting_vg.csv") %>% 
-  rename(tension_pF = `pF [-]`,
-         moisture_vol = `Water Content [Vol%]`) %>% 
-  dplyr::mutate(soiltype = recode(soiltype,
-                                   `soil` = "Soil (sandy clay loam)",
-                                   `soil_sand` = "Soil + Sand")) %>% 
-  group_by(soiltype) %>% 
-  dplyr::mutate(kPa = round((10^tension_pF)/10,2),
-                perc_sat = (moisture_vol/max(moisture_vol))*100) %>% 
-  dplyr::filter(kPa < 200,
-                tension_pF>=0)
+          ###  prop = 
+          ###  read_csv("data/hyprop_fitting_vg.csv") %>% 
+          ###  rename(tension_pF = `pF [-]`,
+          ###         moisture_vol = `Water Content [Vol%]`) %>% 
+          ###  dplyr::mutate(soiltype = recode(soiltype,
+          ###                                   `soil` = "Soil (sandy clay loam)",
+          ###                                   `soil_sand` = "Soil + Sand")) %>% 
+          ###  group_by(soiltype) %>% 
+          ###  dplyr::mutate(kPa = round((10^tension_pF)/10,2),
+          ###                perc_sat = (moisture_vol/max(moisture_vol))*100) %>% 
+          ###  dplyr::filter(kPa < 200,
+          ###                tension_pF>=0)
 
-hyprop_subset = 
-  hyprop %>% 
-  dplyr::mutate(pores_um = round(300/kPa,2),
-                perc_sat = round(perc_sat,1)) 
-#  filter(perc_sat %in% c(5,35,50,75,100))
-
-
-  
-  
-## ggplot trial with wp4c
+          ###  prop_subset = 
+          ###  hyprop %>% 
+          ###  dplyr::mutate(pores_um = round(300/kPa,2),
+          ###                perc_sat = round(perc_sat,1)) 
+          ###   filter(perc_sat %in% c(5,35,50,75,100))
 
 
-ggplot(hyprop, aes(x = kPa, y = perc_sat, color = treatment, linetype=treatment))+
-  geom_path(size=1.5)+
-  scale_color_manual(labels = c("drying","rewetting"), values = c("darkorange2","gray40"), na.translate=F)+
-  scale_linetype_manual(labels = c("drying","rewetting"), values = c("solid","twodash"), na.translate=F)+
-  geom_point(data = wp4c, aes(x = kPa, y = perc_sat), color = "black")+
-  
-  facet_wrap(.~soiltype)+
-  xlab ("tension, kPa (log scale)")+
-  ylab ("percent saturation")+
-  #ylim(0,100)+
-  #  scale_x_reverse(name = "percent saturation")+
-  scale_x_log10()+
-  # xlim(0,100)+
-  theme_kp()
+          ###  
+          ###  
+          ###   ggplot trial with wp4c
+
+
+          ###  plot(hyprop, aes(x = kPa, y = perc_sat, color = treatment, linetype=treatment))+
+          ###  geom_path(size=1.5)+
+          ###  scale_color_manual(labels = c("drying","rewetting"), values = c("darkorange2","gray40"), na.translate=F)+
+          ###  scale_linetype_manual(labels = c("drying","rewetting"), values = c("solid","twodash"), na.translate=F)+
+          ###  geom_point(data = wp4c, aes(x = kPa, y = perc_sat), color = "black")+
+          ###  
+          ###  facet_wrap(.~soiltype)+
+          ###  xlab ("tension, kPa (log scale)")+
+          ###  ylab ("percent saturation")+
+          ###  #ylim(0,100)+
+          ###  #  scale_x_reverse(name = "percent saturation")+
+          ###  scale_x_log10()+
+          ###  # xlim(0,100)+
+          ###  theme_kp()
 
 
 
-    
- 
- 
+          ###    
+          ###  
+          ###  
 # library(soiltexture) 
 #  
 #  
@@ -273,7 +273,7 @@ ggplot(hyprop, aes(x = kPa, y = perc_sat, color = treatment, linetype=treatment)
   
   
 
-# hyprop with wp4c -- july 9 ----------------------------------------------
+# hyprop with wp4c -- july 9/29 -- vg ----------------------------------------------
 
 filePaths <- list.files(path = "data/wrc/vg_wp4c",pattern = "*.xlsx", full.names = TRUE)
 
@@ -298,20 +298,50 @@ wrc_processed =
     pF>=0)
 
 ##
-ggplot(wrc_processed, aes(y = kPa, x = perc_sat, color = treatment, linetype=treatment))+
+wrc_processed %>% 
+  dplyr::mutate(skip = case_when(grepl("sl_drying",source)~"skip",
+                               grepl("scl_drying",source)~"skip")) %>% 
+  filter(is.na(skip)) %>% 
+  ggplot(aes(x = kPa, y = perc_sat, color = treatment, linetype=treatment, group = source))+
   geom_path(size=1.5)+
   scale_color_manual(labels = c("drying","rewetting"), values = c("darkorange2","gray40"), na.translate=F)+
   scale_linetype_manual(labels = c("drying","rewetting"), values = c("solid","twodash"), na.translate=F)+
   
   facet_wrap(.~texture)+
-  ylab ("tension, kPa (log scale)")+
-  xlab ("percent saturation")+
-  scale_y_continuous(trans = scales::log10_trans(), labels = scales::comma, 
+  xlab ("tension, kPa (log scale)")+
+  ylab ("percent saturation")+
+  scale_x_continuous(trans = scales::log10_trans(), labels = scales::comma, 
                      sec.axis = sec_axis(~ .^-1 * 300, name = "pore size (um)", labels = scales::comma))+
-  geom_vline(xintercept = 5, size=0.5, color = "grey80")+
-  geom_vline(xintercept = 35, size=0.5, color = "grey80")+
-  geom_vline(xintercept = 50, size=0.5, color = "grey80")+
-  geom_vline(xintercept = 75, size=0.5, color = "grey80")+
+  geom_hline(yintercept = 5, size=0.5, color = "grey80")+
+  geom_hline(yintercept = 35, size=0.5, color = "grey80")+
+  geom_hline(yintercept = 50, size=0.5, color = "grey80")+
+  geom_hline(yintercept = 75, size=0.5, color = "grey80")+
+  theme_kp()+
+  theme(panel.grid = element_blank())
+
+
+##
+
+wrc_processed %>% 
+  dplyr::mutate(skip = case_when(grepl("sl_drying",source)~"skip",
+                                 grepl("scl_drying",source)~"skip")) %>% 
+  filter(is.na(skip)) %>% 
+  filter(treatment=="drying") %>% 
+  ggplot(aes(x = kPa, y = perc_sat, color = texture, group = source))+
+  geom_path(size=1.5)+
+  scale_color_manual(#labels = c("drying","rewetting"), 
+                     values = c("darkorange2","gray40"), na.translate=F)+
+  scale_linetype_manual(labels = c("drying","rewetting"), values = c("solid","twodash"), na.translate=F)+
+  
+  #facet_wrap(.~texture)+
+  xlab ("tension, kPa (log scale)")+
+  ylab ("percent saturation")+
+  scale_x_continuous(trans = scales::log10_trans(), labels = scales::comma, 
+                     sec.axis = sec_axis(~ .^-1 * 300, name = "pore size (um)", labels = scales::comma))+
+  geom_hline(yintercept = 5, size=0.5, color = "grey80")+
+  geom_hline(yintercept = 35, size=0.5, color = "grey80")+
+  geom_hline(yintercept = 50, size=0.5, color = "grey80")+
+  geom_hline(yintercept = 75, size=0.5, color = "grey80")+
   theme_kp()+
   theme(panel.grid = element_blank())
 
@@ -319,35 +349,250 @@ ggplot(wrc_processed, aes(y = kPa, x = perc_sat, color = treatment, linetype=tre
 
 
 
-## ggplot with old drying curve
 
-hyprop %>% 
-  mutate(texture = recode(soiltype, "Soil (sandy clay loam)"= "SCL" ,
-                          "Soil + Sand"="SL")) %>% 
-  filter(treatment=="Drying") %>% 
-  ggplot(aes(x = kPa, y = perc_sat))+
-  geom_path(color = "red")+
-  geom_path(data = wrc_processed %>% filter(treatment=="wetting"), color = "blue")+
-  facet_wrap(~texture)+
-  scale_x_log10(labels = scales::comma)+
-  theme_kp()
+
+#
+# hyprop only -- july 29 -- vg ----------------------------------------------
+
+filePaths <- list.files(path = "data/wrc/vg_hyproponly_07-29",pattern = "*.xlsx", full.names = TRUE)
+
+wrc <- do.call(rbind, lapply(filePaths, function(path) {
+  df <- read_excel(path, sheet="Fitting-Retention Θ(pF)")
+  df[["source"]] <- rep(path, nrow(df))
+  df}))
+
+wrc_processed = 
+  wrc %>% 
+  dplyr::rename(pF = `pF [-]`,
+                vol_water_perc = `Water Content [Vol%]`) %>% 
+  #filter(pF>=0) %>% 
+  dplyr::mutate(treatment = case_when(grepl("drying",source)~"drying",
+                                      grepl("wetting",source)~"wetting"),
+                texture = case_when(grepl("scl",source)~"SCL",
+                                    grepl("sl",source)~"SL")) %>% 
+  group_by(texture) %>% 
+  dplyr::mutate(kPa = round((10^pF)/10,2),
+                perc_sat = round((vol_water_perc/max(vol_water_perc))*100,2)) %>% 
+  dplyr::filter(#kPa < 200,
+    pF>=0)
+
+##
+
+wrc_processed %>% 
+  dplyr::mutate(skip = case_when(grepl("sl_drying",source)~"skip",
+                                 grepl("scl_drying",source)~"skip")) %>% 
+  filter(is.na(skip)) %>% 
+  filter(treatment=="drying") %>% 
+  ggplot(aes(x = kPa, y = perc_sat, color = texture, group = source))+
+  geom_path(size=1.5)+
+  scale_color_manual(#labels = c("drying","rewetting"), 
+    values = c("darkorange2","gray40"), na.translate=F)+
+  scale_linetype_manual(labels = c("drying","rewetting"), values = c("solid","twodash"), na.translate=F)+
   
-a = tibble(~"sat", ~"kPa", ~texture,
-           100, 0.10, "SL",
-           100, 0.22,"SL",
-           75, 32.43,"SL",
-           50, 123.59,"SL",
-           35, 374.11,"SL",
-           5, 125314.12,"SL",
-           100, 0.10, "SCL",
-           75, 6.46,"SCL",
-           50, 30.97,"SCL",
-           35, 98.17,"SCL",
-           5, 54575.79, "SCL"
-           
-)
+  #facet_wrap(.~texture)+
+  xlab ("tension, kPa (log scale)")+
+  ylab ("percent saturation")+
+  scale_x_continuous(trans = scales::log10_trans(), labels = scales::comma, 
+                     sec.axis = sec_axis(~ .^-1 * 300, name = "pore size (um)", labels = scales::comma))+
+  geom_hline(yintercept = 5, size=0.5, color = "grey80")+
+  geom_hline(yintercept = 35, size=0.5, color = "grey80")+
+  geom_hline(yintercept = 50, size=0.5, color = "grey80")+
+  geom_hline(yintercept = 75, size=0.5, color = "grey80")+
+  theme_kp()+
+  theme(panel.grid = element_blank())
+
+
+
+#
+
+##    ## ggplot with old drying curve ----
+      ##    
+      ##    hyprop %>% 
+      ##      mutate(texture = recode(soiltype, "Soil (sandy clay loam)"= "SCL" ,
+      ##                              "Soil + Sand"="SL")) %>% 
+      ##      filter(treatment=="Drying") %>% 
+      ##      ggplot(aes(x = kPa, y = perc_sat))+
+      ##      geom_path(color = "red")+
+      ##      geom_path(data = wrc_processed %>% filter(treatment=="wetting"), color = "blue")+
+      ##      facet_wrap(~texture)+
+      ##      scale_x_log10(labels = scales::comma)+
+      ##      theme_kp()
+      ##      
+      ##    a = tibble(~"sat", ~"kPa", ~texture,
+      ##               100, 0.10, "SL",
+      ##               100, 0.22,"SL",
+      ##               75, 32.43,"SL",
+      ##               50, 123.59,"SL",
+      ##               35, 374.11,"SL",
+      ##               5, 125314.12,"SL",
+      ##               100, 0.10, "SCL",
+      ##               75, 6.46,"SCL",
+      ##               50, 30.97,"SCL",
+      ##               35, 98.17,"SCL",
+      ##               5, 54575.79, "SCL"
+      ##               
+      ##    )
+
 
 
 # outputs -----------------------------------------------------------------
 
 write.csv(wrc_processed, "data/processed/wrc.csv", row.names = F)
+
+
+## ----
+
+# water release -----------------------------------------------------------
+
+wrc_processed = read.csv("data/processed/wrc.csv")
+
+# release = 
+#   wrc_processed %>% 
+#   group_by(texture, treatment) %>% 
+#   mutate(Diff = vol_water_perc - lag(vol_water_perc))
+
+release_scl_wetting = 
+  wrc_processed %>% 
+  select(vol_water_perc, treatment, texture, kPa) %>% 
+  filter(treatment %in% "wetting" & texture %in% "SCL") %>% 
+  mutate(pore_um = round(300/kPa,2),
+         x_bins = cut(pore_um, breaks = 300)) %>% 
+  separate(x_bins, c("start", "stop"), sep = ",") %>% 
+  mutate(stop = str_replace(stop, "]",""),
+         stop = as.numeric(stop),
+         start = stri_replace_all_fixed(start, "(",""),
+         #         start = str_replace(start, "-",""),
+         start = as.numeric(start)
+  ) 
+
+release_scl_wetting_summary  = 
+  release_scl_wetting %>% 
+  group_by(start, stop, treatment, texture) %>% 
+  summarize(vol_water = max(vol_water_perc)) 
+
+release_scl_wetting_bins = 
+  release_scl_wetting_summary %>% 
+  ungroup() %>% 
+  # arrange(desc(stop)) %>% 
+  mutate(Diff = vol_water - lag(vol_water),
+         Diff_perc = (Diff/max(vol_water))*100)  %>% 
+  na.omit() %>% 
+  #  mutate(bins = case_when(start==50 & stop==100 ~ "50-100",
+  #                          start>=100 & start <250 ~ "100-250",
+  #                          start >=250 ~ "> 250")) %>% 
+  mutate(bins = if_else(stop<=100, stop, 3000)) %>% 
+  group_by(bins) %>% 
+  summarize(water_vol_perc = round(sum(Diff_perc),2))
+
+
+bins_10 = tribble(
+  ~bins, ~water_vol_perc,
+  10, (33.43/max(release_scl_wetting_summary$vol_water))*100
+)
+## < 10 um = 37.43 = 51.54 % of total volume
+
+bins_combined = 
+  release_scl_wetting_bins %>% 
+  rbind(bins_10) %>% 
+  arrange(bins)
+
+ggplot(bins_combined, aes(x = as.character(bins), y = water_vol_perc))+
+  geom_point()
+
+
+release_scl_wetting_bins2 = 
+  release_scl_wetting %>% 
+  ungroup() %>% 
+  arrange((vol_water_perc)) %>% 
+  mutate(Diff = vol_water_perc - lag(vol_water_perc),
+         Diff_perc = (Diff/max(vol_water_perc))*100)  %>% 
+  na.omit() 
+
+ggplot(release_scl_wetting_bins2, aes(x = (pore_um), y = Diff_perc))+
+  geom_point()+
+  scale_x_continuous(trans = "log10", labels = scales::comma)+
+  labs(title = "scl")
+
+
+####
+
+release_sl_wetting = 
+  wrc_processed %>% 
+  select(vol_water_perc, treatment, texture, kPa) %>% 
+  filter(treatment %in% "wetting" & texture %in% "SL") %>% 
+  mutate(pore_um = round(300/kPa,2),
+         x_bins = cut(pore_um, breaks = 300)) %>% 
+  separate(x_bins, c("start", "stop"), sep = ",") %>% 
+  mutate(stop = str_replace(stop, "]",""),
+         stop = as.numeric(stop),
+         start = stri_replace_all_fixed(start, "(",""),
+         #         start = str_replace(start, "-",""),
+         start = as.numeric(start)
+  ) 
+
+
+release_sl_wetting_bins2 = 
+  release_sl_wetting %>% 
+  ungroup() %>% 
+  arrange((vol_water_perc)) %>% 
+  mutate(Diff = vol_water_perc - lag(vol_water_perc),
+         Diff_perc = (Diff/max(vol_water_perc))*100)  %>% 
+  na.omit()
+
+ggplot(release_sl_wetting_bins2, aes(x = (pore_um), y = Diff_perc))+
+  geom_point()+
+  scale_x_continuous(trans = "log10", labels = scales::comma)+
+  labs(title = "sl")
+
+
+release_sl_wetting_summary  = 
+  release_sl_wetting %>% 
+  group_by(start, stop, treatment, texture) %>% 
+  summarize(vol_water = max(vol_water_perc)) 
+
+
+release_sl_wetting_bins = 
+  release_sl_wetting_summary %>% 
+  ungroup() %>% 
+  # arrange(desc(stop)) %>% 
+  mutate(Diff = vol_water - lag(vol_water),
+         Diff_perc = (Diff/max(vol_water))*100)  %>% 
+  na.omit() %>% 
+  #  mutate(bins = case_when(start==50 & stop==100 ~ "50-100",
+  #                          start>=100 & start <250 ~ "100-250",
+  #                          start >=250 ~ "> 250")) %>% 
+  mutate(bins = if_else(stop<=100, stop, 3000)) %>% 
+  group_by(bins) %>% 
+  summarize(water_vol_perc = round(sum(Diff_perc),2))
+
+
+bins_10_sl = tribble(
+  ~bins, ~water_vol_perc,
+  10, (52.57/max(release_sl_wetting_summary$vol_water))*100
+)
+## < 10 um = 37.43 = 51.54 % of total volume
+
+bins_combined_sl = 
+  release_sl_wetting_bins %>% 
+  rbind(bins_10_sl) %>% 
+  arrange(bins) %>% 
+  mutate(texture="SL")
+
+ggplot(bins_combined_sl, aes(x = (bins), y = water_vol_perc))+
+  geom_point()
+
+
+bins_combined_both = 
+  bins_combined %>% 
+  mutate(texture="SCL") %>% 
+  rbind(bins_combined_sl) %>% 
+  arrange(bins)
+
+bins_combined_both %>% 
+  ggplot(aes(x = reorder(as.character(bins),bins), y = water_vol_perc, color = texture))+
+  geom_point()+
+  geom_path(aes(group=texture))
+
+
+
+
