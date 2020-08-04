@@ -624,7 +624,7 @@ ggplot(rel_abund2,
             aes(x = treatment, y = rel_abund, color = color), 
             label = "*", size=7,
             show.legend = F)+
-  facet_grid(texture ~ sat_level, scales = "free_x")+
+  facet_grid(texture ~ sat_level, scales = "free_x", space = "free_x")+
   scale_x_discrete(position = "bottom") +
   labs(x = "",
        y = "relative contribution (%)",
