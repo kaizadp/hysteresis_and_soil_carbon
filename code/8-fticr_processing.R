@@ -9,9 +9,6 @@
 
 source("code/0-hysteresis_packages.R")
 
-#install.packages("devtools") 
-#devtools::install_github("jakelawlor/PNWColors") 
-#library(PNWColors)
 # ------------------------------------------------------- ----
 
 ## step 1: load the files ----
@@ -21,7 +18,6 @@ fticr_report = read.csv("data/fticr/Report-08-04-2020.csv") %>%
   filter(C13==0) %>% 
 # remove peaks without C assignment
   filter(C>0)
-
 
 # this has metadata as well as sample data
 # split them
@@ -62,7 +58,10 @@ corekey_subset =
   dplyr::select(Core, texture, treatment, sat_level, Core_assignment) %>% 
   dplyr::mutate(Core = as.factor(Core))
 
-
+fticr_key_full = 
+  fticr_key %>% 
+  dplyr::mutate(Core = as.factor(Core)) %>% 
+  left_join(corekey_subset, by = "Core")
 
 fticr_data = 
   fticr_report %>% 
@@ -87,6 +86,7 @@ fticr_data =
 write.csv(fticr_data,FTICR_LONG, row.names = FALSE)
 write.csv(fticr_meta,FTICR_META, row.names = FALSE)
 write.csv(meta_hcoc,FTICR_META_HCOC, row.names = FALSE)
+write.csv(fticr_key_full,"data/processed/fticr_key_full.csv", row.names = FALSE)
 
 
 
