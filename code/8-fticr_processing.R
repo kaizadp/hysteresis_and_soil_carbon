@@ -63,7 +63,8 @@ fticr_key_full =
   dplyr::mutate(Core = as.factor(Core)) %>% 
   left_join(corekey_subset, by = "Core")
 
-fticr_data = 
+## step 2: clean the files ----
+fticr_data_allpeaks = 
   fticr_report %>% 
   dplyr::select(Mass,starts_with("FT")) %>% 
   #tidyr::gather(sample,intensity,FT007:FT006) %>% 
@@ -75,15 +76,28 @@ fticr_data =
 # rearrange columns
   dplyr::select(Core, FTICR_ID, Mass, formula, presence) %>% 
   left_join(corekey_subset, by = "Core") %>% 
-  dplyr::select(-Mass,-formula, -presence,Mass,formula,presence) %>% 
-# now we want only peaks that are in all replicates
+  dplyr::select(-Mass,-formula, -presence,Mass,formula,presence)
+
+# now we want only peaks that are in 3+ replicates
+
+# create a longform file for peak assignments in each core
+fticr_data = 
+  fticr_data_allpeaks %>% 
+  group_by(Core_assignment,treatment, texture, sat_level,formula) %>% 
+  dplyr::mutate(n = n()) %>% 
+  filter(n>=3) 
+
+# create a longform file of peaks by treatments only. remove replication
+fticr_data_trt = 
+  fticr_data_allpeaks %>% 
   group_by(Core_assignment,treatment, texture, sat_level,formula) %>% 
   dplyr::summarize(n = n(),
                    presence = mean(presence)) %>% 
   filter(n>=3) 
 
-## OUTPUTS
+## step 3: OUTPUTS ----
 write.csv(fticr_data,FTICR_LONG, row.names = FALSE)
+write.csv(fticr_data_trt, "data/processed/fticr_longform_bytrt.csv", row.names = FALSE)
 write.csv(fticr_meta,FTICR_META, row.names = FALSE)
 write.csv(meta_hcoc,FTICR_META_HCOC, row.names = FALSE)
 write.csv(fticr_key_full,"data/processed/fticr_key_full.csv", row.names = FALSE)
