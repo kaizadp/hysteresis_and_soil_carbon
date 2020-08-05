@@ -12,7 +12,7 @@ source("code/0-hysteresis_packages.R")
 # ------------------------------------------------------- ----
 
 ## step 1: load the files ----
-fticr_report = read.csv("data/fticr/Report-08-04-2020.csv") %>% 
+fticr_report = read.csv("data/fticr/Report-08-05-2020.csv") %>% 
   filter(Mass>200 & Mass<900) %>% 
 # a. remove isotopes
   filter(C13==0) %>% 
@@ -41,8 +41,8 @@ fticr_meta =
   mutate(Class = case_when(AImod>0.66 ~ "condensed aromatic",
                            AImod<=0.66 & AImod > 0.50 ~ "aromatic",
                            AImod <= 0.50 & HC < 1.5 ~ "unsaturated/lignin",
-                           HC < 2.0 & HC >= 1.5 & N==0 ~ "unsaturated aliphatic",
-                           HC >= 2.0 | OC >= 0.9 ~ "saturated",
+                           ((HC < 2.0 & HC >= 1.5)|(HC>=2.0 & OC < 0.9)) & N==0 ~ "aliphatic",
+                           HC >= 2.0 & OC >= 0.9 ~ "carbohydrate",
                            HC < 2.0 & HC >= 1.5 & N > 0 ~ "aliphatic+N",
   )) %>% 
   
@@ -98,7 +98,8 @@ fticr_data =
   fticr_data_allpeaks %>% 
   group_by(Core_assignment,treatment, texture, sat_level,formula) %>% 
   dplyr::mutate(n = n()) %>% 
-  filter(n>=3) 
+  filter(n>=3) %>% 
+  dplyr::select(-FTICR_ID)
 
 # create a longform file of peaks by treatments only. remove replication
 fticr_data_trt = 
