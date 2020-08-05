@@ -1,0 +1,67 @@
+"Core_assignment","texture","treatment","sat_level","Class","rel_abund"
+"Soil_50_D","SCL","Drying",35,"aliphatic+N",0.86
+"Soil_50_D","SCL","Drying",35,"aromatic",13.58
+"Soil_50_D","SCL","Drying",35,"condensed aromatic",6.73
+"Soil_50_D","SCL","Drying",35,"saturated",0.58
+"Soil_50_D","SCL","Drying",35,"unsaturated aliphatic",13.94
+"Soil_50_D","SCL","Drying",35,"unsaturated/lignin",64.31
+"Soil_50_W","SCL","Wetting",35,"aliphatic+N",0.3
+"Soil_50_W","SCL","Wetting",35,"aromatic",15.42
+"Soil_50_W","SCL","Wetting",35,"condensed aromatic",7.15
+"Soil_50_W","SCL","Wetting",35,"saturated",0.31
+"Soil_50_W","SCL","Wetting",35,"unsaturated aliphatic",10.26
+"Soil_50_W","SCL","Wetting",35,"unsaturated/lignin",66.56
+"Soil_75_D","SCL","Drying",50,"aliphatic+N",1.27
+"Soil_75_D","SCL","Drying",50,"aromatic",11.84
+"Soil_75_D","SCL","Drying",50,"condensed aromatic",5.35
+"Soil_75_D","SCL","Drying",50,"saturated",1.29
+"Soil_75_D","SCL","Drying",50,"unsaturated aliphatic",15.17
+"Soil_75_D","SCL","Drying",50,"unsaturated/lignin",65.08
+"Soil_75_W","SCL","Wetting",50,"aliphatic+N",0.69
+"Soil_75_W","SCL","Wetting",50,"aromatic",13.24
+"Soil_75_W","SCL","Wetting",50,"condensed aromatic",5.59
+"Soil_75_W","SCL","Wetting",50,"saturated",0.74
+"Soil_75_W","SCL","Wetting",50,"unsaturated aliphatic",13.29
+"Soil_75_W","SCL","Wetting",50,"unsaturated/lignin",66.45
+"Soil_dry_W","SCL","Wetting",5,"aliphatic+N",2.1
+"Soil_dry_W","SCL","Wetting",5,"aromatic",11.46
+"Soil_dry_W","SCL","Wetting",5,"condensed aromatic",5.04
+"Soil_dry_W","SCL","Wetting",5,"saturated",1.17
+"Soil_dry_W","SCL","Wetting",5,"unsaturated aliphatic",12.34
+"Soil_dry_W","SCL","Wetting",5,"unsaturated/lignin",67.88
+"Soil_fm","SCL","FM",NA,"aliphatic+N",1.15
+"Soil_fm","SCL","FM",NA,"aromatic",12.56
+"Soil_fm","SCL","FM",NA,"condensed aromatic",5.95
+"Soil_fm","SCL","FM",NA,"saturated",1.13
+"Soil_fm","SCL","FM",NA,"unsaturated aliphatic",15.26
+"Soil_fm","SCL","FM",NA,"unsaturated/lignin",63.96
+"Soil_sand_75_W","SL","Wetting",75,"aliphatic+N",0.07
+"Soil_sand_75_W","SL","Wetting",75,"aromatic",13.06
+"Soil_sand_75_W","SL","Wetting",75,"condensed aromatic",2.95
+"Soil_sand_75_W","SL","Wetting",75,"saturated",0.27
+"Soil_sand_75_W","SL","Wetting",75,"unsaturated aliphatic",12.16
+"Soil_sand_75_W","SL","Wetting",75,"unsaturated/lignin",71.5
+"Soil_sand_sat_D","SL","Drying",100,"aliphatic+N",0.93
+"Soil_sand_sat_D","SL","Drying",100,"aromatic",11.36
+"Soil_sand_sat_D","SL","Drying",100,"condensed aromatic",4.69
+"Soil_sand_sat_D","SL","Drying",100,"saturated",1.09
+"Soil_sand_sat_D","SL","Drying",100,"unsaturated aliphatic",17.1
+"Soil_sand_sat_D","SL","Drying",100,"unsaturated/lignin",64.84
+"Soil_sand_sat_W","SL","Wetting",100,"aliphatic+N",0.18
+"Soil_sand_sat_W","SL","Wetting",100,"aromatic",12.58
+"Soil_sand_sat_W","SL","Wetting",100,"condensed aromatic",5.8
+"Soil_sand_sat_W","SL","Wetting",100,"saturated",0.5
+"Soil_sand_sat_W","SL","Wetting",100,"unsaturated aliphatic",13.56
+"Soil_sand_sat_W","SL","Wetting",100,"unsaturated/lignin",67.38
+"Soil_sat_D","SCL","Drying",100,"aliphatic+N",1.66
+"Soil_sat_D","SCL","Drying",100,"aromatic",11.32
+"Soil_sat_D","SCL","Drying",100,"condensed aromatic",3.43
+"Soil_sat_D","SCL","Drying",100,"saturated",1.16
+"Soil_sat_D","SCL","Drying",100,"unsaturated aliphatic",18.41
+"Soil_sat_D","SCL","Drying",100,"unsaturated/lignin",64.02
+"Soil_sat_W","SCL","Wetting",100,"aliphatic+N",0.43
+"Soil_sat_W","SCL","Wetting",100,"aromatic",12.98
+"Soil_sat_W","SCL","Wetting",100,"condensed aromatic",5.85
+"Soil_sat_W","SCL","Wetting",100,"saturated",0.49
+"Soil_sat_W","SCL","Wetting",100,"unsaturated aliphatic",12.44
+"Soil_sat_W","SCL","Wetting",100,"unsaturated/lignin",67.81
