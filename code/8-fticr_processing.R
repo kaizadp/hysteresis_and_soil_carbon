@@ -36,15 +36,23 @@ fticr_meta =
   dplyr::mutate(AImod = round((1+C-(0.5*O)-S-(0.5*(N+P+H)))/(C-(0.5*O)-S-N-P),4),
                 NOSC =  round(4-(((4*C)+H-(3*N)-(2*O)-(2*S))/C),4),
                 HC = round(H/C,2),
-                OC = round(O/C,2)) %>% 
+                OC = round(O/C,2),
+                DBE_AI = 1+C-O-S-0.5*(N+P+H),
+                DBE =  1 + ((2*C-H + N + P))/2,
+                DBE_C = DBE_AI/C) %>% 
 # d. create new Class assignments, based on Seidel et al. 2014 (http://dx.doi.org/10.1016/j.gca.2014.05.038)
   mutate(Class = case_when(AImod>0.66 ~ "condensed aromatic",
                            AImod<=0.66 & AImod > 0.50 ~ "aromatic",
                            AImod <= 0.50 & HC < 1.5 ~ "unsaturated/lignin",
-                           ((HC < 2.0 & HC >= 1.5)|(HC>=2.0 & OC < 0.9)) & N==0 ~ "aliphatic",
-                           HC >= 2.0 & OC >= 0.9 ~ "carbohydrate",
-                           HC < 2.0 & HC >= 1.5 & N > 0 ~ "aliphatic+N",
-  )) %>% 
+                           HC >= 1.5 ~ "aliphatic"),
+         Class = replace_na(Class, "other"),
+         Class_detailed = case_when(AImod>0.66 ~ "condensed aromatic",
+                                    AImod<=0.66 & AImod > 0.50 ~ "aromatic",
+                                    AImod <= 0.50 & HC < 1.5 ~ "unsaturated/lignin",
+                                    HC >= 2.0 & OC >= 0.9 ~ "carbohydrate",
+                                    HC >= 2.0 & OC < 0.9 ~ "lipid",
+                                    HC < 2.0 & HC >= 1.5 & N==0 ~ "aliphatic",
+                                    HC < 2.0 & HC >= 1.5 & N > 0 ~ "aliphatic+N")) %>%
   
 # e. create column/s for formula
 # first, create columns for individual elements
