@@ -23,13 +23,14 @@ relabund2 =
   dplyr::select(Core, texture, treatment, sat_level, Class, relabund) %>% 
   spread(Class, relabund) %>% 
   filter(!treatment=="FM") %>% 
+  filter(texture=="SCL") %>% 
   replace(is.na(.),0)
 
 # create a matrix within relabund2 file, which we will use as the PERMANOVA response variable
 relabund2$DV = as.matrix(relabund2[,5:8])
 
 # PERMANOVA
-adonis2(relabund2$DV ~ treatment*sat_level*texture, data = relabund2)
+adonis2(relabund2$DV ~ treatment*sat_level, data = relabund2)
 
 #
 # PART II: RELATIVE ABUNDANCE PCA ----
