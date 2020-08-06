@@ -1,40 +1,44 @@
-source("0-hysteresis_packages.R")
+# HYSTERESIS AND SOIL CARBON
+# 3-fticr_stats
+# Kaizad F. Patel
+# April 2020
+
+## use this script to run statistical tests on the processed FTICR data (relative abundances)
+
+source("code/0-hysteresis_packages.R")
+library(vegan)
+library(scales)
+
+# ------------------------------------------------------- ----
+
+# I. load files -----------------------------------------------------------
 
 relabund = read.csv("data/processed/fticr_relabund.csv")
 
+# 1. PERMANOVA ----
+
+## make wider 
 relabund2 = 
   relabund %>% 
-  dplyr::select(texture, treatment, sat_level, Class, relabund) %>% 
+  dplyr::select(Core, texture, treatment, sat_level, Class, relabund) %>% 
   spread(Class, relabund) %>% 
   filter(!treatment=="FM") %>% 
   replace(is.na(.),0)
 
-#
-# 1. MANOVA ----
-relabund2$DV = as.matrix(relabund2[,4:12])
+# create a matrix within relabund2 file, which we will use as the PERMANOVA response variable
+relabund2$DV = as.matrix(relabund2[,5:8])
 
-# since the relative abundances are not strictly independent and all add to 100 %,
-# use the isometric log ratio transformation
-# http://www.sthda.com/english/wiki/manova-test-in-r-multivariate-analysis-of-variance#import-your-data-into-r
-
-library(compositions)
-
-man = manova(ilr(clo(DV)) ~ treatment, data = relabund2)
-summary(man)
-
-# there is currently an issue with summary(man) becayse residuals have rank 5 < 8
-# need to fix
-
-summary.aov(man)
+# PERMANOVA
+adonis2(relabund2$DV ~ treatment*sat_level*texture, data = relabund2)
 
 #
-# 2. PCA ----
 # PART II: RELATIVE ABUNDANCE PCA ----
-
 relabund_pca=
   relabund %>% 
   ungroup %>% 
-  dplyr::select(Core_assignment, treatment, sat_level, texture, Class, relabund) %>% 
+  filter(texture=="SCL") %>% 
+  #filter(!Core==25) %>% 
+  dplyr::select(Core, Core_assignment, treatment, sat_level, texture, Class, relabund) %>% 
   spread(Class, relabund) %>% 
   replace(.,is.na(.),0)  %>% 
   dplyr::mutate(sat_level = if_else(treatment=="FM","FM", as.character(sat_level))) %>% 
@@ -44,11 +48,11 @@ relabund_pca=
 ## 1. overall PCA ----
 relabund_pca_num = 
   relabund_pca %>% 
-  dplyr::select(.,-(1:3))
+  dplyr::select(.,-(1:4))
 
 relabund_pca_grp = 
   relabund_pca %>% 
-  dplyr::select(.,(1:3)) %>% 
+  dplyr::select(.,(1:4)) %>% 
   dplyr::mutate(row = row_number())
 
 pca = prcomp(relabund_pca_num, scale. = T)
@@ -57,5 +61,44 @@ summary(pca)
 ggbiplot(pca, obs.scale = 1, var.scale = 1, 
          groups = relabund_pca_grp$treatment, ellipse = TRUE, circle = F,
          var.axes = TRUE)+
-  geom_point(size=2,stroke=2, aes(color = groups, shape = as.factor(relabund_pca_grp$sat_level)))
+  geom_point(size=2,stroke=2, aes(color = groups, shape = as.factor(relabund_pca_grp$sat_level)))+
+  scale_x_continuous(limits = c(-4,4), oob=rescale_none)+
+  labs(caption = "core 25 is out of bounds, influenced by aliphatic, ~10 on Axis1")
 
+
+
+## 2. relative abundance ANOVA ---- 
+
+fit_aov_nmr <- function(dat) {
+  a <-aov(relabund ~ treatment, data = dat)
+  tibble(`p` = summary(a)[[1]][[1,"Pr(>F)"]])
+} 
+
+fticr_aov = 
+  relabund %>% 
+  filter(!treatment=="FM" & texture=="SCL") %>% 
+  ungroup %>% 
+  group_by(texture, sat_level, Class) %>% 
+  do(fit_aov_nmr(.)) %>% 
+  dplyr::mutate(p = round(p,4),
+                asterisk = if_else(p<0.05,"*",as.character(NA)),
+                treatment="Wetting") %>% 
+  dplyr::select(-p)
+
+
+
+
+#
+##  1. MANOVA ----
+## relabund2$DV = as.matrix(relabund2[,4:12])
+## 
+## # since the relative abundances are not strictly independent and all add to 100 %,
+## # use the isometric log ratio transformation
+## # http://www.sthda.com/english/wiki/manova-test-in-r-multivariate-analysis-of-variance#import-your-data-into-r
+## 
+## library(compositions)
+## 
+## man = manova(ilr(clo(DV)) ~ treatment, data = relabund2)
+## summary(man)
+
+## summary.aov(man)
