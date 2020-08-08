@@ -397,7 +397,7 @@ pca = prcomp(relabund_pca_num, scale. = T)
 
 
 ## biplot ----
-fticr_biplot = 
+(fticr_biplot = 
   ggbiplot(pca, obs.scale = 1, var.scale = 1, 
          groups = relabund_pca_grp$treatment, ellipse = TRUE, circle = F,
          var.axes = TRUE)+
@@ -418,13 +418,13 @@ fticr_biplot =
   theme(panel.grid = element_blank(),
         title = element_text(hjust = 0.5),
         legend.position = "right")+
-
   NULL
+)
 ```
 
 ### euclidean distance
 
-```{r}
+```{r fticr_eucl}
 # euclidean distance ----
 library(vegan)
 library(ape)
@@ -477,7 +477,7 @@ eucl_label = tribble(
 )
   
 
-fticr_eucl = 
+(fticr_eucl = 
   ggplot(matrix3, aes(x = sat_level, y = distance))+
   geom_point(size=3)+
   geom_segment(aes(x = sat_level, xend = sat_level, y = 0, yend = distance))+
@@ -485,7 +485,7 @@ fticr_eucl =
   ylim(0,10)+
   labs(x = "% saturation",
        y = "drying-rewetting \n Euclidean distance")+
-  geom_hline(yintercept = 1.73, linetype = "dashed")+
+  geom_hline(yintercept = 1.713, linetype = "dashed")+
   
   geom_text(data = eucl_label %>% filter(type=="text"), aes(x = x, y = y), 
             label = "avg. within-group distance", angle=90, hjust="left", size=3)+
@@ -497,6 +497,7 @@ fticr_eucl =
   #annotate("text", label = "avg within-group distance", x = 0.7, y = 30, angle=90, size=3, hjust="left")+
   #annotate("curve", x = 0.7, xend = 0.7, y = 19, yend = 28, curvature=-0.2)+
   theme_kp()
+)
 
   # within-treatment variation
   # ggplot(matrix2, aes(x = sat_level, y = mean(distance), color = treatment.x, shape = texture.x))+

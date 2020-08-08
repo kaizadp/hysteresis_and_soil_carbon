@@ -100,11 +100,11 @@ h = agricolae::HSD.test(aov_wsoc_fm, trt = "texture");h
     #> 
     #> adonis2(formula = relabund2$DV ~ treatment * sat_level, data = relabund2)
     #>                     Df SumOfSqs      R2       F Pr(>F)    
-    #> treatment            1 0.019624 0.21251 16.3353  0.001 ***
-    #> sat_level            1 0.006470 0.07007  5.3859  0.013 *  
-    #> treatment:sat_level  1 0.010988 0.11899  9.1464  0.001 ***
-    #> Residual            46 0.055260 0.59843                   
-    #> Total               49 0.092342 1.00000                   
+    #> treatment            1 0.019567 0.21660 16.9931  0.001 ***
+    #> sat_level            1 0.006774 0.07499  5.8831  0.006 ** 
+    #> treatment:sat_level  1 0.011031 0.12210  9.5794  0.001 ***
+    #> Residual            46 0.052969 0.58632                   
+    #> Total               49 0.090341 1.00000                   
     #> ---
     #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
@@ -118,7 +118,7 @@ h = agricolae::HSD.test(aov_wsoc_fm, trt = "texture");h
 
 ### euclidean distance
 
-![](images/markdown/unnamed-chunk-5-1.png)<!-- -->
+![](images/markdown/fticr_eucl-1.png)<!-- -->
 
 -----
 
@@ -151,11 +151,25 @@ PERMANOVA: treatment and moisture level had a significant influence
     #>                     Df SumOfSqs      R2       F Pr(>F)    
     #> treatment            2   1.9419 0.31916 27.9847  0.001 ***
     #> sat_level            1   0.7115 0.11694 20.5067  0.001 ***
-    #> texture              1   0.0620 0.01019  1.7869  0.174    
-    #> treatment:sat_level  1   0.0724 0.01190  2.0875  0.146    
-    #> sat_level:texture    1   0.0542 0.00891  1.5630  0.214    
-    #> treatment:texture    2   0.1545 0.02539  2.2262  0.074 .  
+    #> texture              1   0.0620 0.01019  1.7869  0.170    
+    #> treatment:sat_level  1   0.0724 0.01190  2.0875  0.145    
+    #> sat_level:texture    1   0.0542 0.00891  1.5630  0.213    
+    #> treatment:texture    2   0.1545 0.02539  2.2262  0.079 .  
     #> Residual            89   3.0880 0.50751                   
+    #> Total               97   6.0846 1.00000                   
+    #> ---
+    #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    #> Permutation test for adonis under reduced model
+    #> Terms added sequentially (first to last)
+    #> Permutation: free
+    #> Number of permutations: 999
+    #> 
+    #> adonis2(formula = rel_abund2$DV ~ treatment * sat_level, data = rel_abund2)
+    #>                     Df SumOfSqs      R2       F Pr(>F)    
+    #> treatment            2   1.9419 0.31916 26.8456  0.001 ***
+    #> sat_level            1   0.7115 0.11694 19.6720  0.001 ***
+    #> treatment:sat_level  1   0.0674 0.01108  1.8647  0.171    
+    #> Residual            93   3.3637 0.55282                   
     #> Total               97   6.0846 1.00000                   
     #> ---
     #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
@@ -194,7 +208,7 @@ peaks in treatments
 
 ### Session Info
 
-Run: 2020-08-05
+Run: 2020-08-08
 
     #> R version 4.0.2 (2020-06-22)
     #> Platform: x86_64-apple-darwin17.0 (64-bit)

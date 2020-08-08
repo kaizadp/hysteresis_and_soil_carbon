@@ -101,7 +101,7 @@ ggMarginal(gg_100,groupColour = TRUE,groupFill = TRUE)
 
 field moist soils
 
-```{r}
+```{r, eval=FALSE}
 relabund %>% 
   filter(treatment=="FM") %>% 
   dplyr::select(Class, texture, relabund) %>% 
@@ -111,7 +111,7 @@ relabund %>%
 
 
 treatment
-```{r}
+```{r, eval=FALSE}
 relabund %>% 
   filter(!treatment == "FM") %>% 
   dplyr::mutate(var = paste0(texture,"-",treatment)) %>% 
