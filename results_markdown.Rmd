@@ -15,6 +15,7 @@ knitr::opts_chunk$set(dpi = 300,
                       fig.path = "images/markdown/")
 
 source("code/0-hysteresis_packages.R")
+library(vegan)
 ```
 
 ```{r, eval=TRUE}
@@ -262,6 +263,248 @@ gg_marg_fm = ggMarginal(gg_fm,groupColour = TRUE,groupFill = TRUE)
 gg_marg_100 = ggMarginal(gg_100,groupColour = TRUE,groupFill = TRUE)
 
 plot_grid(gg_marg_fm, gg_marg_100, nrow = 1, ncol = 2)
+```
+
+### PERMANOVA
+
+```{r}
+relabund = read.csv("data/processed/fticr_relabund.csv")
+
+# 1. PERMANOVA ----
+
+## make wider 
+relabund2 = 
+  relabund %>% 
+  dplyr::select(Core, texture, treatment, sat_level, Class, relabund) %>% 
+  spread(Class, relabund) %>% 
+  filter(!treatment=="FM") %>% 
+  filter(texture=="SCL") %>% 
+  replace(is.na(.),0)
+
+# create a matrix within relabund2 file, which we will use as the PERMANOVA response variable
+relabund2$DV = as.matrix(relabund2[,5:8])
+
+# PERMANOVA
+adonis2(relabund2$DV ~ treatment*sat_level, data = relabund2)
+```
+
+
+### relative abundance bar plots
+
+```{r fticr_barplot, fig.width=9, fig.height=5}
+library(scales)
+
+relabund_trt = read.csv("data/processed/fticr_relabund_trt.csv")
+
+
+fticr_label <- 
+  tribble(
+  ~texture, ~sat_level, ~treatment, ~Class, ~rel_abund, ~color,
+  "SCL", "5", "Wetting", "aliphatic", 90, "white",
+  "SCL", "5", "Wetting", "condensed aromatic", 1, "black",
+  
+  "SCL", "35", "Wetting", "aliphatic", 90, "white",
+  "SCL", "35", "Wetting", "unsaturated/lignin", 50, "black",
+  "SCL", "35", "Wetting", "aromatic", 10, "black",
+  
+  "SCL", "50", "Wetting", "aliphatic", 90, "white",
+  "SCL", "50", "Wetting", "unsaturated/lignin", 50, "black",
+  "SCL", "50", "Wetting", "aromatic", 10, "black",
+  "SCL", "50", "Wetting", "condensed aromatic", 1, "black",
+  
+  "SCL", "75", "Wetting", "aliphatic", 90, "white",
+  "SCL", "75", "Wetting", "unsaturated/lignin", 50, "black",
+  "SCL", "75", "Wetting", "aromatic", 10, "black",
+  
+  "SCL", "100", "Wetting", "condensed aromatic", 1, "black"
+) %>% 
+  dplyr::mutate(sat_level = if_else(treatment=="FM", "FM", as.character(sat_level)),
+                sat_level = factor(sat_level, levels = 
+                                     c("FM", "5", "35", "50", "75", "100"))) 
+
+
+relabund_trt %>% 
+  filter(texture=="SCL") %>% 
+  ungroup %>% 
+  mutate(Class = factor(Class, levels = 
+                          c("aliphatic",
+                            "unsaturated/lignin",
+                            "aromatic",
+                            "condensed aromatic"))) %>% 
+  dplyr::mutate(sat_level = if_else(treatment=="FM", "FM", as.character(sat_level)),
+                sat_level = factor(sat_level, levels = 
+                                     c("FM", "5", "35", "50", "75", "100"))) %>% 
+  ggplot(aes(x = treatment, y = rel_abund, fill = Class))+
+  geom_bar(stat = "identity")+
+  
+  geom_text(data = fticr_label, 
+            aes(x = treatment, y = rel_abund, color = color), 
+            label = "*", size=7,
+            show.legend = F)+
+  
+  scale_fill_manual(values = PNWColors::pnw_palette("Sunset2",4))+
+  scale_color_manual(values = c("black", "white"))+
+
+  labs(x = "",
+       y = "relative contribution (%)",
+       subtitle = "% saturation")+
+  #scale_y_continuous(limits=c(60,100), oob = rescale_none)+
+  facet_grid(texture~sat_level, scales = "free_x", space = "free_x")+
+  theme_kp()+
+  theme(
+    plot.subtitle = element_text(size=14, face = "bold", hjust=0.5),
+    panel.border = element_rect(color="black",size=0.5, fill = NA),
+    strip.background = element_blank(), #facet formatting
+    panel.spacing.x = unit(0.5, "lines"), #facet spacing for x axis
+    panel.spacing.y = unit(1, "lines"), #facet spacing for x axis
+    strip.text.x = element_text(size=12, face = "bold"), #facet labels
+    strip.text.y = element_text(size=12, face = "bold", angle = 270)
+    )+
+  NULL
+```
+
+### relative abundance PCA
+
+```{r fticr_pca}
+library(scales)
+relabund = read.csv("data/processed/fticr_relabund.csv")
+
+# PART II: RELATIVE ABUNDANCE PCA ----
+relabund_pca=
+  relabund %>% 
+  ungroup %>% 
+  filter(texture=="SCL") %>% 
+  #filter(!Core==25) %>% 
+  dplyr::select(Core, Core_assignment, treatment, sat_level, texture, Class, relabund) %>% 
+  spread(Class, relabund) %>% 
+  replace(.,is.na(.),0)  %>% 
+  dplyr::mutate(sat_level = if_else(treatment=="FM","FM", as.character(sat_level))) %>% 
+  dplyr::select(-1)
+
+#
+## SCL PCA ----
+relabund_pca_num = 
+  relabund_pca %>% 
+  dplyr::select(.,-(1:4))
+
+relabund_pca_grp = 
+  relabund_pca %>% 
+  dplyr::select(.,(1:4)) %>% 
+  dplyr::mutate(row = row_number())
+
+pca = prcomp(relabund_pca_num, scale. = T)
+#summary(pca)
+
+
+## biplot ----
+fticr_biplot = 
+  ggbiplot(pca, obs.scale = 1, var.scale = 1, 
+         groups = relabund_pca_grp$treatment, ellipse = TRUE, circle = F,
+         var.axes = TRUE)+
+  geom_point(size=2,stroke=2, 
+             aes(color = groups, 
+                 shape = as.factor(relabund_pca_grp$sat_level)))+
+  scale_color_manual(values = (pal3),
+                     breaks = c("Drying","Wetting", "FM"),
+                     labels = c("drying","rewetting", "field moist"),
+                     na.translate=F) +
+  scale_shape_manual(values = c(18, 17, 3, 15, 16, 4),
+                     breaks = c(5, 35, 50, 75, 100, "FM"))+
+  scale_x_continuous(limits = c(-3,3.5), oob=rescale_none)+
+  scale_y_continuous(limits = c(-3,3.5), oob=rescale_none)+
+  labs(title = "SCL",
+       caption = "core 25 is out of bounds, influenced by aliphatic, ~10 on Axis1")+
+  theme_kp()+
+  theme(panel.grid = element_blank(),
+        title = element_text(hjust = 0.5),
+        legend.position = "right")+
+
+  NULL
+```
+
+### euclidean distance
+
+```{r}
+# euclidean distance ----
+library(vegan)
+library(ape)
+
+bray_distance = vegdist(relabund_pca_num, method="euclidean")
+principal_coordinates = pcoa(bray_distance)
+pcoa_plot = data.frame(principal_coordinates$vectors[,])
+pcoa_plot_merged = merge(pcoa_plot, relabund_pca_grp, by="row.names")
+
+grp = 
+  relabund_pca_grp %>% 
+  dplyr::mutate(grp = paste0(texture,"-",sat_level,"-",treatment))
+  #dplyr::select(row, grp)
+matrix = as.matrix(bray_distance)
+
+matrix2 = 
+  matrix %>% 
+  melt() %>% 
+  left_join(grp, by = c("Var1"="row")) %>% 
+  #rename(grp1 = grp) %>% 
+  left_join(grp, by = c("Var2"="row")) %>% 
+  filter(grp.x==grp.y) %>% 
+  group_by(grp.x,grp.y,sat_level.x, texture.x,treatment.x,treatment.y) %>% 
+  dplyr::summarise(distance  =mean(value)) %>%
+  ungroup %>% 
+  rename(sat_level = sat_level.x) %>% 
+  dplyr::mutate(sat_level = if_else(treatment.x=="FM","FM",sat_level),
+                sat_level = factor(sat_level, levels = c(5,35,50,75,100,"FM")))
+
+matrix3 = 
+  matrix %>% 
+  melt() %>% 
+  left_join(grp, by = c("Var1"="row")) %>% 
+  #rename(grp1 = grp) %>% 
+  left_join(grp, by = c("Var2"="row")) %>% 
+  filter(!grp.x==grp.y) %>% 
+  filter(sat_level.x == sat_level.y) %>% 
+  filter(texture.x == texture.y) %>% 
+  group_by(grp.x,grp.y,sat_level.x, texture.x,treatment.x,treatment.y) %>% 
+  dplyr::summarise(distance  =mean(value)) %>%
+  ungroup %>% 
+  rename(sat_level = sat_level.x) %>% 
+  dplyr::mutate(sat_level = factor(sat_level, levels = c(5,35,50,75,100)))
+
+
+eucl_label = tribble(
+  ~x, ~xend, ~y, ~yend, ~texture.x, ~type,
+  0.7, NA , 30, NA, "SCL", "text",
+  0.7, 0.7, 19, 28, "SCL", "curve"
+)
+  
+
+fticr_eucl = 
+  ggplot(matrix3, aes(x = sat_level, y = distance))+
+  geom_point(size=3)+
+  geom_segment(aes(x = sat_level, xend = sat_level, y = 0, yend = distance))+
+  
+  ylim(0,10)+
+  labs(x = "% saturation",
+       y = "drying-rewetting \n Euclidean distance")+
+  geom_hline(yintercept = 1.73, linetype = "dashed")+
+  
+  geom_text(data = eucl_label %>% filter(type=="text"), aes(x = x, y = y), 
+            label = "avg. within-group distance", angle=90, hjust="left", size=3)+
+  geom_curve(data = eucl_label %>% filter(type=="curve"), aes(x = x, xend = xend, y = y, yend = yend),
+             curvature = -0.2)+
+  
+    facet_grid(.~texture.x)+
+
+  #annotate("text", label = "avg within-group distance", x = 0.7, y = 30, angle=90, size=3, hjust="left")+
+  #annotate("curve", x = 0.7, xend = 0.7, y = 19, yend = 28, curvature=-0.2)+
+  theme_kp()
+
+  # within-treatment variation
+  # ggplot(matrix2, aes(x = sat_level, y = mean(distance), color = treatment.x, shape = texture.x))+
+  #   geom_point(size = 3)+
+  #   ylim(1,2)+
+  #   theme_kp()
+# mean(matrix2$distance)
+
 ```
 
 ---
@@ -560,6 +803,9 @@ rel_abund2$DV = as.matrix(rel_abund2[,5:9])
 
 library(vegan)
 adonis2(rel_abund2$DV ~ treatment*sat_level +sat_level*texture + treatment*texture, data = rel_abund2)
+
+adonis2(rel_abund2$DV ~ treatment*sat_level, data = rel_abund2)
+
 ```
 
 
@@ -647,6 +893,7 @@ ggplot(rel_abund2,
 ```
 
 ---
+
 ### Session Info
 
 Run: `r Sys.Date()`

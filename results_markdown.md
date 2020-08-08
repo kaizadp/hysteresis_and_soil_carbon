@@ -91,6 +91,35 @@ h = agricolae::HSD.test(aov_wsoc_fm, trt = "texture");h
 
 ![](images/markdown/vk_marginal-1.png)<!-- -->
 
+### PERMANOVA
+
+    #> Permutation test for adonis under reduced model
+    #> Terms added sequentially (first to last)
+    #> Permutation: free
+    #> Number of permutations: 999
+    #> 
+    #> adonis2(formula = relabund2$DV ~ treatment * sat_level, data = relabund2)
+    #>                     Df SumOfSqs      R2       F Pr(>F)    
+    #> treatment            1 0.019624 0.21251 16.3353  0.001 ***
+    #> sat_level            1 0.006470 0.07007  5.3859  0.013 *  
+    #> treatment:sat_level  1 0.010988 0.11899  9.1464  0.001 ***
+    #> Residual            46 0.055260 0.59843                   
+    #> Total               49 0.092342 1.00000                   
+    #> ---
+    #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+### relative abundance bar plots
+
+![](images/markdown/fticr_barplot-1.png)<!-- -->
+
+### relative abundance PCA
+
+![](images/markdown/fticr_pca-1.png)<!-- -->
+
+### euclidean distance
+
+![](images/markdown/unnamed-chunk-5-1.png)<!-- -->
+
 -----
 
 ## NMR
@@ -122,10 +151,10 @@ PERMANOVA: treatment and moisture level had a significant influence
     #>                     Df SumOfSqs      R2       F Pr(>F)    
     #> treatment            2   1.9419 0.31916 27.9847  0.001 ***
     #> sat_level            1   0.7115 0.11694 20.5067  0.001 ***
-    #> texture              1   0.0620 0.01019  1.7869  0.169    
-    #> treatment:sat_level  1   0.0724 0.01190  2.0875  0.114    
-    #> sat_level:texture    1   0.0542 0.00891  1.5630  0.174    
-    #> treatment:texture    2   0.1545 0.02539  2.2262  0.083 .  
+    #> texture              1   0.0620 0.01019  1.7869  0.174    
+    #> treatment:sat_level  1   0.0724 0.01190  2.0875  0.146    
+    #> sat_level:texture    1   0.0542 0.00891  1.5630  0.214    
+    #> treatment:texture    2   0.1545 0.02539  2.2262  0.074 .  
     #> Residual            89   3.0880 0.50751                   
     #> Total               97   6.0846 1.00000                   
     #> ---
@@ -165,7 +194,7 @@ peaks in treatments
 
 ### Session Info
 
-Run: 2020-07-24
+Run: 2020-08-05
 
     #> R version 4.0.2 (2020-06-22)
     #> Platform: x86_64-apple-darwin17.0 (64-bit)
@@ -182,19 +211,20 @@ Run: 2020-07-24
     #> [1] stats     graphics  grDevices utils     datasets  methods   base     
     #> 
     #> other attached packages:
-    #>  [1] ape_5.4            vegan_2.5-6        permute_0.9-5      patchwork_1.0.1   
-    #>  [5] soilpalettes_0.1.0 forcats_0.5.0      stringr_1.4.0      dplyr_1.0.0       
-    #>  [9] purrr_0.3.4        readr_1.3.1        tidyr_1.1.0        tibble_3.0.3      
-    #> [13] tidyverse_1.3.0    ggbiplot_0.55      picarro.data_0.1.1 drake_7.12.4      
-    #> [17] multcomp_1.4-13    TH.data_1.0-10     MASS_7.3-51.6      survival_3.1-12   
-    #> [21] mvtnorm_1.1-1      agricolae_1.3-3    car_3.0-8          carData_3.0-4     
-    #> [25] nlme_3.1-148       stringi_1.4.6      ggExtra_0.9        ggalt_0.4.0       
-    #> [29] ggplot2_3.3.2      reshape2_1.4.4     knitr_1.29         qwraps2_0.4.2     
-    #> [33] cowplot_1.0.0      data.table_1.12.8  Rmisc_1.5          plyr_1.8.6        
-    #> [37] lattice_0.20-41    luzlogr_0.2.0      lubridate_1.7.9    readxl_1.3.1      
+    #>  [1] patchwork_1.0.1    ape_5.4            scales_1.1.1       vegan_2.5-6       
+    #>  [5] permute_0.9-5      soilpalettes_0.1.0 forcats_0.5.0      stringr_1.4.0     
+    #>  [9] dplyr_1.0.1        purrr_0.3.4        readr_1.3.1        tidyr_1.1.1       
+    #> [13] tibble_3.0.3       tidyverse_1.3.0    ggbiplot_0.55      picarro.data_0.1.1
+    #> [17] drake_7.12.4       multcomp_1.4-13    TH.data_1.0-10     MASS_7.3-51.6     
+    #> [21] survival_3.1-12    mvtnorm_1.1-1      agricolae_1.3-3    car_3.0-8         
+    #> [25] carData_3.0-4      nlme_3.1-148       stringi_1.4.6      ggExtra_0.9       
+    #> [29] ggalt_0.4.0        ggplot2_3.3.2      reshape2_1.4.4     knitr_1.29        
+    #> [33] qwraps2_0.4.2      cowplot_1.0.0      data.table_1.13.0  Rmisc_1.5         
+    #> [37] plyr_1.8.6         lattice_0.20-41    luzlogr_0.2.0      lubridate_1.7.9   
+    #> [41] readxl_1.3.1      
     #> 
     #> loaded via a namespace (and not attached):
-    #>  [1] colorspace_1.4-1   ellipsis_0.3.1     rio_0.5.16         fs_1.4.2          
+    #>  [1] colorspace_1.4-1   ellipsis_0.3.1     rio_0.5.16         fs_1.5.0          
     #>  [5] rstudioapi_0.11    farver_2.0.3       fansi_0.4.1        xml2_1.3.2        
     #>  [9] codetools_0.2-16   splines_4.0.2      extrafont_0.17     jsonlite_1.7.0    
     #> [13] broom_0.7.0        Rttf2pt1_1.3.8     dbplyr_1.4.4       cluster_2.1.0     
@@ -203,17 +233,17 @@ Run: 2020-07-24
     #> [25] later_1.1.0.1      htmltools_0.5.0    prettyunits_1.1.1  tools_4.0.2       
     #> [29] igraph_1.2.5       gtable_0.3.0       glue_1.4.1         maps_3.3.0        
     #> [33] Rcpp_1.0.5         cellranger_1.1.0   vctrs_0.3.2        extrafontdb_1.0   
-    #> [37] xfun_0.15          rvest_0.3.5        openxlsx_4.1.5     mime_0.9          
-    #> [41] miniUI_0.1.1.1     lifecycle_0.2.0    zoo_1.8-8          scales_1.1.1      
-    #> [45] hms_0.5.3          promises_1.1.1     parallel_4.0.2     proj4_1.0-10      
-    #> [49] sandwich_2.5-1     RColorBrewer_1.1-2 yaml_2.2.1         curl_4.3          
-    #> [53] labelled_2.5.0     highr_0.8          klaR_0.6-15        AlgDesign_1.2.0   
-    #> [57] PNWColors_0.1.0    filelock_1.0.2     zip_2.0.4          storr_1.2.1       
-    #> [61] rlang_0.4.7        pkgconfig_2.0.3    evaluate_0.14      labeling_0.3      
-    #> [65] tidyselect_1.1.0   magrittr_1.5       R6_2.4.1           generics_0.0.2    
-    #> [69] base64url_1.4      combinat_0.0-8     DBI_1.1.0          txtq_0.2.3        
-    #> [73] mgcv_1.8-31        pillar_1.4.6       haven_2.3.1        foreign_0.8-80    
-    #> [77] withr_2.2.0        abind_1.4-5        ash_1.0-15         modelr_0.1.8      
-    #> [81] crayon_1.3.4       questionr_0.7.1    KernSmooth_2.23-17 rmarkdown_2.3     
-    #> [85] progress_1.2.2     grid_4.0.2         blob_1.2.1         reprex_0.3.0      
-    #> [89] digest_0.6.25      xtable_1.8-4       httpuv_1.5.4       munsell_0.5.0
+    #> [37] xfun_0.16          rvest_0.3.6        openxlsx_4.1.5     mime_0.9          
+    #> [41] miniUI_0.1.1.1     lifecycle_0.2.0    zoo_1.8-8          hms_0.5.3         
+    #> [45] promises_1.1.1     parallel_4.0.2     proj4_1.0-10       sandwich_2.5-1    
+    #> [49] RColorBrewer_1.1-2 yaml_2.2.1         curl_4.3           labelled_2.5.0    
+    #> [53] highr_0.8          klaR_0.6-15        AlgDesign_1.2.0    PNWColors_0.1.0   
+    #> [57] filelock_1.0.2     zip_2.0.4          storr_1.2.1        rlang_0.4.7       
+    #> [61] pkgconfig_2.0.3    evaluate_0.14      labeling_0.3       tidyselect_1.1.0  
+    #> [65] magrittr_1.5       R6_2.4.1           generics_0.0.2     base64url_1.4     
+    #> [69] combinat_0.0-8     DBI_1.1.0          txtq_0.2.3         mgcv_1.8-31       
+    #> [73] pillar_1.4.6       haven_2.3.1        foreign_0.8-80     withr_2.2.0       
+    #> [77] abind_1.4-5        ash_1.0-15         modelr_0.1.8       crayon_1.3.4      
+    #> [81] questionr_0.7.1    KernSmooth_2.23-17 rmarkdown_2.3      progress_1.2.2    
+    #> [85] grid_4.0.2         blob_1.2.1         reprex_0.3.0       digest_0.6.25     
+    #> [89] xtable_1.8-4       httpuv_1.5.4       munsell_0.5.0
