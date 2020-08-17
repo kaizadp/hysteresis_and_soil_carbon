@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo=FALSE,message=FALSE,warning=FALSE,
 ```
 
 ```{r}
-source("0-hysteresis_packages.R")
+source("code/0-hysteresis_packages.R")
 
 fticr_data = read.csv(FTICR_LONG)
 fticr_meta = read.csv(FTICR_META)
@@ -34,8 +34,13 @@ corekey_subset =
 ## VAN KREVELEN DOMAINS
 
 ```{r vk_domains, fig.asp=1, fig.height=5}
-gg_vankrev(fticr_meta, aes(x = OC, y = HC, color = Class))+
+gg_vankrev(fticr_meta, aes(x = OC, y = HC, color = Class_detailed))+
   scale_color_viridis_d(option = "inferno")+
+  theme_kp()
+
+gg_vankrev(fticr_meta %>% filter(DBE==0), aes(x = OC, y = HC, color = DBE/C))+
+#  scale_color_viridis_c(option = "inferno")+
+  scale_color_gradient(low = "red", high = "black")+
   theme_kp()
 ```
 
@@ -51,7 +56,7 @@ gg_vankrev(fticr, aes(x = OC, y = HC, color = treatment))+
   geom_point(alpha = 0.1)+
   facet_grid(treatment+texture~sat_level)+
   theme_kp()+
-  ggtitle("peaks seen in all 5 replicates")
+  ggtitle("peaks seen in 3+ replicates")
 ```
 
 ```{r vk2, fig.height = 6, fig.width=10}
@@ -63,7 +68,7 @@ fticr_subset =
 gg_fm = gg_vankrev(fticr_subset[fticr_subset$treatment=="FM",], aes(x = OC, y = HC, color = treatment))+
   theme_kp()
 
-gg_100_d = 
+gg_100 = 
   fticr_subset %>% 
   filter(sat_level==100) %>% 
   #dplyr::mutate(treatment = factor(treatment, levels = c("Wetting", "Drying"))) %>% 
@@ -96,7 +101,7 @@ ggMarginal(gg_100,groupColour = TRUE,groupFill = TRUE)
 
 field moist soils
 
-```{r}
+```{r, eval=FALSE}
 relabund %>% 
   filter(treatment=="FM") %>% 
   dplyr::select(Class, texture, relabund) %>% 
@@ -106,7 +111,7 @@ relabund %>%
 
 
 treatment
-```{r}
+```{r, eval=FALSE}
 relabund %>% 
   filter(!treatment == "FM") %>% 
   dplyr::mutate(var = paste0(texture,"-",treatment)) %>% 
@@ -114,5 +119,79 @@ relabund %>%
    
   spread(var, relabund) %>% 
   knitr::kable(align = "r")
+```
+
+### bar plots
+
+```{r barplot, fig.width=9, fig.height=4}
+# ggplot
+library(scales)
+
+relabund_trt = read.csv("data/processed/fticr_relabund_trt.csv")
+
+
+fticr_label <- tribble(
+  ~texture, ~sat_level, ~treatment, ~Class, ~rel_abund, ~color,
+  "SCL", "5", "Wetting", "aliphatic", 90, "white",
+  "SCL", "5", "Wetting", "condensed aromatic", 1, "black",
+  
+  "SCL", "35", "Wetting", "aliphatic", 90, "white",
+  "SCL", "35", "Wetting", "unsaturated/lignin", 50, "black",
+  "SCL", "35", "Wetting", "aromatic", 10, "black",
+  
+  "SCL", "50", "Wetting", "aliphatic", 90, "white",
+  "SCL", "50", "Wetting", "unsaturated/lignin", 50, "black",
+  "SCL", "50", "Wetting", "aromatic", 10, "black",
+  "SCL", "50", "Wetting", "condensed aromatic", 1, "black",
+  
+  "SCL", "75", "Wetting", "aliphatic", 90, "white",
+  "SCL", "75", "Wetting", "unsaturated/lignin", 50, "black",
+  "SCL", "75", "Wetting", "aromatic", 10, "black",
+  
+  "SCL", "100", "Wetting", "condensed aromatic", 1, "black"
+) %>% 
+  dplyr::mutate(sat_level = if_else(treatment=="FM", "FM", as.character(sat_level)),
+                sat_level = factor(sat_level, levels = 
+                                     c("FM", "5", "35", "50", "75", "100"))) 
+
+
+relabund_trt %>% 
+  filter(texture=="SCL") %>% 
+  ungroup %>% 
+  mutate(Class = factor(Class, levels = 
+                          c("aliphatic",
+                            "unsaturated/lignin",
+                            "aromatic",
+                            "condensed aromatic"))) %>% 
+  dplyr::mutate(sat_level = if_else(treatment=="FM", "FM", as.character(sat_level)),
+                sat_level = factor(sat_level, levels = 
+                                     c("FM", "5", "35", "50", "75", "100"))) %>% 
+  ggplot(aes(x = treatment, y = rel_abund, fill = Class))+
+  geom_bar(stat = "identity")+
+  
+  geom_text(data = fticr_label, 
+            aes(x = treatment, y = rel_abund, color = color), 
+            label = "*", size=7,
+            show.legend = F)+
+  
+  scale_fill_manual(values = PNWColors::pnw_palette("Sunset2",4))+
+  scale_color_manual(values = c("black", "white"))+
+
+  labs(x = "",
+       y = "relative contribution (%)",
+       subtitle = "% saturation")+
+  #scale_y_continuous(limits=c(60,100), oob = rescale_none)+
+  facet_grid(texture~sat_level, scales = "free_x", space = "free_x")+
+  theme_kp()+
+  theme(
+    plot.subtitle = element_text(size=14, face = "bold", hjust=0.5),
+    panel.border = element_rect(color="black",size=0.5, fill = NA),
+    strip.background = element_blank(), #facet formatting
+    panel.spacing.x = unit(0.5, "lines"), #facet spacing for x axis
+    panel.spacing.y = unit(1, "lines"), #facet spacing for x axis
+    strip.text.x = element_text(size=12, face = "bold"), #facet labels
+    strip.text.y = element_text(size=12, face = "bold", angle = 270)
+    )+
+  NULL
 ```
 

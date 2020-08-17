@@ -12,11 +12,11 @@ source("code/0-hysteresis_packages.R")
 # ------------------------------------------------------- ----
 
 ## step 1: load the files ----
-fticr_report = read.csv("data/fticr/Report-08-04-2020.csv") %>% 
+fticr_report = read.csv("data/fticr/Report-08-08-2020_sn7.csv") %>% 
   filter(Mass>200 & Mass<900) %>% 
-# remove isotopes
+# a. remove isotopes
   filter(C13==0) %>% 
-# remove peaks without C assignment
+# b. remove peaks without C assignment
   filter(C>0)
 
 # this has metadata as well as sample data
@@ -28,12 +28,33 @@ fticr_meta =
   dplyr::select(-starts_with("FT")) %>% 
 # select only necessary columns
   dplyr::select(Mass, C, H, O, N, S, P, El_comp, Class) %>% 
-# create columns for indices
+# we don't want to use this set of boundary conditions for Class assignments
+# rename Class to Class_old, create a new blank column Class, and we will fill that in later
+  rename(Class_old = Class) %>% 
+  mutate(Class = "") %>% 
+# c. create columns for indices
   dplyr::mutate(AImod = round((1+C-(0.5*O)-S-(0.5*(N+P+H)))/(C-(0.5*O)-S-N-P),4),
                 NOSC =  round(4-(((4*C)+H-(3*N)-(2*O)-(2*S))/C),4),
                 HC = round(H/C,2),
-                OC = round(O/C,2)) %>% 
-# create column/s for formula
+                OC = round(O/C,2),
+                DBE_AI = 1+C-O-S-0.5*(N+P+H),
+                DBE =  1 + ((2*C-H + N + P))/2,
+                DBE_C = DBE_AI/C) %>% 
+# d. create new Class assignments, based on Seidel et al. 2014 (http://dx.doi.org/10.1016/j.gca.2014.05.038)
+  mutate(Class = case_when(AImod>0.66 ~ "condensed aromatic",
+                           AImod<=0.66 & AImod > 0.50 ~ "aromatic",
+                           AImod <= 0.50 & HC < 1.5 ~ "unsaturated/lignin",
+                           HC >= 1.5 ~ "aliphatic"),
+         Class = replace_na(Class, "other"),
+         Class_detailed = case_when(AImod>0.66 ~ "condensed aromatic",
+                                    AImod<=0.66 & AImod > 0.50 ~ "aromatic",
+                                    AImod <= 0.50 & HC < 1.5 ~ "unsaturated/lignin",
+                                    HC >= 2.0 & OC >= 0.9 ~ "carbohydrate",
+                                    HC >= 2.0 & OC < 0.9 ~ "lipid",
+                                    HC < 2.0 & HC >= 1.5 & N==0 ~ "aliphatic",
+                                    HC < 2.0 & HC >= 1.5 & N > 0 ~ "aliphatic+N")) %>%
+  
+# e. create column/s for formula
 # first, create columns for individual elements
 # then, combine
   dplyr::mutate(formula_c = if_else(C>0,paste0("C",C),as.character(NA)),
@@ -63,7 +84,8 @@ fticr_key_full =
   dplyr::mutate(Core = as.factor(Core)) %>% 
   left_join(corekey_subset, by = "Core")
 
-fticr_data = 
+## step 2: clean the files ----
+fticr_data_allpeaks = 
   fticr_report %>% 
   dplyr::select(Mass,starts_with("FT")) %>% 
   #tidyr::gather(sample,intensity,FT007:FT006) %>% 
@@ -75,15 +97,29 @@ fticr_data =
 # rearrange columns
   dplyr::select(Core, FTICR_ID, Mass, formula, presence) %>% 
   left_join(corekey_subset, by = "Core") %>% 
-  dplyr::select(-Mass,-formula, -presence,Mass,formula,presence) %>% 
-# now we want only peaks that are in all replicates
+  dplyr::select(-Mass,-formula, -presence,Mass,formula,presence)
+
+# now we want only peaks that are in 3+ replicates
+
+# create a longform file for peak assignments in each core
+fticr_data = 
+  fticr_data_allpeaks %>% 
+  group_by(Core_assignment,treatment, texture, sat_level,formula) %>% 
+  dplyr::mutate(n = n()) %>% 
+  filter(n>=3) %>% 
+  dplyr::select(-FTICR_ID)
+
+# create a longform file of peaks by treatments only. remove replication
+fticr_data_trt = 
+  fticr_data_allpeaks %>% 
   group_by(Core_assignment,treatment, texture, sat_level,formula) %>% 
   dplyr::summarize(n = n(),
                    presence = mean(presence)) %>% 
   filter(n>=3) 
 
-## OUTPUTS
+## step 3: OUTPUTS ----
 write.csv(fticr_data,FTICR_LONG, row.names = FALSE)
+write.csv(fticr_data_trt, "data/processed/fticr_longform_bytrt.csv", row.names = FALSE)
 write.csv(fticr_meta,FTICR_META, row.names = FALSE)
 write.csv(meta_hcoc,FTICR_META_HCOC, row.names = FALSE)
 write.csv(fticr_key_full,"data/processed/fticr_key_full.csv", row.names = FALSE)
