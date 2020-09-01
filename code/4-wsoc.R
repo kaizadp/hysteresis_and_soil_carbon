@@ -22,6 +22,7 @@ wsoc_raw = sapply(list.files(path = "data/wsoc_data/",pattern = "*.csv", full.na
                   read_csv, simplify = FALSE) %>% bind_rows(),
 wsoc_key = read_csv("data/WSOC_SAMPLE_KEY.csv"), # wsoc key
 core_key = read.csv(COREKEY) %>% mutate(Core = as.character(Core)), # core key
+TC = 8.34, #carbon percentage,
 
 # process
 wsoc_processed = 
@@ -104,7 +105,7 @@ wsoc_weights =
 wsoc_results = wsoc_samples %>% 
   left_join(wsoc_weights, by = "Core") %>% 
   dplyr::mutate(wsoc_mg_g = round(npoc_mg_l * (40+WSOC_water_g)/(WSOC_drywt_g*1000),3),
-                wsoc_mg_gC = round(npoc_mg_l * (40+WSOC_water_g)/(Carbon_g*1000),3),
+                wsoc_mg_gC = round(wsoc_mg_g/(TC/100),3),
                 perc_sat_actual = case_when(soil_type=="Soil" ~ (gmoist/140)*100,
                                             soil_type=="Soil_sand" ~ (gmoist/100)*100),
                 perc_sat_actual = if_else(perc_sat_actual>100,100,perc_sat_actual)) %>% 
