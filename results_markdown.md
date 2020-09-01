@@ -33,6 +33,8 @@
 
 ![](images/markdown/respiration_graph-1.png)<!-- -->
 
+![](images/markdown/respiration_graph_ugC-1.png)<!-- -->
+
 -----
 
 ## WSOC
@@ -103,11 +105,11 @@ h = agricolae::HSD.test(aov_wsoc_fm, trt = "texture");h
     #> 
     #> adonis2(formula = relabund2$DV ~ treatment * sat_level, data = relabund2)
     #>                     Df SumOfSqs      R2       F Pr(>F)    
-    #> treatment            1 0.019567 0.21660 16.9931  0.001 ***
-    #> sat_level            1 0.006774 0.07499  5.8831  0.004 ** 
-    #> treatment:sat_level  1 0.011031 0.12210  9.5794  0.002 ** 
-    #> Residual            46 0.052969 0.58632                   
-    #> Total               49 0.090341 1.00000                   
+    #> treatment            1 0.018955 0.22247 17.2485  0.001 ***
+    #> sat_level            1 0.004090 0.04800  3.7217  0.043 *  
+    #> treatment:sat_level  1 0.011607 0.13623 10.5627  0.001 ***
+    #> Residual            46 0.050550 0.59330                   
+    #> Total               49 0.085202 1.00000                   
     #> ---
     #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
@@ -158,10 +160,10 @@ PERMANOVA: treatment and moisture level had a significant influence
     #>                     Df SumOfSqs      R2       F Pr(>F)    
     #> treatment            2   1.9419 0.31916 27.9847  0.001 ***
     #> sat_level            1   0.7115 0.11694 20.5067  0.001 ***
-    #> texture              1   0.0620 0.01019  1.7869  0.155    
-    #> treatment:sat_level  1   0.0724 0.01190  2.0875  0.126    
-    #> sat_level:texture    1   0.0542 0.00891  1.5630  0.194    
-    #> treatment:texture    2   0.1545 0.02539  2.2262  0.068 .  
+    #> texture              1   0.0620 0.01019  1.7869  0.168    
+    #> treatment:sat_level  1   0.0724 0.01190  2.0875  0.123    
+    #> sat_level:texture    1   0.0542 0.00891  1.5630  0.219    
+    #> treatment:texture    2   0.1545 0.02539  2.2262  0.066 .  
     #> Residual            89   3.0880 0.50751                   
     #> Total               97   6.0846 1.00000                   
     #> ---
@@ -175,7 +177,7 @@ PERMANOVA: treatment and moisture level had a significant influence
     #>                     Df SumOfSqs      R2       F Pr(>F)    
     #> treatment            2   1.9419 0.31916 26.8456  0.001 ***
     #> sat_level            1   0.7115 0.11694 19.6720  0.001 ***
-    #> treatment:sat_level  1   0.0674 0.01108  1.8647  0.148    
+    #> treatment:sat_level  1   0.0674 0.01108  1.8647  0.158    
     #> Residual            93   3.3637 0.55282                   
     #> Total               97   6.0846 1.00000                   
     #> ---
@@ -207,7 +209,7 @@ peaks in treatments
 |      SL |      amide |           NA |   0.74 ± 0.2 |           NA |           NA |  0.81 ± 0.07 |    1.06 ± NA |           NA |            NA |           NA |           NA |
 |      SL |   aromatic | 17.61 ± 7.05 | 47.12 ± 4.62 | 26.32 ± 6.45 | 58.93 ± 7.33 | 19.95 ± 5.62 | 23.72 ± 5.53 | 16.61 ± 4.22 |  64.33 ± 7.09 |   19.9 ± 5.5 |    72 ± 3.65 |
 
-### more viz
+### bar graph
 
 ![](images/markdown/nmr_relabund-1.png)<!-- -->
 
@@ -215,7 +217,7 @@ peaks in treatments
 
 ### Session Info
 
-Run: 2020-08-09
+Run: 2020-08-27
 
     #> R version 4.0.2 (2020-06-22)
     #> Platform: x86_64-apple-darwin17.0 (64-bit)
@@ -232,13 +234,13 @@ Run: 2020-08-09
     #> [1] stats     graphics  grDevices utils     datasets  methods   base     
     #> 
     #> other attached packages:
-    #>  [1] patchwork_1.0.1    ggpubr_0.4.0       ape_5.4            scales_1.1.1      
+    #>  [1] patchwork_1.0.1    ggpubr_0.4.0       ape_5.4-1          scales_1.1.1      
     #>  [5] vegan_2.5-6        permute_0.9-5      soilpalettes_0.1.0 forcats_0.5.0     
     #>  [9] stringr_1.4.0      dplyr_1.0.1        purrr_0.3.4        readr_1.3.1       
     #> [13] tidyr_1.1.1        tibble_3.0.3       tidyverse_1.3.0    ggbiplot_0.55     
     #> [17] picarro.data_0.1.1 drake_7.12.4       multcomp_1.4-13    TH.data_1.0-10    
-    #> [21] MASS_7.3-51.6      survival_3.1-12    mvtnorm_1.1-1      agricolae_1.3-3   
-    #> [25] car_3.0-8          carData_3.0-4      nlme_3.1-148       stringi_1.4.6     
+    #> [21] MASS_7.3-51.6      survival_3.2-3     mvtnorm_1.1-1      agricolae_1.3-3   
+    #> [25] car_3.0-9          carData_3.0-4      nlme_3.1-148       stringi_1.4.6     
     #> [29] ggExtra_0.9        ggalt_0.4.0        ggplot2_3.3.2      reshape2_1.4.4    
     #> [33] knitr_1.29         qwraps2_0.4.2      cowplot_1.0.0      data.table_1.13.0 
     #> [37] Rmisc_1.5          plyr_1.8.6         lattice_0.20-41    luzlogr_0.2.0     
@@ -260,7 +262,7 @@ Run: 2020-08-09
     #> [49] proj4_1.0-10       sandwich_2.5-1     RColorBrewer_1.1-2 yaml_2.2.1        
     #> [53] curl_4.3           gridExtra_2.3      labelled_2.5.0     highr_0.8         
     #> [57] klaR_0.6-15        AlgDesign_1.2.0    PNWColors_0.1.0    filelock_1.0.2    
-    #> [61] zip_2.0.4          storr_1.2.1        rlang_0.4.7        pkgconfig_2.0.3   
+    #> [61] zip_2.1.0          storr_1.2.1        rlang_0.4.7        pkgconfig_2.0.3   
     #> [65] evaluate_0.14      labeling_0.3       tidyselect_1.1.0   magrittr_1.5      
     #> [69] R6_2.4.1           generics_0.0.2     base64url_1.4      combinat_0.0-8    
     #> [73] DBI_1.1.0          txtq_0.2.3         mgcv_1.8-31        pillar_1.4.6      

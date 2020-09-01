@@ -123,7 +123,7 @@ relabund %>%
 
 ### bar plots
 
-```{r barplot, fig.width=9, fig.height=4}
+```{r barplot, fig.width=9, fig.height=8}
 # ggplot
 library(scales)
 
@@ -156,7 +156,7 @@ fticr_label <- tribble(
 
 
 relabund_trt %>% 
-  filter(texture=="SCL") %>% 
+  #filter(texture=="SCL") %>% 
   ungroup %>% 
   mutate(Class = factor(Class, levels = 
                           c("aliphatic",
@@ -193,5 +193,65 @@ relabund_trt %>%
     strip.text.y = element_text(size=12, face = "bold", angle = 270)
     )+
   NULL
+```
+
+
+
+
+### van krevelen unique
+
+```{r}
+meta_class = 
+  fticr_meta %>% 
+  dplyr::select(formula, Class, Class_old)
+
+fticr_by_trt = 
+  fticr_data %>% 
+  filter(n==5) %>% 
+  distinct(texture, treatment, sat_level, formula)
+
+fticr_unique = 
+  fticr_by_trt %>% 
+  group_by(texture, sat_level, formula) %>% 
+  dplyr::mutate(n = n())
+
+
+fticr_unique %>% 
+  left_join(meta_hcoc, by = "formula") %>% 
+  filter(n==1 & texture=="SCL" & treatment !="FM") %>%
+  gg_vankrev(aes(x = OC, y = HC, color = treatment))+
+  facet_grid(treatment~sat_level)+
+  scale_color_manual(values = rev(PNWColors::pnw_palette("Bay",2)))+
+  theme_kp()+
+  NULL
+  
+
+
+fticr_unique_to_trt =
+  fticr_by_trt %>% 
+  distinct(formula, texture, treatment) %>% 
+  group_by(texture, formula) %>% 
+  dplyr::mutate(n = n()) %>% 
+  left_join(meta_class)
+
+fticr_unique_to_trt %>% 
+  left_join(meta_hcoc, by = "formula") %>% 
+  filter(n==1 & texture=="SCL" & treatment !="FM") %>%
+  gg_vankrev(aes(x = OC, y = HC, color = treatment))+
+  #facet_grid(treatment~.)+
+  #stat_ellipse()+
+  geom_boxplot(aes(x = OC, y = 2.3, color = treatment, fill = treatment), width = 0.3, alpha = 0.1)+
+  geom_boxplot(aes(y = HC, x = 1.15, color = treatment, fill = treatment), width = 0.15, alpha = 0.1)+
+  scale_color_manual(values = rev(PNWColors::pnw_palette("Bay",2)))+
+  scale_fill_manual(values = rev(PNWColors::pnw_palette("Bay",2)))+
+  theme_kp()+
+  NULL
+
+fticr_unique_to_trt %>% 
+  filter(n==1) %>% 
+  group_by(texture, treatment, Class) %>% 
+  dplyr::summarise(n = sum(n)) %>% 
+  spread(treatment, n) %>% 
+  knitr::kable()
 ```
 

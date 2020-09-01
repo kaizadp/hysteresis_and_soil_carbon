@@ -29,3 +29,14 @@ treatment
 ### bar plots
 
 ![](images/9-fticr_markdown/barplot-1.png)<!-- -->
+
+### van krevelen unique
+
+![](images/9-fticr_markdown/unnamed-chunk-4-1.png)<!-- -->![](images/9-fticr_markdown/unnamed-chunk-4-2.png)<!-- -->
+
+| texture | Class              | Drying | FM | Wetting |
+| :------ | :----------------- | -----: | -: | ------: |
+| SCL     | aliphatic          |    119 |  7 |     121 |
+| SCL     | aromatic           |     18 |  3 |      79 |
+| SCL     | condensed aromatic |     51 | 11 |      76 |
+| SCL     | unsaturated/lignin |    133 |  4 |     358 |
