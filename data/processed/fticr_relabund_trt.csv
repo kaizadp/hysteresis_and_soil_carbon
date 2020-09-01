@@ -35,38 +35,6 @@
 "Soil_fm","SCL","FM",NA,"aromatic",12.43
 "Soil_fm","SCL","FM",NA,"condensed aromatic",6.7
 "Soil_fm","SCL","FM",NA,"unsaturated/lignin",59.94
-"Soil_sand_50_D","SL","Drying",50,"aliphatic",20.42
-"Soil_sand_50_D","SL","Drying",50,"aromatic",11.73
-"Soil_sand_50_D","SL","Drying",50,"condensed aromatic",3.13
-"Soil_sand_50_D","SL","Drying",50,"unsaturated/lignin",64.72
-"Soil_sand_50_W","SL","Wetting",50,"aliphatic",16.47
-"Soil_sand_50_W","SL","Wetting",50,"aromatic",12.29
-"Soil_sand_50_W","SL","Wetting",50,"condensed aromatic",7.47
-"Soil_sand_50_W","SL","Wetting",50,"unsaturated/lignin",63.77
-"Soil_sand_75_D","SL","Drying",75,"aliphatic",18.37
-"Soil_sand_75_D","SL","Drying",75,"aromatic",12.14
-"Soil_sand_75_D","SL","Drying",75,"condensed aromatic",2.93
-"Soil_sand_75_D","SL","Drying",75,"unsaturated/lignin",66.56
-"Soil_sand_75_W","SL","Wetting",75,"aliphatic",15.17
-"Soil_sand_75_W","SL","Wetting",75,"aromatic",13.14
-"Soil_sand_75_W","SL","Wetting",75,"condensed aromatic",3.07
-"Soil_sand_75_W","SL","Wetting",75,"unsaturated/lignin",68.62
-"Soil_sand_dry_D","SL","Drying",5,"aliphatic",12.58
-"Soil_sand_dry_D","SL","Drying",5,"aromatic",12.06
-"Soil_sand_dry_D","SL","Drying",5,"condensed aromatic",1.89
-"Soil_sand_dry_D","SL","Drying",5,"unsaturated/lignin",73.47
-"Soil_sand_dry_W","SL","Wetting",5,"aliphatic",11.38
-"Soil_sand_dry_W","SL","Wetting",5,"aromatic",11.84
-"Soil_sand_dry_W","SL","Wetting",5,"condensed aromatic",1.31
-"Soil_sand_dry_W","SL","Wetting",5,"unsaturated/lignin",75.48
-"Soil_sand_sat_D","SL","Drying",100,"aliphatic",21.69
-"Soil_sand_sat_D","SL","Drying",100,"aromatic",11.54
-"Soil_sand_sat_D","SL","Drying",100,"condensed aromatic",5.38
-"Soil_sand_sat_D","SL","Drying",100,"unsaturated/lignin",61.39
-"Soil_sand_sat_W","SL","Wetting",100,"aliphatic",16.72
-"Soil_sand_sat_W","SL","Wetting",100,"aromatic",12.55
-"Soil_sand_sat_W","SL","Wetting",100,"condensed aromatic",6.21
-"Soil_sand_sat_W","SL","Wetting",100,"unsaturated/lignin",64.52
 "Soil_sat_D","SCL","Drying",100,"aliphatic",23.86
 "Soil_sat_D","SCL","Drying",100,"aromatic",11.13
 "Soil_sat_D","SCL","Drying",100,"condensed aromatic",4.39
