@@ -12,7 +12,7 @@ source("code/0-hysteresis_packages.R")
 # ------------------------------------------------------- ----
 
 ## step 1: load the files ----
-fticr_report = read.csv("data/fticr/Report-08-08-2020_sn7.csv") %>% 
+fticr_report = read.csv("data/fticr/Report-08-17-2020_newfilters.csv") %>% 
   filter(Mass>200 & Mass<900) %>% 
 # a. remove isotopes
   filter(C13==0) %>% 
