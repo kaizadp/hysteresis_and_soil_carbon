@@ -386,6 +386,39 @@ ggplot(fluxes, aes(x = sat_level, y = flux_co2_nmol_gC_s, shape=treatment, color
   NULL
 ```
 
+
+```{r respiration_graph_ugC, fig.width=9}
+
+label2 = tibble(x = c(50, 75, 100, 100),
+               y = c(35, 50, 50, 35),
+               texture = c("SCL", "SCL", "SCL", "SL"),
+               label = c("*","*","*","*"),
+               treatment = c("Drying", "Drying", "Drying", "Drying"))
+
+# convert units
+fluxes %>% 
+  mutate(flux_co2_ugC_gC_hr = 
+           flux_co2_nmol_gC_s * 
+           (12/1000) * # convert to mg C
+           3600) %>%   # per hour
+  ggplot(aes(x = sat_level, y = flux_co2_ugC_gC_hr, shape=treatment, color = treatment))+
+  geom_point(position = position_dodge(width = 0.5), size=3.5, stroke=1.5)+
+  geom_text(data = label2, aes(x = x, y = y, label = label), size=10, color = "black")+
+  scale_color_manual(values = (pal3),
+                     breaks = c("Drying","Wetting", "FM"),
+                     labels = c("drying","rewetting", "field moist"), 
+                     na.translate=F)+
+  scale_shape_manual(breaks = c("Drying","Wetting", "FM"),
+                     labels = c("drying","rewetting", "field moist"), 
+                     values = c(16,1, 4), na.translate=F)+
+  facet_grid(.~texture)+
+  ylab(expression(bold(paste("mean CO"[2],"-C flux, μgC gC"^{-1}, " hr"^{-1}))))+
+  xlab("percent saturation")+
+  theme_kp()+
+  NULL
+```
+
+
 ---
 
 ## WSOC
@@ -396,7 +429,7 @@ wsoc_summary = read.csv("data/processed/wsoc_summary.csv", stringsAsFactors = F)
 wsoc_label =
   wsoc %>%
   group_by(texture, sat_level) %>% 
-  dplyr::mutate(y = max(wsoc_mg_g)+0.05) %>% 
+  dplyr::mutate(y = max(wsoc_mg_gC)+0.5) %>% 
   ungroup() %>% 
   mutate(asterisk = case_when(texture=="SCL" & sat_level %in% c(5,35,50,75,100) ~ "*",
                               texture=="SL" & sat_level %in% c(5,50,75,100) ~ "*")) %>% 
@@ -404,7 +437,7 @@ wsoc_label =
 ```
 
 ```{r wsoc_graphs, fig.width=9}
-ggplot(wsoc, aes(x = sat_level, y = wsoc_mg_g, shape = treatment, color = treatment))+
+ggplot(wsoc, aes(x = sat_level, y = wsoc_mg_gC, shape = treatment, color = treatment))+
   geom_point(size=3.5, stroke=1.5)+
   geom_text(data = wsoc_label %>% na.omit(), 
             aes(x = sat_level, y = y, label = asterisk), color = "black", size=10)+
@@ -418,6 +451,7 @@ ggplot(wsoc, aes(x = sat_level, y = wsoc_mg_g, shape = treatment, color = treatm
   facet_grid(.~texture)+
   ylab(expression(bold(paste("WEOC, mg gC"^{-1}))))+
   xlab("percent saturation")+
+  ylim(0,5.5)+
   theme_kp()+
   NULL
 ```
@@ -533,23 +567,23 @@ relabund_trt = read.csv("data/processed/fticr_relabund_trt.csv")
 fticr_label <- 
   tribble(
   ~texture, ~sat_level, ~treatment, ~Class, ~rel_abund, ~color,
-  "SCL", "5", "Wetting", "aliphatic", 90, "white",
-  "SCL", "5", "Wetting", "condensed aromatic", 1, "black",
+  "SCL", "5", "rewetting", "aliphatic", 90, "white",
+  "SCL", "5", "rewetting", "condensed aromatic", 1, "black",
   
-  "SCL", "35", "Wetting", "aliphatic", 90, "white",
-  "SCL", "35", "Wetting", "unsaturated/lignin", 50, "black",
-  "SCL", "35", "Wetting", "aromatic", 10, "black",
+  "SCL", "35", "rewetting", "aliphatic", 90, "white",
+  "SCL", "35", "rewetting", "unsaturated/lignin", 50, "black",
+  "SCL", "35", "rewetting", "aromatic", 10, "black",
   
-  "SCL", "50", "Wetting", "aliphatic", 90, "white",
-  "SCL", "50", "Wetting", "unsaturated/lignin", 50, "black",
-  "SCL", "50", "Wetting", "aromatic", 10, "black",
-  "SCL", "50", "Wetting", "condensed aromatic", 1, "black",
+  "SCL", "50", "rewetting", "aliphatic", 90, "white",
+  "SCL", "50", "rewetting", "unsaturated/lignin", 50, "black",
+  "SCL", "50", "rewetting", "aromatic", 10, "black",
+  "SCL", "50", "rewetting", "condensed aromatic", 1, "black",
   
-  "SCL", "75", "Wetting", "aliphatic", 90, "white",
-  "SCL", "75", "Wetting", "unsaturated/lignin", 50, "black",
-  "SCL", "75", "Wetting", "aromatic", 10, "black",
+  "SCL", "75", "rewetting", "aliphatic", 90, "white",
+  "SCL", "75", "rewetting", "unsaturated/lignin", 50, "black",
+  "SCL", "75", "rewetting", "aromatic", 10, "black",
   
-  "SCL", "100", "Wetting", "condensed aromatic", 1, "black"
+  "SCL", "100", "rewetting", "condensed aromatic", 1, "black"
 ) %>% 
   dplyr::mutate(sat_level = if_else(treatment=="FM", "FM", as.character(sat_level)),
                 sat_level = factor(sat_level, levels = 
@@ -566,7 +600,9 @@ relabund_trt %>%
                             "condensed aromatic"))) %>% 
   dplyr::mutate(sat_level = if_else(treatment=="FM", "FM", as.character(sat_level)),
                 sat_level = factor(sat_level, levels = 
-                                     c("FM", "5", "35", "50", "75", "100"))) %>% 
+                                     c("FM", "5", "35", "50", "75", "100")),
+                treatment = recode(treatment, "Drying" = "drying",
+                                   "Wetting" = "rewetting")) %>% 
   ggplot(aes(x = treatment, y = rel_abund, fill = Class))+
   geom_bar(stat = "identity")+
   
@@ -585,6 +621,7 @@ relabund_trt %>%
   facet_grid(texture~sat_level, scales = "free_x", space = "free_x")+
   theme_kp()+
   theme(
+    legend.position = "bottom",
     plot.subtitle = element_text(size=14, face = "bold", hjust=0.5),
     panel.border = element_rect(color="black",size=0.5, fill = NA),
     strip.background = element_blank(), #facet formatting
@@ -879,7 +916,9 @@ ggbiplot_scl =
     ggtitle("SCL")+
     theme_kp()+
     theme(panel.grid = element_blank(),
-          title = element_text(hjust = 0.5))+
+          title = element_text(hjust = 0.5),
+          axis.title = element_text(face="bold", size = 12),
+          axis.text = element_text(size = 10))+
     NULL
 
 
@@ -907,15 +946,17 @@ ggbiplot_sl =
               aes(color = groups,
                   shape = as.factor(relabund_pca_sl_grp$sat_level)))+
     scale_color_manual(values = (pal3),
-                     breaks = c("Drying","Wetting", "FM"),
-                     labels = c("drying","rewetting", "field moist"), 
-                     na.translate=F)+
-    scale_shape_manual(values = c(18, 17, 3, 15, 16, 4),
-                       breaks = c(5, 35, 50, 75, 100, "FM"))+
+                       breaks = c("Drying","Wetting", "FM"),
+                       labels = c("drying","rewetting", "field moist"), 
+                       na.translate=F)+
+  scale_shape_manual(values = c(18, 17, 3, 15, 16, 4),
+                     breaks = c(5, 35, 50, 75, 100, "FM"))+
   ggtitle("SL")+
-    theme_kp()+
-    theme(panel.grid = element_blank(),
-          title = element_text(hjust = 0.5))+  
+  theme_kp()+
+  theme(panel.grid = element_blank(),
+        title = element_text(hjust = 0.5),
+        axis.title = element_text(face="bold", size = 12),
+        axis.text = element_text(size = 10))+  
   NULL
 
 
@@ -1069,26 +1110,27 @@ rel_abund %>%
 
 
 
-### more viz
+### bar graph
 ```{r nmr_relabund, fig.width=9, fig.height=7}
 rel_abund2 = 
   rel_abund %>% 
   dplyr::mutate(sat_level = if_else(treatment=="FM", "FM", as.character(sat_level)),
                 sat_level = factor(sat_level, levels = 
-                                     c("FM", "5", "35", "50", "75", "100"))) 
+                                     c("FM", "5", "35", "50", "75", "100")),
+                treatment = recode(treatment, "Drying" = "drying", "Wetting" = "rewetting")) 
 
 nmr_label <- tribble(
   ~texture, ~sat_level, ~treatment, ~group, ~rel_abund, ~color,
-  "SCL", "35", "Wetting", "aliphatic1", 80, "white",
-  "SCL", "35", "Wetting", "aromatic", 30, "black",
-  "SCL", "50", "Wetting", "aromatic", 30, "black",
-  "SCL", "100", "Wetting", "aliphatic2", 80, "white",
-  "SL", "35", "Wetting", "aromatic", 30, "black",
-  "SL", "50", "Wetting", "aliphatic1", 80, "white",
-  "SL", "75", "Wetting", "aromatic", 30, "black",
-  "SL", "75", "Wetting", "aliphatic1", 80, "white",
-  "SL", "100", "Wetting", "aromatic", 30, "black",
-  "SL", "100", "Wetting", "aliphatic1", 80, "white"
+  "SCL", "35", "rewetting", "aliphatic1", 80, "white",
+  "SCL", "35", "rewetting", "aromatic", 30, "black",
+  "SCL", "50", "rewetting", "aromatic", 30, "black",
+  "SCL", "100", "rewetting", "aliphatic2", 80, "white",
+  "SL", "35", "rewetting", "aromatic", 30, "black",
+  "SL", "50", "rewetting", "aliphatic1", 80, "white",
+  "SL", "75", "rewetting", "aromatic", 30, "black",
+  "SL", "75", "rewetting", "aliphatic1", 80, "white",
+  "SL", "100", "rewetting", "aromatic", 30, "black",
+  "SL", "100", "rewetting", "aliphatic1", 80, "white"
 ) %>% 
   dplyr::mutate(sat_level = if_else(treatment=="FM", "FM", as.character(sat_level)),
                 sat_level = factor(sat_level, levels = 
@@ -1114,6 +1156,7 @@ ggplot(rel_abund2,
   scale_color_manual(values = c("black", "white"))+
   theme_kp()+
   theme(
+    legend.position = "bottom",
     plot.subtitle = element_text(size=14, face = "bold", hjust=0.5),
     panel.border = element_rect(color="black",size=0.5, fill = NA),
     strip.background = element_blank(), #facet formatting
