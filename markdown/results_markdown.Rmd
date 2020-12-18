@@ -994,7 +994,7 @@ ggbiplot_scl =
     ggtitle("SCL")+
     theme_kp()+
     theme(panel.grid = element_blank(),
-          title = element_text(hjust = 0.5),
+          plot.title = element_text(hjust = 0.5, face = "bold"),
           axis.title = element_text(face="bold", size = 12),
           axis.text = element_text(size = 10))+
     NULL
@@ -1032,7 +1032,7 @@ ggbiplot_sl =
   ggtitle("SL")+
   theme_kp()+
   theme(panel.grid = element_blank(),
-        title = element_text(hjust = 0.5),
+        plot.title = element_text(hjust = 0.5, face = "bold"),
         axis.title = element_text(face="bold", size = 12),
         axis.text = element_text(size = 10))+  
   NULL
@@ -1040,7 +1040,7 @@ ggbiplot_sl =
 
 # combined biplots ----
 library(patchwork)
-gg_pca = ggbiplot_scl+ggbiplot_sl +
+ggbiplot_scl+ggbiplot_sl +
   plot_layout(guides = "collect") & theme(legend.position = "bottom")
 ```
 
@@ -1107,8 +1107,8 @@ eucl_label = tribble(
   0.7, 0.7, 19, 28, "SCL", "curve"
 )
   
-gg_eucl = 
-  ggplot(matrix3, aes(x = sat_level, y = distance))+
+
+ggplot(matrix3, aes(x = sat_level, y = distance))+
   geom_point(size=3)+
   geom_segment(aes(x = sat_level, xend = sat_level, y = 0, yend = distance))+
   ylim(0,80)+
@@ -1123,7 +1123,9 @@ gg_eucl =
              curvature = -0.2)+
   
   facet_grid(.~texture.x)+
-  theme_kp()
+  theme_kp()+
+  theme(axis.text = element_text(size = 10, color = "black"),
+        axis.title = element_text(size = 12, face = "bold", color = "black"))
 
   # within-treatment variation
   # ggplot(matrix2, aes(x = sat_level, y = mean(distance), color = treatment.x, shape = texture.x))+
@@ -1133,7 +1135,7 @@ gg_eucl =
 # mean(matrix2$distance)
 ```
 
-```{r nmr_pca_combined, fig.height=6.5, fig.width=6.5}
+```{r nmr_pca_combined, eval = FALSE, fig.height=6.5, fig.width=8}
 patch = gg_pca/gg_eucl 
 
 patch[[1]] <- patch[[1]] + plot_layout(tag_level = "new")

@@ -9,11 +9,13 @@
 
 ## WATER RETENTION CURVES
 
-![](images/markdown/wrc_drying-1.png)<!-- -->
+![](images/markdown/wrc_drying-1.png)<!-- -->![](images/markdown/wrc_drying-2.png)<!-- -->
 
 ![](images/markdown/wrc_more-1.png)<!-- -->![](images/markdown/wrc_more-2.png)<!-- -->
 
-![](images/markdown/wrc_release-1.png)<!-- -->![](images/markdown/wrc_release-2.png)<!-- -->
+![](images/markdown/wrc_release-1.png)<!-- -->
+
+![](images/markdown/appendix1_wrc-1.png)<!-- -->
 
 -----
 
@@ -106,7 +108,7 @@ h = agricolae::HSD.test(aov_wsoc_fm, trt = "texture");h
     #> adonis2(formula = relabund2$DV ~ treatment * sat_level, data = relabund2)
     #>                     Df SumOfSqs      R2       F Pr(>F)    
     #> treatment            1 0.018955 0.22247 17.2485  0.001 ***
-    #> sat_level            1 0.004090 0.04800  3.7217  0.043 *  
+    #> sat_level            1 0.004090 0.04800  3.7217  0.045 *  
     #> treatment:sat_level  1 0.011607 0.13623 10.5627  0.001 ***
     #> Residual            46 0.050550 0.59330                   
     #> Total               49 0.085202 1.00000                   
@@ -160,10 +162,10 @@ PERMANOVA: treatment and moisture level had a significant influence
     #>                     Df SumOfSqs      R2       F Pr(>F)    
     #> treatment            2   1.9419 0.31916 27.9847  0.001 ***
     #> sat_level            1   0.7115 0.11694 20.5067  0.001 ***
-    #> texture              1   0.0620 0.01019  1.7869  0.168    
-    #> treatment:sat_level  1   0.0724 0.01190  2.0875  0.123    
-    #> sat_level:texture    1   0.0542 0.00891  1.5630  0.219    
-    #> treatment:texture    2   0.1545 0.02539  2.2262  0.066 .  
+    #> texture              1   0.0620 0.01019  1.7869  0.153    
+    #> treatment:sat_level  1   0.0724 0.01190  2.0875  0.130    
+    #> sat_level:texture    1   0.0542 0.00891  1.5630  0.206    
+    #> treatment:texture    2   0.1545 0.02539  2.2262  0.081 .  
     #> Residual            89   3.0880 0.50751                   
     #> Total               97   6.0846 1.00000                   
     #> ---
@@ -177,7 +179,7 @@ PERMANOVA: treatment and moisture level had a significant influence
     #>                     Df SumOfSqs      R2       F Pr(>F)    
     #> treatment            2   1.9419 0.31916 26.8456  0.001 ***
     #> sat_level            1   0.7115 0.11694 19.6720  0.001 ***
-    #> treatment:sat_level  1   0.0674 0.01108  1.8647  0.158    
+    #> treatment:sat_level  1   0.0674 0.01108  1.8647  0.135    
     #> Residual            93   3.3637 0.55282                   
     #> Total               97   6.0846 1.00000                   
     #> ---
@@ -217,11 +219,11 @@ peaks in treatments
 
 ### Session Info
 
-Run: 2020-08-27
+Run: 2020-12-17
 
     #> R version 4.0.2 (2020-06-22)
     #> Platform: x86_64-apple-darwin17.0 (64-bit)
-    #> Running under: macOS Catalina 10.15.6
+    #> Running under: macOS Catalina 10.15.7
     #> 
     #> Matrix products: default
     #> BLAS:   /Library/Frameworks/R.framework/Versions/4.0/Resources/lib/libRblas.dylib
@@ -234,7 +236,7 @@ Run: 2020-08-27
     #> [1] stats     graphics  grDevices utils     datasets  methods   base     
     #> 
     #> other attached packages:
-    #>  [1] patchwork_1.0.1    ggpubr_0.4.0       ape_5.4-1          scales_1.1.1      
+    #>  [1] ggpubr_0.4.0       ape_5.4-1          scales_1.1.1       patchwork_1.0.1   
     #>  [5] vegan_2.5-6        permute_0.9-5      soilpalettes_0.1.0 forcats_0.5.0     
     #>  [9] stringr_1.4.0      dplyr_1.0.1        purrr_0.3.4        readr_1.3.1       
     #> [13] tidyr_1.1.1        tibble_3.0.3       tidyverse_1.3.0    ggbiplot_0.55     
