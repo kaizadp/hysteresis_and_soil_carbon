@@ -64,3 +64,27 @@ core_key =
 
 ### OUTPUT
 write.csv(core_key,COREKEY, row.names = F,na = "")
+
+
+# CALCULATING BD AND POROSITY ---------------------------------------------
+
+corekey_temp = read.csv("data/processed/corekey.csv")
+corekey = 
+  corekey_temp %>% 
+  dplyr::select(Core, treatment, texture, sat_level, DryWt_g)
+
+
+
+mass_tracking_temp = read_excel("data/Core_weights.xlsx", sheet = "Mass_tracking")
+mass_tracking = 
+  mass_tracking_temp %>% 
+  dplyr::select(Core, Mass_g, `Headspace, cm`) %>% 
+  rename(headspace_cm = `Headspace, cm`) %>% 
+  filter(!is.na(headspace_cm)) %>% 
+  left_join(corekey, by = "Core") %>% 
+  mutate(vol_cm3 = pi * (2.5 * 2.5) * (7.5-headspace_cm),
+         bd_g_cm3 = DryWt_g/vol_cm3) %>% 
+  group_by(texture) %>% 
+  dplyr::summarise(bd = mean(bd_g_cm3)) %>% 
+  mutate(porosity = (1-(bd/2.65))*100)
+
