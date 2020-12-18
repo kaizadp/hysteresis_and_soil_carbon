@@ -177,7 +177,7 @@ matrix2 =
   group_by(grp.x,grp.y,sat_level.x, texture.x,treatment.x,treatment.y) %>% 
   dplyr::summarise(distance  =mean(value)) %>%
   ungroup %>% 
-  rename(sat_level = sat_level.x) %>% 
+  dplyr::rename(sat_level = sat_level.x) %>% 
   dplyr::mutate(sat_level = if_else(treatment.x=="FM","FM",sat_level),
                 sat_level = factor(sat_level, levels = c(5,35,50,75,100,"FM")))
 
@@ -194,7 +194,7 @@ matrix3 =
   group_by(grp.x,grp.y,sat_level.x, texture.x,treatment.x,treatment.y) %>% 
   dplyr::summarise(distance  =mean(value)) %>%
   ungroup %>% 
-  rename(sat_level = sat_level.x) %>% 
+  dplyr::rename(sat_level = sat_level.x) %>% 
   dplyr::mutate(sat_level = factor(sat_level, levels = c(5,35,50,75,100)))
 
 ggplot(matrix3, aes(x = sat_level, y = distance))+
