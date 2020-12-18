@@ -141,6 +141,37 @@ wrc_processed %>%
         legend.position = c(0.8, 0.8))+
   NULL
 
+
+
+wrc_processed %>% 
+  dplyr::mutate(skip = case_when(grepl("sl_drying",source)~"skip",
+                                 grepl("scl_drying",source)~"skip")) %>% 
+  filter(is.na(skip)) %>% 
+  filter(treatment=="drying") %>% 
+  ggplot(aes(x = kPa, y = perc_sat, color = texture, group = source))+
+  geom_path(size=1.5)+
+  scale_color_manual(#labels = c("drying","rewetting"), 
+    #values = c("darkorange2","gray40"), 
+    values = soilpalettes::soil_palette("eutrostox",2),
+    na.translate=F)+
+  scale_linetype_manual(labels = c("drying","rewetting"), 
+                        values = c("solid","twodash"), na.translate=F)+
+  
+  labs (x = "tension, kPa (log scale)",
+        y = "percent saturation")+
+  scale_x_continuous(trans = scales::log10_trans(), labels = scales::comma, 
+#                     sec.axis = sec_axis(~ .^-1 * 300, name = "pore size (um)", 
+#                                         labels = scales::comma)
+)+
+            #  geom_hline(yintercept = 5, size=0.5, color = "grey80")+
+            #  geom_hline(yintercept = 35, size=0.5, color = "grey80")+
+            #  geom_hline(yintercept = 50, size=0.5, color = "grey80")+
+            #  geom_hline(yintercept = 75, size=0.5, color = "grey80")+
+  theme_kp()+
+  theme(panel.grid = element_blank(),
+        legend.position = c(0.8, 0.8))+
+  NULL
+
 ```
 
 ```{r wrc_hysteresis, eval=FALSE}
@@ -238,6 +269,42 @@ wrc_processed %>%
         legend.position = c(0.8, 0.8))+
   NULL
 
+
+gg_wrc_grav = 
+  wrc_processed %>% 
+  dplyr::mutate(skip = case_when(grepl("sl_drying",source)~"skip",
+                                 grepl("scl_drying",source)~"skip")) %>% 
+  filter(is.na(skip)) %>% 
+  filter(treatment=="drying") %>% 
+  ggplot(aes(x = kPa, y = grav_water_perc))+
+  geom_path(size=1.5, aes(color = texture, group = source))+
+  scale_color_manual(
+    values = soilpalettes::soil_palette("eutrostox",2),
+    na.translate=F)+
+  
+  #geom_point(data = wrc_closest, size=4, color = "black")+
+  #geom_text(data = wrc_label %>% filter(type=="text"),
+  #          aes(x = x2, y = y2, label = label2), color = "black")+
+
+  
+  labs (x = "tension, kPa (log scale)",
+        y = "gravimetric moisture (%)")+
+  scale_x_continuous(trans = scales::log10_trans(), labels = scales::comma, 
+                     sec.axis = sec_axis(~ .^-1 * 300, name = "pore size (μm)", 
+                                         labels = scales::comma))+
+        ##  geom_hline(yintercept = 5, size=0.5, color = "grey80")+
+        ##  geom_hline(yintercept = 35, size=0.5, color = "grey80")+
+        ##  geom_hline(yintercept = 50, size=0.5, color = "grey80")+
+        ##  geom_hline(yintercept = 75, size=0.5, color = "grey80")+
+  theme_kp()+
+  theme(panel.grid = element_blank(),
+        legend.position = c(0.8, 0.8))+
+  NULL
+
+
+
+
+
 ## grav with saturation points and pore sizes ----
       ##  wrc_closest_wide = 
       ##    wrc_closest %>% 
@@ -290,17 +357,19 @@ wrc_processed %>%
 ```{r wrc_release}
 wrc_release = read.csv("data/processed/wrc_drying_release.csv")
 
-wrc_release %>% 
+gg_wrc_release =
+  wrc_release %>% 
   mutate(mask = if_else(Diff>5, "large", "small")) %>% 
   ggplot(aes(x = pore_um, y = Diff, color = texture))+
   geom_point()+
   labs(x = "pore size (um)",
-       y = "volume of pores (cm3)")+
+       y = expression("volume of pores (cm"^3*")"))+
   scale_color_manual(values = soilpalettes::soil_palette("eutrostox",2))+
   #facet_grid(mask~., scales = "free_y")+
   scale_y_log10(breaks=c(0.1, 0.2, 0.5, 1, 5, 10))+
   theme_kp()+
-  theme(panel.grid.minor = element_blank())+
+  theme(panel.grid.minor = element_blank(),
+        legend.position = c(0.8, 0.8))+
   NULL
 
 release_drying_summary  = 
@@ -323,6 +392,15 @@ release_drying_summary %>%
   theme(panel.grid.minor = element_blank())+
   NULL
 ```
+
+```{r appendix1_wrc, fig.height=4, fig.width=10}
+library(patchwork)
+
+gg_wrc_grav + gg_wrc_release +
+  plot_layout(widths = c(1,1.5))
+```
+
+
 
 ```{r wrc_release_bins, eval=FALSE}
 release_drying_bins = 
@@ -962,7 +1040,7 @@ ggbiplot_sl =
 
 # combined biplots ----
 library(patchwork)
-ggbiplot_scl+ggbiplot_sl +
+gg_pca = ggbiplot_scl+ggbiplot_sl +
   plot_layout(guides = "collect") & theme(legend.position = "bottom")
 ```
 
@@ -1003,7 +1081,7 @@ matrix2 =
   group_by(grp.x,grp.y,sat_level.x, texture.x,treatment.x,treatment.y) %>% 
   dplyr::summarise(distance  =mean(value)) %>%
   ungroup %>% 
-  rename(sat_level = sat_level.x) %>% 
+  dplyr::rename(sat_level = sat_level.x) %>% 
   dplyr::mutate(sat_level = if_else(treatment.x=="FM","FM",sat_level),
                 sat_level = factor(sat_level, levels = c(5,35,50,75,100,"FM")))
 
@@ -1019,7 +1097,7 @@ matrix3 =
   group_by(grp.x,grp.y,sat_level.x, texture.x,treatment.x,treatment.y) %>% 
   dplyr::summarise(distance  =mean(value)) %>%
   ungroup %>% 
-  rename(sat_level = sat_level.x) %>% 
+  dplyr::rename(sat_level = sat_level.x) %>% 
   dplyr::mutate(sat_level = factor(sat_level, levels = c(5,35,50,75,100)))
 
 ## plot ----
@@ -1029,7 +1107,8 @@ eucl_label = tribble(
   0.7, 0.7, 19, 28, "SCL", "curve"
 )
   
-ggplot(matrix3, aes(x = sat_level, y = distance))+
+gg_eucl = 
+  ggplot(matrix3, aes(x = sat_level, y = distance))+
   geom_point(size=3)+
   geom_segment(aes(x = sat_level, xend = sat_level, y = 0, yend = distance))+
   ylim(0,80)+
@@ -1053,6 +1132,15 @@ ggplot(matrix3, aes(x = sat_level, y = distance))+
   #   theme_kp()
 # mean(matrix2$distance)
 ```
+
+```{r nmr_pca_combined, fig.height=6.5, fig.width=6.5}
+patch = gg_pca/gg_eucl 
+
+patch[[1]] <- patch[[1]] + plot_layout(tag_level = "new")
+patch + plot_annotation(tag_levels = c('A', '1'))
+
+```
+
 
 ### RELATIVE ABUNDANCE
 
