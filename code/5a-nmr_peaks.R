@@ -1,3 +1,12 @@
+## SOIL CARBON-WATER HYSTERESIS
+## KAIZAD F. PATEL
+
+## 5a-nmr_peaks.R
+
+## THIS SCRIPT CONTAINS CODE TO SET UP NMR PARAMETERS AND PROCESS PEAKS DATA.
+
+############### #
+############### #
 
 source("code/0-hysteresis_packages.R")
 

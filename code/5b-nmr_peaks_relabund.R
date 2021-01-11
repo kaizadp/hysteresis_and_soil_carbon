@@ -1,5 +1,14 @@
+## SOIL CARBON-WATER HYSTERESIS
+## KAIZAD F. PATEL
 
-source("code/6a-nmr_peaks.R")
+## 6a-nmr_peaks_relabund.R
+
+## THIS SCRIPT CONTAINS CODE TO CALCULATE RELATIVE ABUNDANCE BASED ON NMR PEAKS DATA.
+
+############### #
+############### #
+
+source("code/5a-nmr_peaks.R")
 
 # first, add metadata for Cores
 corekey = read.csv(COREKEY)

@@ -1,8 +1,13 @@
 # HYSTERESIS AND SOIL CARBON
-# 
 # Kaizad F. Patel
 # April 2020
 
+# 6b-fticr_abundance.R
+
+## this script will calculate relative abundance from processed FTICR data.
+
+############### #
+############### #
 
 source("code/0-hysteresis_packages.R")
 

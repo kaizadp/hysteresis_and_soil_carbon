@@ -1,17 +1,20 @@
-# R script for Kenton Rod's DOC experiment
-# Kaizad F. Patel
-# September 2019
-# ----------------------------------------------------------------------------------- -
-# ----------------------------------------------------------------------------------- -
+## SOIL CARBON-WATER HYSTERESIS
+## KAIZAD F. PATEL
+## 2020
 
+## 4-wsoc.R
+
+## THIS SCRIPT CONTAINS CODE TO PROCESS WSOC (WATER SOLUBLE/EXTRACTABLE ORGANIC CARBON) DATA. 
+
+############### #
+############### #
 
 ### save all raw data files as .csv files in the directory "data/wsoc_data"
 ### make sure all the .csv files have the same column names
 
 # install packages defined in the linked script
-source("0-hysteresis_packages.R")
+source("code/0-hysteresis_packages.R")
 library(purrr)
-
 
 wsoc_plan = drake_plan(
   

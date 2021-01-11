@@ -1,11 +1,15 @@
 # HYSTERESIS AND SOIL CARBON
-# 3-fticr_initial processing
 # Kaizad F. Patel
 # March 2020
+
+# 6a-fticr_processing.R
 
  ## this script will process the input data and metadata files and
  ## generate clean files that can be used for subsequent analysis.
  ## each dataset will generate longform files of (a) all cores, (b) summarized data for each treatment (i.e. cores combined) 
+
+############### #
+############### #
 
 source("code/0-hysteresis_packages.R")
 

@@ -1,4 +1,18 @@
+# HYSTERESIS AND SOIL CARBON
+# Kaizad F. Patel
+# April 2020
+
+# 6c-fticr_loss.R
+
+## this script will compute additional metric for the processed FTICR data.
+## this script looks at sequential loss/gain across moisture levels.
+
+############### #
+############### #
+
 source("0-hysteresis_packages.R")
+
+# -------------------------------------------------------------------------
 
 
 fticr_data = read.csv(FTICR_LONG)

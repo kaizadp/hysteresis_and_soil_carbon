@@ -1,9 +1,13 @@
 # HYSTERESIS AND SOIL CARBON
-# picarro_stats
 # Kaizad F. Patel
 # 2020
 
+## 3d-picarro_stats.R
+
 ## this script will use processed Picarro data and calculate statistics.
+
+############### #
+############### #
 
 # 1. load packages and files ----
 source("0-hysteresis_packages.R")

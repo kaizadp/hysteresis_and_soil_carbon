@@ -1,5 +1,18 @@
+## SOIL CARBON-WATER HYSTERESIS
+## KAIZAD F. PATEL
+
+## 0-initial_cleaning.R
+
+## THIS SCRIPT CONTAINS CODE TO CLEAN SOME DATA PRIOR TO RUNNING IN OTHER SCRIPTS.
+
+############### #
+############### #
 
 source("0-hysteresis_packages.R")
+
+
+# CORE KEY AND CORE WEIGHTS -----------------------------------------------
+
 
 ### CONSTANT VALUES USED IN CALCULATIONS
 TC = 8.34 #carbon percentage

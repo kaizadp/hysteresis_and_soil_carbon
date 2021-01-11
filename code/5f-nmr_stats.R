@@ -1,3 +1,13 @@
+## SOIL CARBON-WATER HYSTERESIS
+## KAIZAD F. PATEL
+
+## 5f-nmr_stats.R
+
+## THIS SCRIPT CONTAINS CODE TO CALCULATE STATISTICS FOR NMR DATA (RELATIVE ABUNDANCE DATA).
+
+############### #
+############### #
+
 source("code/0-hysteresis_packages.R")
 library(ggbiplot)
 

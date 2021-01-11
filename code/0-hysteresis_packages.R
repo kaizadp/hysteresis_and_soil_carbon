@@ -1,8 +1,16 @@
+## SOIL CARBON-WATER HYSTERESIS
+## KAIZAD F. PATEL
 
-## Functions
-# Kaizad F. Patel
+## 0-hysteresis_packages.R
 
-## packages ####
+## THIS SCRIPT CONTAINS PACKAGES, FUNCTIONS, AND FILE PATHS NEEDED TO RUN THE PROCESSING/ANALYSIS SCRIPTS IN THIS REPO.
+## SOURCE THIS FILE IN THE SCRIPT YOU WANT TO RUN.
+
+
+############### #
+############### #
+
+# PACKAGES ---------------------------------------------------------------
 library(readxl)
 library(lubridate)     # 1.6.0
 library(luzlogr)       # 0.2.0
@@ -37,9 +45,7 @@ library(tidyverse)
 #devtools::install_github("kaizadp/soilpalettes")
 library(soilpalettes)
 
-# ggplot customizations ---------------------------------------------------
-
-
+# GGPLOT CUSTOMIZATIONS ---------------------------------------------------
 
 # custom ggplot theme
 theme_kp <- function() {  # this for all the elements common across plots
@@ -65,7 +71,6 @@ theme_kp <- function() {  # this for all the elements common across plots
           strip.text.y = element_text(size=12, face="bold", angle = 270) #facet labels
     )
 }
-
 
 # custom ggplot function for Van Krevelen plots
 gg_vankrev <- function(data,mapping){
@@ -93,11 +98,7 @@ gg_vankrev <- function(data,mapping){
 ## to make the Van Krevelen plot:
 # replace the initial `ggplot` function with `gg_vankrev` and use as normal
 
-
-
-# files -------------------------------------------------------------------
-
-
+# FILE PATHS -------------------------------------------------------------------
 ## CREATE OUTPUT FILES
 COREKEY = "data/processed/corekey.csv"
 WSOC = "data/processed/wsoc.csv"

@@ -1,4 +1,14 @@
-# 3-clean_picarro_data.R
+## SOIL CARBON-WATER HYSTERESIS
+## KAIZAD F. PATEL
+
+## 3-picarro_data.R
+
+## THIS SCRIPT CONTAINS FUNCTIONS TO CLEAN PICARRO DATA AND COMPUTE GHG FLUXES.
+## THIS SCRIPT WILL BE SOURCED IN SUBSEQUENT PICARRO SCRIPTS.
+
+############### #
+############### #
+
 
 # This is just a thin wrapper around two calls to picarro.data package functions
 clean_picarro_data <- function(prd) {

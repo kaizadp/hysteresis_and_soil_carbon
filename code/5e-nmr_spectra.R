@@ -1,5 +1,15 @@
-source("0-hysteresis_packages.R")
-source("7a-nmr_spectra_setup.R")
+## SOIL CARBON-WATER HYSTERESIS
+## KAIZAD F. PATEL
+
+## 5e-nmr_spectra.R
+
+## THIS SCRIPT CONTAINS CODE TO SET UP NMR PARAMETERS AND PROCESS PEAKS DATA.
+
+############### #
+############### #
+
+source("code/0-hysteresis_packages.R")
+source("code/5d-nmr_spectra_setup.R")
 
 
 # PART II. NMR spectra ----

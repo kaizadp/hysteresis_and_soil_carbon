@@ -1,3 +1,13 @@
+## SOIL CARBON-WATER HYSTERESIS
+## KAIZAD F. PATEL
+
+## 5d-nmr_spectra_setup.R
+
+## THIS SCRIPT CONTAINS CODE TO SET UP NMR SPECTRA.
+
+############### #
+############### #
+
 source("code/0-hysteresis_packages.R")
 
 

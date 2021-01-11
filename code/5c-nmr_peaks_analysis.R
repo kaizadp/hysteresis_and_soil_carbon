@@ -1,3 +1,13 @@
+## SOIL CARBON-WATER HYSTERESIS
+## KAIZAD F. PATEL
+
+## 5c-nmr_peaks_analysis.R
+
+## THIS SCRIPT CONTAINS CODE TO ANALYE NMR PEAKS DATA.
+
+############### #
+############### #
+
 source("0-hysteresis_packages.R")
 peaks = read.csv("data/processed/nmr_peaks.csv")
 
@@ -31,7 +41,7 @@ ggplot(peaks2, aes(x = ppm, y = n))+
   facet_grid(sat_level ~ treatment+texture)
   
 
-source("7a-nmr_spectra_setup.R")
+source("5d-nmr_spectra_setup.R")
 gg_nmr+
   geom_point(data = peaks2, aes(x = ppm, y = n))+
   ylab("frequency")+

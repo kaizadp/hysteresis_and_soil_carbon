@@ -1,5 +1,14 @@
-## 3b-Picarro graphs
+## SOIL CARBON-WATER HYSTERESIS
+## KAIZAD F. PATEL
 
+## 3b-picarro_output.R
+
+## THIS SCRIPT CONTAINS THE {DRAKE} PLAN TO RUN AND PROCESS PICARRO FUNCTIONS.
+## KP EDIT: {DRAKE} was giving me trouble, so I made a non-drake version (`3c-picarro_output_NODRAKE.R`). USE THAT INSTEAD.
+
+
+############### #
+############### #
 
 source("0-hysteresis_packages.R")
 source("1-moisture_tracking.R")

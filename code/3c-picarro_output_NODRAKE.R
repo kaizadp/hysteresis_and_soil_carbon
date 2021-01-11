@@ -1,7 +1,13 @@
-## 3b-Picarro graphs
-## doing this without drake
+## SOIL CARBON-WATER HYSTERESIS
+## KAIZAD F. PATEL
+
+## 3c-picarro_output_NODRAKE.R
+
+## THIS SCRIPT CONTAINS THE NON-{DRAKE} PLAN TO RUN AND PROCESS PICARRO FUNCTIONS.
 ## use drake only to read the Picarro data
 
+############### #
+############### #
 
 source("0-hysteresis_packages.R")
 source("1-moisture_tracking.R")

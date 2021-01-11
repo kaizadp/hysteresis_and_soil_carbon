@@ -1,9 +1,14 @@
 # HYSTERESIS AND SOIL CARBON
-# 3-fticr_stats
 # Kaizad F. Patel
 # April 2020
 
+## 6c-fticr_stats.R
+
 ## use this script to run statistical tests on the processed FTICR data (relative abundances)
+
+
+############### #
+############### #
 
 source("code/0-hysteresis_packages.R")
 library(vegan)
