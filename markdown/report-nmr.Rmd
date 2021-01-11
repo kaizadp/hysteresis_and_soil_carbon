@@ -1,5 +1,5 @@
 ---
-title: "7-nmr_markdown"
+title: "nmr_markdown"
 output: github_document
 ---
 
@@ -7,11 +7,11 @@ output: github_document
 knitr::opts_chunk$set(echo=FALSE,message=FALSE,warning=FALSE,
                       collapse = TRUE,
                       comment = "#>", 
-                      fig.path = "images/7b-nmr_markdown/"
+                      fig.path = "images/nmr_markdown/"
                       )
 
 source("code/0-hysteresis_packages.R")
-source("code/7a-nmr_spectra_setup.R")
+source("code/5d-nmr_spectra_setup.R")
 #source("code/6b-nmr_peaks_relabund.R")
 ```
 

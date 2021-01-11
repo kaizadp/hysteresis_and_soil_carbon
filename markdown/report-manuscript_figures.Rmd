@@ -1,5 +1,4 @@
 ---
-title: "[Hysteresis and Soil C]"
 output: github_document
 ---
 
@@ -12,7 +11,7 @@ knitr::opts_chunk$set(dpi = 300,
                       echo=FALSE,message=FALSE,warning=FALSE,
                       collapse = TRUE,
                       comment = "#>", 
-                      fig.path = "images/markdown/")
+                      fig.path = "images/manuscript_figures/")
 
 source("code/0-hysteresis_packages.R")
 library(vegan)
@@ -21,93 +20,11 @@ library(vegan)
 ```{r, eval=TRUE}
 pal2 = PNWColors::pnw_palette("Bay",2)
 pal3 = c("#dd4124", "#00496f", "#edd746") #bay
-
-  ## pal2=soilpalettes::soil_palette("gley",2)
-  ## pal3=c(soilpalettes::soil_palette("gley",2), "black") 
-  ##   
-  ## pal = soilpalettes::soil_palette("eutrostox",3)
-  ## PNWColors::pnw_palette("Bay",3)
-  ## pal = c("#ed8b00", "#00496f") 
-  ## pal = c("#d2848d", "#6e7cb9") 
-  ## pal = c("#f9ad2a", "#1d457f")
 ```
 
 ---
 
 ## WATER RETENTION CURVES
-
-```{r hyprop_old, eval=FALSE, fig.width=9, dpi=300, eval=FALSE}
-  ##source("2-hyprop.R")
-  ##
-  ##ggplot(hyprop, aes(y = kPa, x = perc_sat, color = treatment, linetype=treatment))+
-  ##  geom_path(size=1.5)+
-  ##  scale_color_manual(labels = c("drying","rewetting"), values = c("darkorange2","gray40"),   ##na.translate=F)+
-  ##  scale_linetype_manual(labels = c("drying","rewetting"), values = c("solid","twodash"),   ##na.translate=F)+
-  ##  facet_wrap(.~soiltype)+
-  ##  ylab ("tension, kPa")+
-  ##  scale_x_reverse(name = "percent saturation")+
-  ##  theme_kp()
-  ##
-  ##
-  ##ggplot(hyprop, aes(y = kPa, x = perc_sat, color = treatment, linetype=treatment))+
-  ##  geom_path(size=1.5)+
-  ##  scale_color_manual(labels = c("drying","rewetting"), values = c("darkorange2","gray40"),   ##na.translate=F)+
-  ##  scale_linetype_manual(labels = c("drying","rewetting"), values = c("solid","twodash"),   ##na.translate=F)+
-  ##  facet_wrap(.~soiltype)+
-  ##  ylab ("tension, kPa (log scale)")+
-  ##  xlab ("percent saturation")+
-  ###  scale_x_reverse(name = "percent saturation")+
-  ##  scale_y_log10()+
-  ## # xlim(0,100)+
-  ##  theme_kp()
-  ##
-  ##
-  ##ggplot(hyprop, aes(y = kPa, x = perc_sat, color = treatment, linetype=treatment))+
-  ##  geom_path(size=1.5)+
-  ##  scale_color_manual(labels = c("drying","rewetting"), values = c("darkorange2","gray40"),   ##na.translate=F)+
-  ##  scale_linetype_manual(labels = c("drying","rewetting"), values = c("solid","twodash"),   ##na.translate=F)+
-  ##  facet_wrap(.~soiltype)+
-  ##  ylab ("tension, kPa (log scale)")+
-  ##  xlab ("percent saturation")+
-  ###  scale_x_reverse(name = "percent saturation")+
-  ##  scale_y_log10()+
-  ##  scale_y_continuous(trans = log10_trans(),
-  ##                     sec.axis = sec_axis(~ .^-1 * 300, name = "pore size (um)"))+
-  ## # xlim(0,100)+
-  ##  theme_kp()
-  ##
-
-  ##wrc = read.csv("data/processed/wrc.csv")
-  ##
-  ##ggplot(wrc, aes(y = kPa, x = perc_sat, linetype=treatment, color = treatment))+
-  ##  geom_path(size=1)+
-  ##  scale_color_manual(labels = c("drying","rewetting"), 
-  ##                     values = rev(pal2), 
-  ##                     na.translate=F)+
-  ##  scale_linetype_manual(labels = c("drying","rewetting"), 
-  ##                        values = c("solid","dashed"), 
-  ##                        na.translate=F)+
-  ##  
-  ##  facet_wrap(.~texture)+
-  ##  ylab ("tension, kPa")+
-  ##  xlab ("percent saturation")+
-  ##  scale_y_continuous(trans = scales::log10_trans(), 
-  ##                     labels = scales::comma, 
-  ##                     sec.axis = sec_axis(~ .^-1 * 300, 
-  ##                                         name = "pore size (um)", 
-  ##                                         labels = scales::comma))+
-  ##  geom_vline(xintercept = 5, size=0.5, color = "grey80")+
-  ##  geom_vline(xintercept = 35, size=0.5, color = "grey80")+
-  ##  geom_vline(xintercept = 50, size=0.5, color = "grey80")+
-  ##  geom_vline(xintercept = 75, size=0.5, color = "grey80")+
-  ##  theme_kp()+
-  ##  theme(panel.grid = element_blank())+
-  ##  NULL
-  ##
-  ##
-  ##
-
-```
 
 ```{r wrc_drying, fig.height=5, fig.width=6}
 wrc_processed = read.csv("data/processed/wrc.csv")
@@ -132,16 +49,10 @@ wrc_processed %>%
 #                     sec.axis = sec_axis(~ .^-1 * 300, name = "pore size (um)", 
 #                                         labels = scales::comma)
 )+
-            #  geom_hline(yintercept = 5, size=0.5, color = "grey80")+
-            #  geom_hline(yintercept = 35, size=0.5, color = "grey80")+
-            #  geom_hline(yintercept = 50, size=0.5, color = "grey80")+
-            #  geom_hline(yintercept = 75, size=0.5, color = "grey80")+
   theme_kp()+
   theme(panel.grid = element_blank(),
         legend.position = c(0.8, 0.8))+
   NULL
-
-
 
 wrc_processed %>% 
   dplyr::mutate(skip = case_when(grepl("sl_drying",source)~"skip",
@@ -163,10 +74,6 @@ wrc_processed %>%
 #                     sec.axis = sec_axis(~ .^-1 * 300, name = "pore size (um)", 
 #                                         labels = scales::comma)
 )+
-            #  geom_hline(yintercept = 5, size=0.5, color = "grey80")+
-            #  geom_hline(yintercept = 35, size=0.5, color = "grey80")+
-            #  geom_hline(yintercept = 50, size=0.5, color = "grey80")+
-            #  geom_hline(yintercept = 75, size=0.5, color = "grey80")+
   theme_kp()+
   theme(panel.grid = element_blank(),
         legend.position = c(0.8, 0.8))+
@@ -260,10 +167,6 @@ wrc_processed %>%
   scale_x_continuous(trans = scales::log10_trans(), labels = scales::comma, 
                      sec.axis = sec_axis(~ .^-1 * 300, name = "pore size (μm)", 
                                          labels = scales::comma))+
-        ##  geom_hline(yintercept = 5, size=0.5, color = "grey80")+
-        ##  geom_hline(yintercept = 35, size=0.5, color = "grey80")+
-        ##  geom_hline(yintercept = 50, size=0.5, color = "grey80")+
-        ##  geom_hline(yintercept = 75, size=0.5, color = "grey80")+
   theme_kp()+
   theme(panel.grid = element_blank(),
         legend.position = c(0.8, 0.8))+
@@ -282,41 +185,15 @@ gg_wrc_grav =
     values = soilpalettes::soil_palette("eutrostox",2),
     na.translate=F)+
   
-  #geom_point(data = wrc_closest, size=4, color = "black")+
-  #geom_text(data = wrc_label %>% filter(type=="text"),
-  #          aes(x = x2, y = y2, label = label2), color = "black")+
-
-  
   labs (x = "tension, kPa (log scale)",
         y = "gravimetric moisture (%)")+
   scale_x_continuous(trans = scales::log10_trans(), labels = scales::comma, 
                      sec.axis = sec_axis(~ .^-1 * 300, name = "pore size (μm)", 
                                          labels = scales::comma))+
-        ##  geom_hline(yintercept = 5, size=0.5, color = "grey80")+
-        ##  geom_hline(yintercept = 35, size=0.5, color = "grey80")+
-        ##  geom_hline(yintercept = 50, size=0.5, color = "grey80")+
-        ##  geom_hline(yintercept = 75, size=0.5, color = "grey80")+
-  theme_kp()+
+ theme_kp()+
   theme(panel.grid = element_blank(),
         legend.position = c(0.8, 0.8))+
   NULL
-
-
-
-
-
-## grav with saturation points and pore sizes ----
-      ##  wrc_closest_wide = 
-      ##    wrc_closest %>% 
-      ##    ungroup %>% 
-      ##    dplyr::select(texture, points, grav_water_perc, kPa) %>% 
-      ##    #spread(texture, grav_water_perc)
-      ##    #pivot_wider(from = "kPa")
-      ##    nest(kPa, grav_water_perc, .key = 'value_col') %>%
-      ##    spread(key = texture, value = value_col) %>%
-      ##    unnest(SCL, SL, .sep = '_') %>% 
-      ##    mutate(texture="SCL")
-
 
 ## plot ----
 wrc_processed %>% 
@@ -350,8 +227,6 @@ wrc_processed %>%
   theme(panel.grid = element_blank(),
         legend.position = c(0.1, 0.15))+
   NULL
-
-
 ```
 
 ```{r wrc_release}
@@ -399,8 +274,6 @@ library(patchwork)
 gg_wrc_grav + gg_wrc_release +
   plot_layout(widths = c(1,1.5))
 ```
-
-
 
 ```{r wrc_release_bins, eval=FALSE}
 release_drying_bins = 
@@ -463,7 +336,6 @@ ggplot(fluxes, aes(x = sat_level, y = flux_co2_nmol_gC_s, shape=treatment, color
   theme_kp()+
   NULL
 ```
-
 
 ```{r respiration_graph_ugC, fig.width=9}
 
@@ -537,7 +409,6 @@ ggplot(wsoc, aes(x = sat_level, y = wsoc_mg_gC, shape = treatment, color = treat
 ```{r wsoc_anova}
 aov = aov(wsoc_mg_g ~ treatment * texture * sat_level, data = wsoc[!wsoc$sat_level==5,])
 summary(aov)
-
 ```
 
 For field moist conditions, WSOC was significantly greater in SL than in SCL soils. 
@@ -548,12 +419,11 @@ summary(aov_wsoc_fm)
 h = agricolae::HSD.test(aov_wsoc_fm, trt = "texture");h
 ```
 
-
 ---
 
 ## FTICR
 
-```{r}
+```{r fticr}
 fticr_data = read.csv(FTICR_LONG)
 #fticr_meta = read.csv(FTICR_META)
 meta_hcoc = read.csv(FTICR_META_HCOC)
@@ -594,8 +464,6 @@ gg_100 =
   gg_vankrev( 
              aes(x = OC, y = HC, color = treatment, group = rev(treatment)))+
   scale_color_manual(values = rev(pal2))+
-  #geom_point(size=0.5, alpha = 0.4)+
-  #facet_grid(.~treatment)+
   theme_kp()+
   theme(legend.position = c(0.7, 0.1),
         legend.text.align = 1)+
@@ -838,21 +706,7 @@ fticr_eucl =
        y = "drying-rewetting \n Euclidean distance")+
   geom_hline(yintercept = 1.713, linetype = "dashed")+
   
-##  geom_text(data = eucl_label %>% filter(type=="text"), aes(x = x, y = y), 
-##            label = "avg. within-group distance", angle=90, hjust="left", size=3)+
-##  geom_curve(data = eucl_label %>% filter(type=="curve"), 
-##             aes(x = x, xend = xend, y = y, yend = yend),
-##             curvature = -0.2)+
-  
   theme_kp()
-
-  # within-treatment variation
-  # ggplot(matrix2, aes(x = sat_level, y = mean(distance), color = treatment.x, shape = texture.x))+
-  #   geom_point(size = 3)+
-  #   ylim(1,2)+
-  #   theme_kp()
-# mean(matrix2$distance)
-
 ```
 
 ```{r fticr_pca_combined, fig.width=7, fig.height=9}
@@ -873,7 +727,7 @@ ggarrange(fticr_biplot , fticr_eucl,
 ### spectra 
 ```{r, eval=TRUE}
 spectra = read.csv("data/processed/nmr_spectra.csv.gz")
-source("code/7a-nmr_spectra_setup.R")
+source("code/5d-nmr_spectra_setup.R")
 
 spectra_plot = 
   spectra %>% 
@@ -1170,8 +1024,6 @@ adonis2(rel_abund2$DV ~ treatment*sat_level +sat_level*texture + treatment*textu
 adonis2(rel_abund2$DV ~ treatment*sat_level, data = rel_abund2)
 
 ```
-
-
 
 ### tables
 
