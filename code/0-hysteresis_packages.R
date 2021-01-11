@@ -26,10 +26,7 @@ library(stringi)
 library(nlme)
 library(car)
 library(agricolae)
-#library(googlesheets)
-#library(gsheet)
 library(multcomp)
-#library(DescTools)
 
 library(drake)
 pkgconfig::set_config("drake::strings_in_dots" = "literals")
@@ -87,10 +84,6 @@ gg_vankrev <- function(data,mapping){
     geom_segment(x = 0.0, y = 1.5, xend = 1.2, yend = 1.5,color="black",linetype="longdash") +
     geom_segment(x = 0.0, y = 0.7, xend = 1.2, yend = 0.4,color="black",linetype="longdash") +
     geom_segment(x = 0.0, y = 1.06, xend = 1.2, yend = 0.51,color="black",linetype="longdash") +
-    #geom_segment(x = 0.0, y = 1.5, xend = 1.2, yend = 1.5,color="black",linetype="longdash") +
-    #geom_segment(x = 0.0, y = 2, xend = 1.2, yend = 2,color="black",linetype="longdash") +
-    #geom_segment(x = 0.0, y = 1, xend = 1.2, yend = 0.75,color="black",linetype="longdash") +
-    #geom_segment(x = 0.0, y = 0.8, xend = 1.2, yend = 0.8,color="black",linetype="longdash")+
     guides(colour = guide_legend(override.aes = list(alpha=1)))
   
 }
