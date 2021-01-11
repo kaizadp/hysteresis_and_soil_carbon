@@ -90,21 +90,3 @@ fticr_aov =
                 asterisk = if_else(p<0.05,"*",as.character(NA)),
                 treatment="Wetting") %>% 
   dplyr::select(-p)
-
-
-
-
-#
-##  1. MANOVA ----
-## relabund2$DV = as.matrix(relabund2[,4:12])
-## 
-## # since the relative abundances are not strictly independent and all add to 100 %,
-## # use the isometric log ratio transformation
-## # http://www.sthda.com/english/wiki/manova-test-in-r-multivariate-analysis-of-variance#import-your-data-into-r
-## 
-## library(compositions)
-## 
-## man = manova(ilr(clo(DV)) ~ treatment, data = relabund2)
-## summary(man)
-
-## summary.aov(man)

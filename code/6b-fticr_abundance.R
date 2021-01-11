@@ -47,27 +47,9 @@ relabund_trt =
   relabund_core %>% 
   group_by(Core_assignment, texture, treatment, sat_level, Class) %>% 
   dplyr::summarise(rel_abund = round(mean(relabund),2))
-  
-
-#
-    ## # III. SHANNON DIVERSITY ----
-    ## # Shannon diversity, H = - sum [p*ln(p)], where n = no. of individuals per species/total number of individuals
-    ## 
-    ## shannon = 
-    ##   relabund %>% 
-    ##   dplyr::mutate(
-    ##                 p = abund/total,
-    ##                 log = log(p),
-    ##                 p_logp = p*log) %>% 
-    ##   group_by(Core_assignment) %>% 
-    ##   dplyr::summarize(H1 = sum(p_logp),
-    ##                 H = round(-1*H1, 2)) %>% 
-    ##   dplyr::select(-H1)
-
 
 #
 # IV. OUTPUT ----
-#write.csv(shannon, "data/processed/fticr_shannon.csv", row.names = FALSE)
 write.csv(relabund_core, "data/processed/fticr_relabund.csv", row.names=FALSE)
 write.csv(relabund_trt, "data/processed/fticr_relabund_trt.csv", row.names=FALSE)
 
