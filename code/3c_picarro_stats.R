@@ -2,7 +2,7 @@
 # Kaizad F. Patel
 # 2020
 
-## 3d-picarro_stats.R
+## 3c-picarro_stats.R
 
 ## this script will use processed Picarro data and calculate statistics.
 
@@ -10,7 +10,8 @@
 ############### #
 
 # 1. load packages and files ----
-source("0-hysteresis_packages.R")
+source("code/0-hysteresis_packages.R")
+
 fluxes = read.csv("data/processed/picarro_fluxes.csv", stringsAsFactors = F)
 meanfluxes = read.csv("data/processed/picarro_meanfluxes.csv", stringsAsFactors = F)
 
@@ -29,6 +30,8 @@ summary(aov2)
 #
 
 # 3. anova ----
+## doing pairwise anova -- create a function and then apply that
+
 # create anova function 
 fit_anova <- function(dat) {
   a <-anova(lm(flux_co2_nmol_gC_s~treatment, data = dat))
@@ -68,10 +71,3 @@ fluxes_summary =
 
 # 4. OUTPUT ----
 write.csv(fluxes_summary, "data/processed/picarro_meanfluxes_summary.csv", row.names = F)
-  
-
-
-
-
-
-
