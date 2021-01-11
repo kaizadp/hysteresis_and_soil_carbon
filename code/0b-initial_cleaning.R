@@ -8,7 +8,7 @@
 ############### #
 ############### #
 
-source("0-hysteresis_packages.R")
+source("code/0-hysteresis_packages.R")
 
 
 # CORE KEY AND CORE WEIGHTS -----------------------------------------------
@@ -73,7 +73,8 @@ core_key =
   dplyr::mutate(MoistWt_g = Total_g - EmptyWt_g,
                 Water_g = MoistWt_g - DryWt_g,
                 Moisture_perc = round(((Water_g / DryWt_g) * 100), 2)) %>% 
-  dplyr::select(-(EmptyWt_g:Sand_g), -(MoistWt_g:Water_g))
+  dplyr::select(-(EmptyWt_g:Sand_g), -(MoistWt_g:Water_g)) %>% 
+  dplyr::select(Core, treatment, texture, sat_level, DryWt_g, Carbon_g)
 
 ### OUTPUT
 write.csv(core_key,COREKEY, row.names = F,na = "")
