@@ -8,14 +8,14 @@
 ############### #
 ############### #
 
-source("0-hysteresis_packages.R")
+source("code/0-hysteresis_packages.R")
 peaks = read.csv("data/processed/nmr_peaks.csv")
 
 corekey = read.csv(COREKEY)
 
 corekey_subset = 
   corekey %>% 
-  dplyr::select(Core, texture, treatment, perc_sat, sat_level,Core_assignment) %>% 
+  dplyr::select(Core, texture, treatment, sat_level,Core_assignment) %>% 
   dplyr::mutate(Core = as.factor(Core))
 
 #
@@ -41,7 +41,7 @@ ggplot(peaks2, aes(x = ppm, y = n))+
   facet_grid(sat_level ~ treatment+texture)
   
 
-source("5d-nmr_spectra_setup.R")
+source("code/5d-nmr_spectra_setup.R")
 gg_nmr+
   geom_point(data = peaks2, aes(x = ppm, y = n))+
   ylab("frequency")+

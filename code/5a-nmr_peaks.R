@@ -23,7 +23,7 @@ cat("ACTION: choose correct value of BINSET
 
 BINSET = "Clemente2012"
 
-bins = read_csv("nmr_bins.csv")
+bins = read_csv("data/nmr_bins.csv")
 bins2 = 
   bins %>% 
   # here we select only the BINSET we chose above

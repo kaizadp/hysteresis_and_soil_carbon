@@ -31,7 +31,7 @@ spectra <- do.call(rbind, lapply(filePaths, function(path) {
 corekey = read.csv(COREKEY)
 key = 
   corekey %>% 
-  dplyr::select(Core, treatment, Core_assignment, perc_sat, sat_level,texture, soil_type) %>% 
+  dplyr::select(Core, treatment, Core_assignment, sat_level,texture) %>% 
   dplyr::mutate(Core = as.character(Core))
 
 spectra2 = 
@@ -50,6 +50,5 @@ crunch::write.csv.gz(spectra2, "data/processed/nmr_spectra.csv.gz", na = "")
 #
 
 # PART III: PLOTTING THE SPECTRA ----
+## see markdown file
 ## since we created the base gg_nmr earlier, we only need to add a single layer for the geom_path spectra
-
-

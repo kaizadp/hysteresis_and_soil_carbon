@@ -1,7 +1,7 @@
 ## SOIL CARBON-WATER HYSTERESIS
 ## KAIZAD F. PATEL
 
-## 6a-nmr_peaks_relabund.R
+## 5b-nmr_peaks_relabund.R
 
 ## THIS SCRIPT CONTAINS CODE TO CALCULATE RELATIVE ABUNDANCE BASED ON NMR PEAKS DATA.
 
@@ -14,7 +14,7 @@ source("code/5a-nmr_peaks.R")
 corekey = read.csv(COREKEY)
 key = 
   corekey %>% 
-  dplyr::select(Core, treatment, Core_assignment, perc_sat, sat_level, texture, soil_type) %>% 
+  dplyr::select(Core, treatment, Core_assignment, sat_level, texture) %>% 
   dplyr::mutate(Core = as.character(Core))
   
 peaks2 = 
@@ -26,16 +26,13 @@ rel_abund =
   subset(merge(peaks2, bins2), start <= ppm & ppm <= stop) %>% 
   #dplyr::select(source,ppm, Area, group) %>% 
   #filter(!(ppm>DMSO_start&ppm<DMSO_stop)) %>% 
-  group_by(Core, group, treatment, sat_level, perc_sat, texture, soil_type) %>% 
+  group_by(Core, group, treatment, sat_level, texture) %>% 
   dplyr::summarize(area = sum(Area)) %>% 
   group_by(Core) %>% 
   dplyr::mutate(total = sum(area),
                 relabund = round((area/total)*100,2))
-# %>% mutate(pos = cumsum(relabund)- relabund/2)
 
 #
-
-
 ## ----
 # relative abundance by treatment
 rel_abund_trt = 

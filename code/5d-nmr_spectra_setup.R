@@ -23,7 +23,7 @@ cat("ACTION: choose correct value of BINSET
 
 BINSET = "Clemente2012"
 
-bins = read_csv("nmr_bins.csv")
+bins = read_csv("data/nmr_bins.csv")
 bins2 = 
   bins %>% 
   # here we select only the BINSET we chose above
@@ -41,26 +41,6 @@ WATER_stop = 4
 
 DMSO_start = 2.20
 DMSO_stop = 2.75
-
-## bins for relative abundance
-
-
-
-
-
-## ALIPHATIC1_START = bins2$shift[bins2=="aliphatic1_start"]
-## ALIPHATIC1_STOP = bins2$shift[bins2=="aliphatic1_stop"]
-## ALIPHATIC2_START = bins2$shift[bins2=="aliphatic2_start"]
-## ALIPHATIC2_STOP = bins2$shift[bins2=="aliphatic2_stop"]
-## OALKYL_START = bins2$shift[bins2=="oalkyl_start"]
-## OALKYL_STOP = bins2$shift[bins2=="oalkyl_stop"]
-## ALPHAH_START = bins2$shift[bins2=="alphah_start"]
-## ALPHAH_STOP = bins2$shift[bins2=="alphah_stop"]
-## AROMATIC_START = bins2$shift[bins2=="aromatic_start"]
-## AROMATIC_STOP = bins2$shift[bins2=="aromatic_stop"]
-## AMIDE_START = bins2$shift[bins2=="amide_start"]
-## AMIDE_STOP = bins2$shift[bins2=="amide_stop"]
-
 
 ## 3. spectra plot parameters ----
 gg_nmr =
