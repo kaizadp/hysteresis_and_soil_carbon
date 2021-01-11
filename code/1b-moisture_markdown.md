@@ -5,9 +5,9 @@
 
 Tracking moisture in soil cores
 
-Run: 2019-11-11
+Run: 2021-01-11
 
-![](README-unnamed-chunk-1-1.png)<!-- -->
+![](images_moisture_tracking/unnamed-chunk-1-1.png)<!-- -->
 
     #> [1] "Current moisture conditions"
 
@@ -35,3 +35,4 @@ Run: 2019-11-11
 | Soil\_sand\_sat\_W |    97.97 | 2019-11-08 14:20:00 |
 | Soil\_sat\_D       |   114.63 | 2019-10-28 14:20:00 |
 | Soil\_sat\_W       |   131.00 | 2019-11-08 14:20:00 |
+| NA                 |    59.43 | 2019-09-25 16:00:00 |

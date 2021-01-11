@@ -10,13 +10,11 @@ output:
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.path = "README-"
+  fig.path = "images_moisture_tracking/"
 )
 options(tibble.print_min = 5, tibble.print_max = 5)
-library(drake)
-library(ggplot2)
+source("code/0-hysteresis_packages.R")
 theme_set(theme_bw())
-library(dplyr)
 ```
 
 # HYSTERESIS
@@ -25,9 +23,7 @@ Tracking moisture in soil cores
 Run: `r Sys.Date()`
 
 ```{r, echo=FALSE, message=FALSE}
-source("1-moisture_tracking.R")
-
-# readd("massdata") %>% 
+source("code/1-moisture_tracking.R")
 
 mass %>% group_by(Core) %>% 
   dplyr::mutate(Hours = as.integer(difftime(Stop_datetime, min(Stop_datetime), units = "hours"))) ->
