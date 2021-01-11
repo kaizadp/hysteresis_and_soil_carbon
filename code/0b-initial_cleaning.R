@@ -74,7 +74,7 @@ core_key =
                 Water_g = MoistWt_g - DryWt_g,
                 Moisture_perc = round(((Water_g / DryWt_g) * 100), 2)) %>% 
   dplyr::select(-(EmptyWt_g:Sand_g), -(MoistWt_g:Water_g)) %>% 
-  dplyr::select(Core, treatment, texture, sat_level, DryWt_g, Carbon_g)
+  dplyr::select(Core, treatment, texture, Core_assignment, Moisture_perc, sat_level, DryWt_g, Carbon_g)
 
 ### OUTPUT
 write.csv(core_key,COREKEY, row.names = F,na = "")
