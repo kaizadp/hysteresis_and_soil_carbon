@@ -13,6 +13,11 @@ knitr::opts_chunk$set(dpi = 300,
 
 ### How are soil carbon dynamics influenced by drying vs. wetting events? 
 
+This repository contains data and code for the manuscript: **Soil carbon dynamics during drying vs. rewetting: importance of antecedent moisture conditions**
+
+Kaizad F. Patel et al.  
+
+
 ---
 
 ```{r map, fig.width=1.5, fig.height=1.5, eval=FALSE}
@@ -37,6 +42,8 @@ plot_usmap(include = c("WA")) +
 
 ---
 
+### EXPERIMENTAL SETUP
+
 ||Soil 1|Soil 2|
 |--|--|--|
 || BC soil | BC + Accusand|
@@ -44,29 +51,46 @@ Texture| SCL | SL|
 Total C (%)| 8.34 %| 5.56% |
 Saturation moisture| 140% w/w| 100% w/w
 
-	moisture (5 levels): 100% saturated, 75% w/w, 50%, 35%, 5% (air dry)
-		+ field moist  
-	treatment (2 levels): wetting, drying  
-	texture (2 levels): sandy clay loam (SCL), sandy loam (SL)  
+
+- moisture (5 levels): 
+  1. 100% saturated, 
+  1. 75%,
+  1. 50%, 
+  1. 35%, 
+  1. 5% (air dry)
+  - *plus field moist*  
+- treatment (2 levels): 
+  1. wetting, 
+  1. drying  
+- texture (2 levels): 
+  1. sandy clay loam (SCL), 
+  1. sandy loam (SL)  
 
 ----
 
-### code/
-`1-moisture_tracking.R`:	tracks moisture in cores for pre-incubation drying  
-`2-hyprop`: water retention curves  
-`3-picarro`: respiration  
-`4-wsoc`: water soluble organic carbon analysis
+### DIRECTORY STRUCTURE
+
+```{r, echo = TRUE, eval = FALSE}
+home
+|------ code/
+|------ data/
+|         |------ fticr/
+|         |------ nmr_peaks/
+|         |------ nmr_spectra/
+|         |------ picarro_data/
+|         |------ processed/
+|         |------ wrc/
+|         |------ wsoc_data/
+|------ markdown/
+|------ outputs/
+|
+|------ hysteresis.Rproj
+|------ README
+  
+
+```
 
 
-### data/
-`core_key` core assignments
-
-`core_weights` 
-
- - `initial` initial weights when cores were packed. includes empty weights
- - `Mass_tracking` core weights for pre-incubation drying. Also includes Picarro valve assignments.
- - ignore tabs marked `x_`
- 
  
 ----
  
