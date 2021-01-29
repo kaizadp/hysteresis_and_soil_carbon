@@ -7,13 +7,13 @@
 
 ## WATER RETENTION CURVES
 
-![](images/manuscript_figures/wrc_drying-1.png)<!-- -->![](images/manuscript_figures/wrc_drying-2.png)<!-- -->
+![](images/manuscript_figures/wrc_drying-1.png)<!-- -->![](images/manuscript_figures/wrc_drying-2.png)<!-- -->![](images/manuscript_figures/wrc_drying-3.png)<!-- -->
 
 ![](images/manuscript_figures/wrc_more-1.png)<!-- -->![](images/manuscript_figures/wrc_more-2.png)<!-- -->
 
 ![](images/manuscript_figures/wrc_release-1.png)<!-- -->
 
-![](images/manuscript_figures/appendix1_wrc-1.png)<!-- -->
+![](images/manuscript_figures/appendix1_wrc-1.png)<!-- -->![](images/manuscript_figures/appendix1_wrc-2.png)<!-- -->
 
 -----
 
@@ -106,7 +106,7 @@ h = agricolae::HSD.test(aov_wsoc_fm, trt = "texture");h
     #> adonis2(formula = relabund2$DV ~ treatment * sat_level, data = relabund2)
     #>                     Df SumOfSqs      R2       F Pr(>F)    
     #> treatment            1 0.018955 0.22247 17.2485  0.001 ***
-    #> sat_level            1 0.004090 0.04800  3.7217  0.036 *  
+    #> sat_level            1 0.004090 0.04800  3.7217  0.041 *  
     #> treatment:sat_level  1 0.011607 0.13623 10.5627  0.001 ***
     #> Residual            46 0.050550 0.59330                   
     #> Total               49 0.085202 1.00000                   
@@ -160,10 +160,10 @@ PERMANOVA: treatment and moisture level had a significant influence
     #>                     Df SumOfSqs      R2       F Pr(>F)    
     #> treatment            2   1.9419 0.31916 27.9847  0.001 ***
     #> sat_level            1   0.7115 0.11694 20.5067  0.001 ***
-    #> texture              1   0.0620 0.01019  1.7869  0.159    
-    #> treatment:sat_level  1   0.0724 0.01190  2.0875  0.116    
-    #> sat_level:texture    1   0.0542 0.00891  1.5630  0.217    
-    #> treatment:texture    2   0.1545 0.02539  2.2262  0.076 .  
+    #> texture              1   0.0620 0.01019  1.7869  0.186    
+    #> treatment:sat_level  1   0.0724 0.01190  2.0875  0.110    
+    #> sat_level:texture    1   0.0542 0.00891  1.5630  0.198    
+    #> treatment:texture    2   0.1545 0.02539  2.2262  0.064 .  
     #> Residual            89   3.0880 0.50751                   
     #> Total               97   6.0846 1.00000                   
     #> ---
@@ -177,7 +177,7 @@ PERMANOVA: treatment and moisture level had a significant influence
     #>                     Df SumOfSqs      R2       F Pr(>F)    
     #> treatment            2   1.9419 0.31916 26.8456  0.001 ***
     #> sat_level            1   0.7115 0.11694 19.6720  0.001 ***
-    #> treatment:sat_level  1   0.0674 0.01108  1.8647  0.138    
+    #> treatment:sat_level  1   0.0674 0.01108  1.8647  0.145    
     #> Residual            93   3.3637 0.55282                   
     #> Total               97   6.0846 1.00000                   
     #> ---
@@ -217,7 +217,7 @@ peaks in treatments
 
 ### Session Info
 
-Run: 2021-01-11
+Run: 2021-01-29
 
     #> R version 4.0.2 (2020-06-22)
     #> Platform: x86_64-apple-darwin17.0 (64-bit)
@@ -234,40 +234,40 @@ Run: 2021-01-11
     #> [1] stats     graphics  grDevices utils     datasets  methods   base     
     #> 
     #> other attached packages:
-    #>  [1] ggpubr_0.4.0       ape_5.4-1          scales_1.1.1       patchwork_1.0.1   
-    #>  [5] vegan_2.5-6        permute_0.9-5      soilpalettes_0.1.0 forcats_0.5.0     
-    #>  [9] stringr_1.4.0      dplyr_1.0.1        purrr_0.3.4        readr_1.3.1       
-    #> [13] tidyr_1.1.1        tibble_3.0.3       tidyverse_1.3.0    ggbiplot_0.55     
-    #> [17] picarro.data_0.1.1 drake_7.12.4       multcomp_1.4-13    TH.data_1.0-10    
-    #> [21] MASS_7.3-51.6      survival_3.2-3     mvtnorm_1.1-1      agricolae_1.3-3   
-    #> [25] car_3.0-9          carData_3.0-4      nlme_3.1-148       stringi_1.4.6     
-    #> [29] ggExtra_0.9        ggalt_0.6.2        ggplot2_3.3.2      reshape2_1.4.4    
-    #> [33] knitr_1.29         qwraps2_0.4.2      cowplot_1.0.0      data.table_1.13.0 
+    #>  [1] ggpubr_0.4.0       ape_5.4-1          scales_1.1.1       patchwork_1.1.1   
+    #>  [5] vegan_2.5-7        permute_0.9-5      soilpalettes_0.1.0 forcats_0.5.0     
+    #>  [9] stringr_1.4.0      dplyr_1.0.2        purrr_0.3.4        readr_1.4.0       
+    #> [13] tidyr_1.1.2        tibble_3.0.4       tidyverse_1.3.0    ggbiplot_0.55     
+    #> [17] picarro.data_0.1.1 drake_7.13.0       multcomp_1.4-15    TH.data_1.0-10    
+    #> [21] MASS_7.3-53        survival_3.2-7     mvtnorm_1.1-1      agricolae_1.3-3   
+    #> [25] car_3.0-10         carData_3.0-4      nlme_3.1-151       stringi_1.5.3     
+    #> [29] ggExtra_0.9        ggalt_0.6.2        ggplot2_3.3.3      reshape2_1.4.4    
+    #> [33] knitr_1.31         qwraps2_0.5.0      cowplot_1.1.1      data.table_1.13.6 
     #> [37] Rmisc_1.5          plyr_1.8.6         lattice_0.20-41    luzlogr_0.2.0     
-    #> [41] lubridate_1.7.9    readxl_1.3.1      
+    #> [41] lubridate_1.7.9.2  readxl_1.3.1      
     #> 
     #> loaded via a namespace (and not attached):
-    #>  [1] colorspace_1.4-1   ggsignif_0.6.0     ellipsis_0.3.1     rio_0.5.16        
-    #>  [5] fs_1.5.0           rstudioapi_0.11    farver_2.0.3       fansi_0.4.1       
-    #>  [9] xml2_1.3.2         codetools_0.2-16   splines_4.0.2      extrafont_0.17    
-    #> [13] jsonlite_1.7.0     broom_0.7.0        Rttf2pt1_1.3.8     dbplyr_1.4.4      
+    #>  [1] colorspace_2.0-0   ggsignif_0.6.0     ellipsis_0.3.1     rio_0.5.16        
+    #>  [5] fs_1.5.0           rstudioapi_0.13    farver_2.0.3       fansi_0.4.1       
+    #>  [9] xml2_1.3.2         codetools_0.2-18   splines_4.0.2      extrafont_0.17    
+    #> [13] jsonlite_1.7.2     broom_0.7.3        Rttf2pt1_1.3.8     dbplyr_2.0.0      
     #> [17] cluster_2.1.0      shiny_1.5.0        httr_1.4.2         compiler_4.0.2    
-    #> [21] backports_1.1.8    assertthat_0.2.1   Matrix_1.2-18      fastmap_1.0.1     
-    #> [25] cli_2.0.2          later_1.1.0.1      htmltools_0.5.0    prettyunits_1.1.1 
-    #> [29] tools_4.0.2        igraph_1.2.5       gtable_0.3.0       glue_1.4.1        
-    #> [33] maps_3.3.0         Rcpp_1.0.5         cellranger_1.1.0   vctrs_0.3.2       
-    #> [37] extrafontdb_1.0    xfun_0.16          rvest_0.3.6        openxlsx_4.1.5    
+    #> [21] backports_1.2.1    assertthat_0.2.1   Matrix_1.3-2       fastmap_1.0.1     
+    #> [25] cli_2.2.0          later_1.1.0.1      htmltools_0.5.1.1  prettyunits_1.1.1 
+    #> [29] tools_4.0.2        igraph_1.2.6       gtable_0.3.0       glue_1.4.2        
+    #> [33] maps_3.3.0         Rcpp_1.0.6         cellranger_1.1.0   vctrs_0.3.6       
+    #> [37] extrafontdb_1.0    xfun_0.20          rvest_0.3.6        openxlsx_4.2.3    
     #> [41] mime_0.9           miniUI_0.1.1.1     lifecycle_0.2.0    rstatix_0.6.0     
     #> [45] zoo_1.8-8          hms_0.5.3          promises_1.1.1     parallel_4.0.2    
-    #> [49] proj4_1.0-10       sandwich_2.5-1     RColorBrewer_1.1-2 yaml_2.2.1        
-    #> [53] curl_4.3           gridExtra_2.3      labelled_2.5.0     highr_0.8         
+    #> [49] proj4_1.0-10       sandwich_3.0-0     RColorBrewer_1.1-2 yaml_2.2.1        
+    #> [53] curl_4.3           gridExtra_2.3      labelled_2.7.0     highr_0.8         
     #> [57] klaR_0.6-15        AlgDesign_1.2.0    PNWColors_0.1.0    filelock_1.0.2    
-    #> [61] zip_2.1.0          storr_1.2.1        rlang_0.4.7        pkgconfig_2.0.3   
-    #> [65] evaluate_0.14      labeling_0.3       tidyselect_1.1.0   magrittr_1.5      
-    #> [69] R6_2.4.1           generics_0.0.2     base64url_1.4      combinat_0.0-8    
-    #> [73] DBI_1.1.0          txtq_0.2.3         mgcv_1.8-31        pillar_1.4.6      
-    #> [77] haven_2.3.1        foreign_0.8-80     withr_2.2.0        abind_1.4-5       
-    #> [81] ash_1.0-15         modelr_0.1.8       crayon_1.3.4       questionr_0.7.1   
-    #> [85] KernSmooth_2.23-17 rmarkdown_2.3      progress_1.2.2     grid_4.0.2        
-    #> [89] blob_1.2.1         reprex_0.3.0       digest_0.6.25      xtable_1.8-4      
-    #> [93] httpuv_1.5.4       munsell_0.5.0
+    #> [61] zip_2.1.1          storr_1.2.5        rlang_0.4.10       pkgconfig_2.0.3   
+    #> [65] evaluate_0.14      labeling_0.4.2     tidyselect_1.1.0   magrittr_2.0.1    
+    #> [69] R6_2.5.0           generics_0.1.0     base64url_1.4      combinat_0.0-8    
+    #> [73] DBI_1.1.0          txtq_0.2.3         mgcv_1.8-33        pillar_1.4.7      
+    #> [77] haven_2.3.1        foreign_0.8-81     withr_2.3.0        abind_1.4-5       
+    #> [81] ash_1.0-15         modelr_0.1.8       crayon_1.3.4       questionr_0.7.4   
+    #> [85] KernSmooth_2.23-18 rmarkdown_2.6.6    progress_1.2.2     grid_4.0.2        
+    #> [89] reprex_0.3.0       digest_0.6.27      xtable_1.8-4       httpuv_1.5.5      
+    #> [93] munsell_0.5.0
