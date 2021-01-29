@@ -32,7 +32,7 @@ corekey_subset =
 ## VAN KREVELEN DOMAINS
 
 ```{r vk_domains, fig.asp=1, fig.height=5}
-gg_vankrev(fticr_meta, aes(x = OC, y = HC, color = Class_detailed))+
+gg_vankrev(fticr_meta %>% filter(!is.na(Class_detailed)), aes(x = OC, y = HC, color = Class_detailed))+
   scale_color_viridis_d(option = "inferno")+
   theme_kp()
 
